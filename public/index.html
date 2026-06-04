@@ -213,12 +213,12 @@ const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'
 const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const UF=38500,COM=0.15;
 const STAGES=[
-  {k:'Por contactar',ico:'🧊',cls:'s-porcontactar',color:'#94a3b8'},
-  {k:'Contactado',ico:'📬',cls:'s-contactado',color:'#3b82f6'},
-  {k:'Respondió',ico:'💬',cls:'s-respondio',color:'#f59e0b'},
-  {k:'Reunión',ico:'🤝',cls:'s-reunion',color:'#8b5cf6'},
-  {k:'Propuesta',ico:'📄',cls:'s-propuesta',color:'#f97316'},
-  {k:'Ganado',ico:'🏆',cls:'s-ganado',color:'#22c55e'},
+  {k:'Por contactar',ico:'',cls:'s-porcontactar',color:'#94a3b8'},
+  {k:'Contactado',ico:'',cls:'s-contactado',color:'#3b82f6'},
+  {k:'Respondió',ico:'',cls:'s-respondio',color:'#f59e0b'},
+  {k:'Reunión',ico:'',cls:'s-reunion',color:'#8b5cf6'},
+  {k:'Propuesta',ico:'',cls:'s-propuesta',color:'#f97316'},
+  {k:'Ganado',ico:'',cls:'s-ganado',color:'#22c55e'},
 ];
 const ORD={'Reunión':0,'Respondió':1,'Propuesta':2,'En proceso':3,'Contactado':4,'Por contactar':5,'On hold':6,'Ganado':7,'No':8};
 function bc(s){return {'Por contactar':'b-pc','Contactado':'b-co','Respondió':'b-re','Reunión':'b-ru','Propuesta':'b-pr','Ganado':'b-ga','On hold':'b-oh','No':'b-no','En proceso':'b-ep'}[s]||'b-pc';}
