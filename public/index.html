@@ -406,6 +406,7 @@ function showToast(m){const t=document.getElementById('toast');t.textContent=m;t
 const now=new Date();
 document.getElementById('day-pill').textContent=DIAS[now.getDay()]+' '+now.getDate()+'/'+String(now.getMonth()+1).padStart(2,'0');
 renderAll();
+syncInstantly();
 </script>
 </body>
 </html>
