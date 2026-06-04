@@ -631,57 +631,11 @@ saveLS();
 syncInstantly();
 loadTips();
 
-async function loadTips(){
+function loadTips(){
   const box=document.getElementById('tips-grid');
   box.innerHTML='<div class="tips-loading"><div class="spinner"></div> Analizando tu pipeline...</div>';
-
-  const hoy=new Date();
-  const diaSemana=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][hoy.getDay()];
-  const resumen=contacts.filter(c=>c.status!=='No').map(c=>
-    `${c.emp} (${c.cargo||'?'}) — ${c.status} — ${getDias(c)}d sin contacto — canal: ${c.canal||'?'} — notas: ${c.notas||'ninguna'}`
-  ).join('\n');
-
-  const rubros={};
-  contacts.forEach(c=>{
-    const r=inferRubro(c.emp);
-    if(r) rubros[r]=(rubros[r]||0)+1;
-  });
-  const rubrosStr=Object.entries(rubros).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k}: ${v}`).join(', ');
-
-  const prompt=`Eres un coach experto en ventas B2B para consultoras de operaciones y logística en Chile.
-Hoy es ${diaSemana}.
-
-Pipeline actual del vendedor:
-${resumen}
-
-Rubros identificados en el pipeline: ${rubrosStr}
-
-Genera exactamente 3 insights accionables y específicos para este vendedor. Cada insight debe:
-- Basarse en los datos reales del pipeline (empresas, rubros, días sin contacto, canales)
-- Incluir un consejo concreto, no genérico
-- Puede ser sobre: mejores días/horarios para contactar, patrones del pipeline, rubros con mayor oportunidad, errores comunes, técnicas específicas
-
-Responde SOLO en JSON, sin markdown, sin explicaciones. Formato exacto:
-[
-  {"icono":"💡","label":"Título corto","texto":"Consejo concreto de 1-2 oraciones basado en los datos."},
-  {"icono":"📊","label":"Título corto","texto":"Consejo concreto."},
-  {"icono":"🎯","label":"Título corto","texto":"Consejo concreto."}
-]`;
-
-  try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        messages:[{role:'user',content:prompt}]
-      })
-    });
-    const data=await resp.json();
-    const raw=data.content.map(b=>b.text||'').join('');
-    const clean=raw.replace(/```json|```/g,'').trim();
-    const tips=JSON.parse(clean);
+  setTimeout(()=>{
+    const tips=generarInsights();
     box.innerHTML=tips.map(t=>`
       <div class="tip-item">
         <div class="tip-ico">${t.icono}</div>
@@ -690,9 +644,76 @@ Responde SOLO en JSON, sin markdown, sin explicaciones. Formato exacto:
           <div class="tip-text">${t.texto}</div>
         </div>
       </div>`).join('');
-  }catch(e){
-    box.innerHTML='<div style="font-size:12px;color:#94a3b8;padding:4px 0">No se pudo cargar. <span style="cursor:pointer;color:var(--blue)" onclick="loadTips()">Reintentar</span></div>';
+  },400);
+}
+
+function generarInsights(){
+  const activos=contacts.filter(c=>c.status!=='No'&&c.status!=='Ganado');
+  const hoy=new Date();
+  const dia=hoy.getDay();
+  const tips=[];
+
+  // Tip 1: día de la semana
+  const tipsDia={
+    1:{icono:'📅',label:'Lunes: activa el pipeline',texto:'El lunes es ideal para enviar primeros contactos — los decisores revisan su semana y están más receptivos a propuestas nuevas. Prioriza los "Por contactar" hoy.'},
+    2:{icono:'🔥',label:'Martes: mejor día para escribir',texto:'Martes y miércoles tienen la tasa de respuesta más alta en B2B. Es el mejor momento para hacer seguimientos y escribir a quienes llevan más de 5 días sin responder.'},
+    3:{icono:'🔥',label:'Miércoles: día peak de respuesta',texto:'Miércoles es el día con mayor tasa de apertura de emails B2B en Latinoamérica. Aprovecha para escribirle a los contactos en estado "Respondió" que llevan 3+ días.'},
+    4:{icono:'📞',label:'Jueves: cierra reuniones',texto:'El jueves es ideal para confirmar reuniones de la próxima semana. Si tienes contactos en estado "Reunión" sin fecha confirmada, hoy es el día para insistir.'},
+    5:{icono:'⚡',label:'Viernes: seguimiento express',texto:'Los viernes son buenos para mensajes cortos y directos — "¿pudiste revisar?" funciona bien. Evita propuestas largas; guárdalas para la próxima semana.'},
+    6:{icono:'😴',label:'Sábado: planifica el lunes',texto:'Pocas personas responden el fin de semana. Usa este tiempo para revisar tu pipeline, actualizar estados y preparar los mensajes que enviarás el lunes.'},
+    0:{icono:'🗓️',label:'Domingo: prepara tu semana',texto:'Revisa quién lleva más de 7 días sin contacto y prepara 3 mensajes para enviar el lunes. La semana que empieza con plan, cierra más.'},
+  };
+  tips.push(tipsDia[dia]);
+
+  // Tip 2: análisis del pipeline
+  const sinContacto=activos.filter(c=>getDias(c)>7&&c.status==='Contactado');
+  const respondieron=activos.filter(c=>c.status==='Respondió');
+  const porContactar=activos.filter(c=>c.status==='Por contactar');
+  const enReunion=activos.filter(c=>c.status==='Reunión');
+
+  if(respondieron.length>=3){
+    tips.push({icono:'🎯',label:`${respondieron.length} leads calientes`,texto:`Tienes ${respondieron.length} contactos que abrieron tu email. En promedio, solo el 20% de los que abren responden si no haces seguimiento. Escríbeles antes de que se enfríen.`});
+  } else if(sinContacto.length>=4){
+    tips.push({icono:'⚠️',label:`${sinContacto.length} contactos estancados`,texto:`${sinContacto.length} prospectos llevan más de 7 días en "Contactado" sin avance. La mayoría no responde al primer mensaje — el segundo mensaje tiene 40% más probabilidad de éxito.`});
+  } else if(porContactar.length>=5){
+    tips.push({icono:'🚀',label:`${porContactar.length} sin contactar aún`,texto:`Tienes ${porContactar.length} prospectos que nunca has contactado. Cada día que pasan sin mensaje es oportunidad perdida — prioriza los referidos primero, cierran 4x más rápido.`});
+  } else if(enReunion.length>=2){
+    tips.push({icono:'💼',label:`${enReunion.length} en etapa reunión`,texto:`Con ${enReunion.length} prospectos en reunión, el siguiente paso crítico es enviar una propuesta en menos de 48 horas post-reunión. Después de 72h la probabilidad de cierre baja 60%.`});
+  } else {
+    tips.push({icono:'📈',label:'Sigue agregando volumen',texto:'Un pipeline saludable necesita al menos 30 prospectos activos para generar 2-3 cierres al mes. Sigue prospectando en LinkedIn y Apollo aunque ya tengas reuniones agendadas.'});
   }
+
+  // Tip 3: análisis de rubros
+  const rubros={};
+  activos.forEach(c=>{const r=inferRubro(c.emp);if(r) rubros[r]=(rubros[r]||0)+1;});
+  const topRubro=Object.entries(rubros).sort((a,b)=>b[1]-a[1])[0];
+  const canales={};
+  activos.forEach(c=>{if(c.canal) canales[c.canal]=(canales[c.canal]||0)+1;});
+  const topCanal=Object.entries(canales).sort((a,b)=>b[1]-a[1])[0];
+
+  if(topRubro&&topRubro[1]>=5){
+    const consejosRubro={
+      'Transporte/Logística':'Las empresas de transporte deciden rápido cuando el dolor es operativo. Usa casos concretos de ahorro en flota o reducción de tiempos muertos en tu pitch.',
+      'Puertos/Operaciones':'El sector portuario tiene ciclos de decisión largos (60-90 días). Necesitas un contacto interno que sea tu "champion" para avanzar.',
+      'Retail/Consumo':'En retail el foco es velocidad y costo. Muestra ROI en menos de 6 meses y tendrás atención inmediata.',
+      'Alimentos':'Las empresas de alimentos priorizan cumplimiento normativo y trazabilidad. Conecta tu propuesta con esos dolores.',
+      '3PL/Operadores':'Los operadores logísticos buscan diferenciar su servicio. Posiciónate como un aliado que les da ventaja frente a sus clientes.',
+      'Minería/Industria':'Minería tiene presupuestos grandes pero procesos de compra formales. Necesitas llegar al área de operaciones, no solo a compras.',
+    };
+    tips.push({icono:'🏭',label:`Tu rubro principal: ${topRubro[0]}`,texto:consejosRubro[topRubro[0]]||`Tienes ${topRubro[1]} prospectos en ${topRubro[0]}. Especialízate en su lenguaje y dolores específicos para cerrar más rápido.`});
+  } else if(topCanal){
+    const consejosCanal={
+      'LinkedIn':'LinkedIn tiene tasa de respuesta del 25-35% en B2B cuando el mensaje es personalizado. Evita copiar-pegar el mismo texto a todos.',
+      'Email':'El email frío funciona mejor con asuntos de menos de 7 palabras y un solo call-to-action. Menos es más.',
+      'WhatsApp':'WhatsApp es el canal más efectivo en Chile para PYMES. Un mensaje directo de 2-3 líneas supera cualquier email largo.',
+      'Referido':'Los referidos cierran 4x más rápido y con menos objeciones. Pide a cada cliente satisfecho que te presente a 2 contactos.',
+    };
+    tips.push({icono:'📱',label:`Canal principal: ${topCanal[0]}`,texto:consejosCanal[topCanal[0]]||`Estás usando principalmente ${topCanal[0]}. Diversificar a 2-3 canales aumenta tu tasa de respuesta general.`});
+  } else {
+    tips.push({icono:'🌐',label:'Diversifica tus canales',texto:'Usar solo 1 canal limita tu alcance. La combinación LinkedIn + Email + WhatsApp tiene 3x más probabilidad de respuesta que cualquier canal solo.'});
+  }
+
+  return tips;
 }
 
 function inferRubro(emp){
