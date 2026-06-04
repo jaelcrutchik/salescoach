@@ -390,6 +390,7 @@ function closeModal(){document.getElementById('overlay').classList.remove('open'
 function deleteContact(){
   if(!editingId||!confirm('¿Eliminar?')) return;
   contacts=contacts.filter(x=>x.id!==editingId);
+  localStorage.setItem('ryc_contacts', JSON.stringify(contacts));
   closeModal();showToast('Eliminado');renderAll();
 }
 function saveContact(){
@@ -398,6 +399,7 @@ function saveContact(){
   const data={emp,cont:document.getElementById('f-cont').value.trim(),cargo:document.getElementById('f-cargo').value.trim(),status:document.getElementById('f-status').value,canal:document.getElementById('f-canal').value,uf:parseFloat(document.getElementById('f-uf').value)||0,horas:parseInt(document.getElementById('f-horas').value)||0,dias:parseInt(document.getElementById('f-dias').value)||0,com:parseFloat(document.getElementById('f-com').value)||15,accion:document.getElementById('f-accion').value.trim(),notas:document.getElementById('f-notas').value.trim()};
   if(editingId){const i=contacts.findIndex(x=>x.id===editingId);if(i>=0)contacts[i]={...contacts[i],...data};}
   else contacts.push({id:nextId++,...data});
+  localStorage.setItem('ryc_contacts', JSON.stringify(contacts));
   closeModal();showToast('✅ Guardado');renderAll();
 }
 document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
@@ -405,7 +407,12 @@ function showToast(m){const t=document.getElementById('toast');t.textContent=m;t
 
 const now=new Date();
 document.getElementById('day-pill').textContent=DIAS[now.getDay()]+' '+now.getDate()+'/'+String(now.getMonth()+1).padStart(2,'0');
+// Load from localStorage
+const saved = localStorage.getItem('ryc_contacts');
+if(saved) try{ contacts = JSON.parse(saved); nextId = Math.max(...contacts.map(c=>c.id))+1; }catch(e){}
+
 renderAll();
+localStorage.setItem('ryc_contacts', JSON.stringify(contacts));
 syncInstantly();
 </script>
 </body>
