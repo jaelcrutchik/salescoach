@@ -33,19 +33,19 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 .faq-title{font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
 .faq-item{font-size:11px;padding:7px 10px;background:var(--cream);border:1px solid var(--border);border-radius:6px;color:#475569;cursor:pointer}
 .faq-item:hover{background:var(--blue-l);color:var(--blue);border-color:var(--blue-m)}
-.recs-box{background:white;border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:0.85rem}
-.recs-title{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px}
-.recs-grid{display:flex;flex-direction:column;gap:7px}
-.rec-item{display:flex;align-items:flex-start;gap:10px;padding:9px 11px;border-radius:8px;border:1px solid var(--border)}
-.rec-icon{font-size:18px;flex-shrink:0;margin-top:1px}
-.rec-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px}
-.rec-text{font-size:12px;color:#475569;line-height:1.45}
-.rec-msg{font-size:11px;color:#1e40af;background:#eff6ff;border-radius:5px;padding:5px 8px;margin-top:5px;cursor:pointer;border:1px solid var(--blue-m);font-style:italic}
-.rec-msg:hover{background:var(--blue-m)}
-.rec-item.fire{background:#fff7ed;border-color:#fed7aa}.rec-item.fire .rec-label{color:#c2410c}
-.rec-item.clock{background:#eff6ff;border-color:#bfdbfe}.rec-item.clock .rec-label{color:#1d4ed8}
-.rec-item.tip{background:#f0fdf4;border-color:#bbf7d0}.rec-item.tip .rec-label{color:#15803d}
-.rec-item.warn{background:#fef9c3;border-color:#fde68a}.rec-item.warn .rec-label{color:#a16207}
+
+.tips-box{background:white;border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:0.85rem}
+.tips-title{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.tips-refresh{font-size:11px;padding:3px 9px;border-radius:6px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0}
+.tips-refresh:hover{background:var(--blue-l);color:var(--blue)}
+.tips-grid{display:flex;flex-direction:column;gap:7px}
+.tip-item{display:flex;align-items:flex-start;gap:10px;padding:9px 11px;border-radius:8px;border:1px solid #e0e7ff;background:#f8f7ff}
+.tip-item .tip-ico{font-size:16px;flex-shrink:0;margin-top:1px}
+.tip-item .tip-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#5b21b6;margin-bottom:2px}
+.tip-item .tip-text{font-size:12px;color:#475569;line-height:1.5}
+.tips-loading{font-size:12px;color:#94a3b8;padding:8px 0;display:flex;align-items:center;gap:8px}
+.spinner{width:14px;height:14px;border:2px solid #e2e8f0;border-top-color:var(--blue);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:0.85rem}
 .stat{background:white;border:1px solid var(--border);border-radius:9px;padding:9px 11px}
 .stat-label{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px;font-weight:500;margin-bottom:2px}
@@ -151,9 +151,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 
 <div class="layout">
   <div class="main">
-    <div class="recs-box">
-      <div class="recs-title">🎯 Recomendaciones del coach</div>
-      <div class="recs-grid" id="recs-grid"></div>
+
+    <div class="tips-box">
+      <div class="tips-title">
+        <span>💡 Insights del coach</span>
+        <button class="tips-refresh" onclick="loadTips()">↻ Actualizar</button>
+      </div>
+      <div class="tips-grid" id="tips-grid"><div class="tips-loading"><div class="spinner"></div> Analizando tu pipeline...</div></div>
     </div>
     <div class="stats" id="stats"></div>
     <div class="funnel">
@@ -165,7 +169,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
       <div class="section-title">Pipeline</div>
       <button class="add-btn" onclick="openModal()">+ Nuevo contacto</button>
     </div>
-    <div class="filter-btns" id="filter-btns"></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+      <div style="position:relative;flex:0 0 auto">
+        <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;color:#94a3b8">🔍</span>
+        <input id="search-input" type="text" placeholder="Buscar empresa o contacto..." oninput="renderContacts()" style="font-size:12px;padding:4px 10px 4px 26px;border:1px solid var(--border);border-radius:99px;outline:none;background:white;width:220px;font-family:var(--sans)">
+      </div>
+      <div class="filter-btns" id="filter-btns" style="margin-bottom:0;flex:1"></div>
+    </div>
     <div class="table-wrap">
       <table class="ctable" id="clist"></table>
     </div>
@@ -395,33 +405,6 @@ const UCOL={h:'#ef4444',m:'#f59e0b',l:'#22c55e'};
 
 function saveLS(){try{localStorage.setItem('ryc_contacts',JSON.stringify(contacts));}catch(e){}}
 
-function renderRecs(){
-  const now=new Date(),day=DIAS[now.getDay()];
-  const recs=[];
-  const listos=contacts.filter(c=>c.status==='Respondió'&&getDias(c)>=3);
-  const esperando=contacts.filter(c=>c.status==='Respondió'&&getDias(c)<3);
-  if(listos.length) recs.push({cls:'fire',ico:'🔥',label:'Escríbeles hoy',text:`${listos.map(c=>c.emp).join(', ')} llevan ${getDias(listos[0])}d desde que abrieron — momento ideal.`,msg:`Hola [nombre], quería saber si pudiste revisar mi mensaje. ¿Vale 15 minutos esta semana?`});
-  if(esperando.length) recs.push({cls:'tip',ico:'⏳',label:'Espera un poco más',text:`${esperando.map(c=>c.emp).join(', ')} abrieron hace menos de 3 días. El timing ideal es día 3-5.`});
-  if(contacts.find(c=>c.emp==='Tagler Foods'&&c.status!=='Ganado')) recs.push({cls:'warn',ico:'💰',label:'Cobro pendiente',text:'Tagler Foods: tienes trabajo hecho sin cobrar.',msg:'Luis, ¿cómo va el proceso de pago? Una vez confirmado te mando el informe completo.'});
-  if(contacts.find(c=>c.emp==='Dmerco')) recs.push({cls:'clock',ico:'📅',label:'Reunión por confirmar',text:`Dmerco (Marco): ${['Jueves','Viernes'].includes(day)?'hoy es buen día para insistir.':'insiste jueves o viernes.'}`,msg:'Marco, ¿quedamos la próxima semana? Propongo lunes o martes a las 10am.'});
-  const refs=contacts.filter(c=>c.canal==='Referido'&&c.status==='Por contactar');
-  if(refs.length) recs.push({cls:'tip',ico:'👥',label:'Referidos sin usar',text:`${refs.map(c=>c.emp).join(', ')} — tienes acceso directo. Cierran 4x más rápido.`});
-  if(!recs.length) recs.push({cls:'tip',ico:'✅',label:'Pipeline bajo control',text:'No hay urgencias hoy. Buen momento para agregar nuevos prospectos en Apollo.'});
-  document.getElementById('recs-grid').innerHTML=recs.map(r=>`
-    <div class="rec-item ${r.cls}">
-      <div class="rec-icon">${r.ico}</div>
-      <div style="flex:1">
-        <div class="rec-label">${r.label}</div>
-        <div class="rec-text">${r.text}</div>
-        ${r.msg?`<div class="rec-msg" onclick="copyText('${r.msg.replace(/'/g,"\\'")}')">📋 "${r.msg}" <span style="font-size:10px;opacity:0.6">(clic para copiar)</span></div>`:''}
-      </div>
-    </div>`).join('');
-}
-
-function copyText(t){
-  navigator.clipboard.writeText(t).then(()=>showToast('✅ Copiado')).catch(()=>showToast('Copia manualmente'));
-}
-
 function renderStats(){
   const act=contacts.filter(c=>c.status!=='No');
   const comEst=act.reduce((s,c)=>s+calcC(c),0);
@@ -450,7 +433,9 @@ function renderFilters(){
 function setF(f){activeFilter=f;renderFilters();renderFunnel();renderContacts();}
 
 function renderContacts(){
-  const list=activeFilter==='todos'?contacts.filter(c=>c.status!=='No'):contacts.filter(c=>c.status===activeFilter);
+  const q=(document.getElementById('search-input')?.value||'').toLowerCase().trim();
+  let list=activeFilter==='todos'?contacts.filter(c=>c.status!=='No'):contacts.filter(c=>c.status===activeFilter);
+  if(q) list=list.filter(c=>(c.emp||'').toLowerCase().includes(q)||(c.cont||'').toLowerCase().includes(q));
   const sorted=[...list].sort((a,b)=>(ORD[a.status]||9)-(ORD[b.status]||9)||getDias(b)-getDias(a));
 
   const thead=`<thead>
@@ -494,7 +479,7 @@ function renderContacts(){
   document.getElementById('clist').innerHTML=thead+`<tbody>${rows}</tbody>`;
 }
 
-function renderAll(){renderStats();renderFunnel();renderRecs();renderFilters();renderContacts();}
+function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();}
 
 async function syncInstantly(){
   const btn=document.getElementById('sync-btn');
@@ -599,7 +584,7 @@ function closeModal(){document.getElementById('overlay').classList.remove('open'
 function deleteContact(){
   if(!editingId||!confirm('¿Eliminar?')) return;
   contacts=contacts.filter(x=>x.id!==editingId);
-  closeModal();saveLS();showToast('Eliminado');renderAll();
+  closeModal();saveLS();showToast('Eliminado');renderAll();loadTips();
 }
 
 function saveContact(){
@@ -624,7 +609,7 @@ function saveContact(){
   } else {
     contacts.push({id:nextId++,...data,historial:[]});
   }
-  closeModal();saveLS();showToast('✅ Guardado');renderAll();
+  closeModal();saveLS();showToast('✅ Guardado');renderAll();loadTips();
 }
 
 ['overlay','hist-overlay','consejo-overlay'].forEach(id=>{
@@ -644,6 +629,83 @@ try{
 renderAll();
 saveLS();
 syncInstantly();
+loadTips();
+
+async function loadTips(){
+  const box=document.getElementById('tips-grid');
+  box.innerHTML='<div class="tips-loading"><div class="spinner"></div> Analizando tu pipeline...</div>';
+
+  const hoy=new Date();
+  const diaSemana=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][hoy.getDay()];
+  const resumen=contacts.filter(c=>c.status!=='No').map(c=>
+    `${c.emp} (${c.cargo||'?'}) — ${c.status} — ${getDias(c)}d sin contacto — canal: ${c.canal||'?'} — notas: ${c.notas||'ninguna'}`
+  ).join('\n');
+
+  const rubros={};
+  contacts.forEach(c=>{
+    const r=inferRubro(c.emp);
+    if(r) rubros[r]=(rubros[r]||0)+1;
+  });
+  const rubrosStr=Object.entries(rubros).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k}: ${v}`).join(', ');
+
+  const prompt=`Eres un coach experto en ventas B2B para consultoras de operaciones y logística en Chile.
+Hoy es ${diaSemana}.
+
+Pipeline actual del vendedor:
+${resumen}
+
+Rubros identificados en el pipeline: ${rubrosStr}
+
+Genera exactamente 3 insights accionables y específicos para este vendedor. Cada insight debe:
+- Basarse en los datos reales del pipeline (empresas, rubros, días sin contacto, canales)
+- Incluir un consejo concreto, no genérico
+- Puede ser sobre: mejores días/horarios para contactar, patrones del pipeline, rubros con mayor oportunidad, errores comunes, técnicas específicas
+
+Responde SOLO en JSON, sin markdown, sin explicaciones. Formato exacto:
+[
+  {"icono":"💡","label":"Título corto","texto":"Consejo concreto de 1-2 oraciones basado en los datos."},
+  {"icono":"📊","label":"Título corto","texto":"Consejo concreto."},
+  {"icono":"🎯","label":"Título corto","texto":"Consejo concreto."}
+]`;
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await resp.json();
+    const raw=data.content.map(b=>b.text||'').join('');
+    const clean=raw.replace(/```json|```/g,'').trim();
+    const tips=JSON.parse(clean);
+    box.innerHTML=tips.map(t=>`
+      <div class="tip-item">
+        <div class="tip-ico">${t.icono}</div>
+        <div>
+          <div class="tip-label">${t.label}</div>
+          <div class="tip-text">${t.texto}</div>
+        </div>
+      </div>`).join('');
+  }catch(e){
+    box.innerHTML='<div style="font-size:12px;color:#94a3b8;padding:4px 0">No se pudo cargar. <span style="cursor:pointer;color:var(--blue)" onclick="loadTips()">Reintentar</span></div>';
+  }
+}
+
+function inferRubro(emp){
+  emp=emp.toLowerCase();
+  if(emp.includes('transport')||emp.includes('logis')||emp.includes('truck')||emp.includes('flota')) return 'Transporte/Logística';
+  if(emp.includes('port')||emp.includes('terminal')||emp.includes('almar')||emp.includes('granel')) return 'Puertos/Operaciones';
+  if(emp.includes('clinic')||emp.includes('salud')||emp.includes('medic')) return 'Salud';
+  if(emp.includes('food')||emp.includes('chocolat')||emp.includes('sushi')||emp.includes('fête')) return 'Alimentos';
+  if(emp.includes('coca')||emp.includes('miniso')||emp.includes('forus')||emp.includes('casa idea')) return 'Retail/Consumo';
+  if(emp.includes('dhl')||emp.includes('id log')||emp.includes('rfp')) return '3PL/Operadores';
+  if(emp.includes('arauco')||emp.includes('sqm')||emp.includes('neulin')) return 'Minería/Industria';
+  return null;
+}
 </script>
 </body>
 </html>
