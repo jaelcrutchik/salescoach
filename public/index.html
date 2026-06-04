@@ -40,6 +40,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 .rec-icon{font-size:18px;flex-shrink:0;margin-top:1px}
 .rec-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px}
 .rec-text{font-size:12px;color:#475569;line-height:1.45}
+.rec-msg{font-size:11px;color:#1e40af;background:#eff6ff;border-radius:5px;padding:5px 8px;margin-top:5px;cursor:pointer;border:1px solid var(--blue-m);font-style:italic}
+.rec-msg:hover{background:var(--blue-m)}
 .rec-item.fire{background:#fff7ed;border-color:#fed7aa}.rec-item.fire .rec-label{color:#c2410c}
 .rec-item.clock{background:#eff6ff;border-color:#bfdbfe}.rec-item.clock .rec-label{color:#1d4ed8}
 .rec-item.tip{background:#f0fdf4;border-color:#bbf7d0}.rec-item.tip .rec-label{color:#15803d}
@@ -79,11 +81,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 .cc-name{font-size:13px;font-weight:600}
 .cc-sub{font-size:11px;color:#94a3b8;margin-top:1px}
 .cc-action{font-size:10px;color:#64748b;margin-top:2px;font-style:italic}
-.cc-btns{display:flex;gap:4px;margin-top:5px}
+.cc-timing{font-size:10px;margin-top:3px;font-weight:500}
+.cc-btns{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
 .cc-btn{font-size:10px;padding:2px 8px;border-radius:5px;border:1px solid var(--border);background:white;cursor:pointer;color:#64748b}
 .cc-btn:hover{background:var(--blue-l);color:var(--blue)}
 .cc-btn.ask{color:var(--purple);border-color:#ddd6fe}
 .cc-btn.ask:hover{background:var(--purple-l)}
+.cc-btn.hist{color:var(--green);border-color:#bbf7d0}
+.cc-btn.hist:hover{background:#f0fdf4}
 .cc-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
 .badge{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:500;white-space:nowrap}
 .b-pc{background:#f1f5f9;color:#475569}
@@ -100,7 +105,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 .cc-dias.hot{color:var(--red);font-weight:600}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:center;justify-content:center}
 .overlay.open{display:flex}
-.modal{background:white;border-radius:14px;padding:1.5rem;width:440px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.15)}
+.modal{background:white;border-radius:14px;padding:1.5rem;width:460px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.15)}
 .modal h3{font-family:var(--serif);font-size:19px;margin-bottom:1.1rem}
 .field{margin-bottom:10px}
 .field label{font-size:11px;color:#64748b;display:block;margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px}
@@ -112,6 +117,22 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 .btn-c{font-size:13px;padding:7px 15px;border-radius:7px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer}
 .btn-s{font-size:13px;padding:7px 15px;border-radius:7px;border:none;background:var(--blue);color:white;cursor:pointer;font-weight:500}
 .btn-del{font-size:13px;padding:7px 15px;border-radius:7px;border:none;background:var(--red-l);color:var(--red);cursor:pointer;font-weight:500;margin-right:auto}
+/* HISTORIAL */
+.hist-entries{display:flex;flex-direction:column;gap:7px;margin-top:0.75rem;max-height:280px;overflow-y:auto}
+.hist-entry{padding:8px 11px;background:var(--cream);border-radius:8px;border:1px solid var(--border)}
+.hist-type{font-size:10px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:0.4px}
+.hist-date{font-size:10px;color:#94a3b8;margin-bottom:3px}
+.hist-text{font-size:12px;color:var(--ink);line-height:1.4}
+.hist-add{display:flex;gap:6px;margin-top:10px}
+.hist-input{flex:1;font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:7px;outline:none;font-family:var(--sans);background:white}
+.hist-input:focus{border-color:var(--blue)}
+.hist-sel{font-size:12px;padding:7px 8px;border:1px solid var(--border);border-radius:7px;outline:none;background:white}
+.hist-add-btn{font-size:12px;padding:7px 12px;border:none;background:var(--blue);color:white;border-radius:7px;cursor:pointer;white-space:nowrap}
+/* CONSEJO */
+.consejo-ctx{font-size:12px;color:#64748b;margin-bottom:10px;line-height:1.5}
+.consejo-msg{background:#eff6ff;border:1px solid var(--blue-m);border-radius:8px;padding:12px 14px;font-size:13px;color:#1e40af;line-height:1.6;margin-bottom:10px}
+.copy-btn{font-size:12px;padding:6px 14px;border:none;background:var(--blue);color:white;border-radius:6px;cursor:pointer}
+.copy-btn:hover{background:#1d4ed8}
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:8px 16px;border-radius:8px;font-size:12px;opacity:0;transition:opacity 0.3s;z-index:200;pointer-events:none}
 .toast.show{opacity:1}
 </style>
@@ -154,7 +175,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
       </div>
     </div>
     <div class="panel-body">
-      <p class="panel-desc">Haz clic en <strong>🎯 Pedir consejo</strong> en cualquier contacto, o abre Claude directamente.</p>
+      <p class="panel-desc">Haz clic en <strong>🎯 Consejo</strong> en cualquier contacto para ver el mensaje sugerido, o abre Claude directamente.</p>
       <a href="https://claude.ai" target="_blank" class="coach-link">🎯 Abrir Sales Coach</a>
       <div class="faq-title" style="margin-top:8px">Preguntas frecuentes</div>
       <div class="faq-item" onclick="window.open('https://claude.ai','_blank')">¿A quién contacto hoy?</div>
@@ -166,6 +187,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
   </div>
 </div>
 
+<!-- MODAL EDITAR -->
 <div class="overlay" id="overlay">
   <div class="modal">
     <h3 id="modal-title">Nuevo contacto</h3>
@@ -194,9 +216,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
       <div class="field"><label>Horas estimadas</label><input id="f-horas" type="number" placeholder="ej: 20" min="0"></div>
     </div>
     <div class="field-row">
-      <div class="field"><label>Días sin contacto</label><input id="f-dias" type="number" placeholder="0" min="0"></div>
+      <div class="field"><label>Fecha último contacto</label><input id="f-fecha" type="date"></div>
       <div class="field"><label>Comisión %</label><input id="f-com" type="number" placeholder="15" min="0" max="100"></div>
     </div>
+    <div class="field"><label>Email</label><input id="f-email" type="email" placeholder="email@empresa.cl"></div>
     <div class="field"><label>Próxima acción</label><input id="f-accion" type="text" placeholder="ej: llamar jueves"></div>
     <div class="field"><label>Notas</label><textarea id="f-notas" placeholder="Contexto, historia, estado actual..."></textarea></div>
     <div class="modal-btns">
@@ -206,12 +229,45 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
     </div>
   </div>
 </div>
+
+<!-- MODAL HISTORIAL -->
+<div class="overlay" id="hist-overlay">
+  <div class="modal" style="width:500px">
+    <h3 id="hist-title">Historial</h3>
+    <div class="hist-entries" id="hist-entries"></div>
+    <div class="hist-add">
+      <select class="hist-sel" id="hist-type">
+        <option>Email</option><option>LinkedIn</option><option>WhatsApp</option>
+        <option>Llamada</option><option>Reunión</option><option>Nota</option>
+      </select>
+      <input class="hist-input" id="hist-input" type="text" placeholder="¿Qué pasó? ej: Respondió positivo, agenda reunión...">
+      <button class="hist-add-btn" onclick="addHist()">+ Agregar</button>
+    </div>
+    <div class="modal-btns" style="margin-top:1rem">
+      <button class="btn-s" onclick="closeHist()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONSEJO -->
+<div class="overlay" id="consejo-overlay">
+  <div class="modal" style="width:500px">
+    <h3 id="consejo-title">Consejo</h3>
+    <div class="consejo-ctx" id="consejo-ctx"></div>
+    <div class="consejo-msg" id="consejo-msg"></div>
+    <button class="copy-btn" id="copy-btn" onclick="copyConsejo()">📋 Copiar mensaje</button>
+    <div class="modal-btns" style="margin-top:1rem">
+      <button class="btn-s" onclick="closeConsejo()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-const UF=38500,COM=0.15;
+const UF=38500;
 const STAGES=[
   {k:'Por contactar',ico:'',cls:'s-porcontactar',color:'#94a3b8'},
   {k:'Contactado',ico:'',cls:'s-contactado',color:'#94a3b8'},
@@ -223,84 +279,148 @@ const STAGES=[
 const ORD={'Reunión':0,'Respondió':1,'Propuesta':2,'En proceso':3,'Contactado':4,'Por contactar':5,'On hold':6,'Ganado':7,'No':8};
 function bc(s){return {'Por contactar':'b-pc','Contactado':'b-co','Respondió':'b-re','Reunión':'b-ru','Propuesta':'b-pr','Ganado':'b-ga','On hold':'b-oh','No':'b-no','En proceso':'b-ep'}[s]||'b-pc';}
 
+// Días automáticos desde fecha
+function getDias(c){
+  if(c.fechaContacto){
+    const d=Math.floor((new Date()-new Date(c.fechaContacto))/(1000*60*60*24));
+    return Math.max(0,d);
+  }
+  return c.dias||0;
+}
+
+// Timing inteligente
+function timing(c){
+  const d=getDias(c);
+  if(c.status==='Respondió'){
+    if(d<3) return {txt:`Espera ${3-d} día${3-d>1?'s':''} más`,color:'#22c55e'};
+    if(d<=6) return {txt:'Momento ideal para escribir',color:'#f59e0b'};
+    return {txt:'Urgente: escríbele hoy',color:'#ef4444'};
+  }
+  if(c.status==='Contactado'){
+    if(d<5) return {txt:`Seguimiento en ${5-d} días`,color:'#22c55e'};
+    if(d<=8) return {txt:'Momento ideal para seguimiento',color:'#f59e0b'};
+    return {txt:'Llevas mucho tiempo sin contacto',color:'#ef4444'};
+  }
+  if(c.status==='Reunión'){
+    if(d<=3) return {txt:'Reunión reciente',color:'#22c55e'};
+    if(d<=7) return {txt:'Confirma próximos pasos',color:'#f59e0b'};
+    return {txt:'Urgente: confirma avance',color:'#ef4444'};
+  }
+  return null;
+}
+
+// Mensaje sugerido por estado
+function getMensaje(c){
+  const nombre=c.cont?.split(' ')[0]||'[Nombre]';
+  const dias=getDias(c);
+  if(c.status==='Respondió')
+    return {ctx:`${nombre} abrió tu email hace ${dias} días. El momentum está ahí — un mensaje corto y directo.`,msg:`Hola ${nombre}, quería saber si pudiste revisar mi mensaje. ¿Vale 15 minutos esta semana para conversar?`};
+  if(c.status==='Contactado'&&dias>=5)
+    return {ctx:`Llevas ${dias} días desde el primer contacto. La mayoría responde al segundo mensaje.`,msg:`Hola ${nombre}, una pregunta directa: ¿están midiendo los indicadores clave de su operación hoy? Si la respuesta es "no del todo", probablemente vale conversar 15 minutos.`};
+  if(c.status==='Reunión')
+    return {ctx:`Tuviste reunión con ${nombre}. Es clave confirmar el siguiente paso concreto.`,msg:`Hola ${nombre}, gracias por la reunión. Me gustaría avanzar en lo que conversamos — ¿podemos agendar un siguiente paso esta semana?`};
+  if(c.status==='Por contactar')
+    return {ctx:`Aún no has contactado a ${nombre}. Tienes su información — es el momento.`,msg:`Hola ${nombre}, mi nombre es Jael, trabajo con Rave & Crutchik. Venimos de liderar operaciones en Nestlé, Unilever, SQM y Enex. ¿Vale 15 minutos para conversar?`};
+  return {ctx:`Contacto en etapa ${c.status}.`,msg:`Hola ${nombre}, ¿cómo van las cosas? Me gustaría retomar nuestra conversación y ver si podemos avanzar.`};
+}
+
 let contacts=[
-  {id:1,emp:'Niu Sushi',cont:'Alan Schoihet',cargo:'Dueño',status:'No',canal:'',dias:30,uf:0,horas:0,accion:'',notas:'No respondió',com:15},
-  {id:2,emp:'Japi Jane',cont:'Mail de contacto',cargo:'Dueño',status:'No',canal:'',dias:30,uf:0,horas:0,accion:'',notas:'No respondió',com:15},
-  {id:3,emp:'Coca Cola',cont:'Romina Elgueta',cargo:'Mejora continua',status:'No',canal:'',dias:30,uf:0,horas:0,accion:'',notas:'Eligieron otra empresa',com:15},
-  {id:4,emp:'Benbo',cont:'Nicolás Borobio',cargo:'Dueño',status:'On hold',canal:'',dias:20,uf:0,horas:0,accion:'Esperar que se ordenen',notas:'Esperando a ordenarse',com:15},
-  {id:5,emp:'Tagler Foods',cont:'Luis Cheriff',cargo:'Gerente Operaciones',status:'Reunión',canal:'Reunión',dias:21,uf:3.5,horas:40,accion:'Cobrar y entregar informe',notas:'Informe visita pendiente, pago atrasado',com:15},
-  {id:6,emp:'HDG',cont:'Seba',cargo:'Producción',status:'Contactado',canal:'Email',dias:10,uf:0,horas:0,accion:'Seguimiento email',notas:'',com:15},
-  {id:7,emp:'Coca Cola',cont:'Cristina Arancibia',cargo:'Mejora continua',status:'On hold',canal:'',dias:15,uf:0,horas:0,accion:'Esperar info',notas:'Sin info por ahora',com:15},
-  {id:8,emp:'Forus',cont:'Caro',cargo:'Gerente Marketing',status:'On hold',canal:'',dias:21,uf:0,horas:0,accion:'Investigar antes de contactar',notas:'',com:15},
-  {id:9,emp:'Arauco',cont:'Luciano Villarroel',cargo:'-',status:'On hold',canal:'',dias:30,uf:0,horas:0,accion:'Retomar en 2 semanas',notas:'',com:15},
-  {id:10,emp:'Neumaérica',cont:'Gabriela Rodriguez',cargo:'Gerente Comercial',status:'Contactado',canal:'Email',dias:21,uf:0,horas:0,accion:'Mail seguimiento',notas:'',com:15},
-  {id:11,emp:'Transportes Jofre Hidalgo',cont:'-',cargo:'-',status:'Contactado',canal:'',dias:14,uf:0,horas:0,accion:'Seguimiento',notas:'',com:15},
-  {id:12,emp:'Transportes Sahid',cont:'Enrique Peña / Felipe Armijo',cargo:'Dueño',status:'Contactado',canal:'WhatsApp',dias:14,uf:0,horas:0,accion:'Seguimiento WhatsApp',notas:'',com:15},
-  {id:13,emp:'Transportes Dliverys',cont:'Cristopher Olguin',cargo:'Dueño',status:'En proceso',canal:'WhatsApp',dias:7,uf:2.5,horas:16,accion:'Insistir — dejó en visto',notas:'No llegó a reunión acordada',com:15},
-  {id:14,emp:'Transportes Concha',cont:'Victor Muñoz',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento WhatsApp',notas:'',com:15},
-  {id:15,emp:'Wild Foods',cont:'Javier Castro',cargo:'Co Founder & CEO',status:'Por contactar',canal:'LinkedIn',dias:5,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15},
-  {id:16,emp:'Transportes Nazar',cont:'José Miguel Gelvez',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:5,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15},
-  {id:17,emp:'Loginsa',cont:'Tomás Cox',cargo:'Gerente General',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15},
-  {id:18,emp:'Clínica Bupa',cont:'Rafael Córdova',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15},
-  {id:19,emp:'Karün',cont:'Ignacio Ureta',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15},
-  {id:20,emp:'Casa Idea',cont:'Cedric Moller',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15},
-  {id:21,emp:'Dimarc',cont:'Valentin Flores',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15},
-  {id:22,emp:'Prisa',cont:'Martín Grosso',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15},
-  {id:23,emp:'Dimerc',cont:'Karim Eltit',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15},
-  {id:24,emp:'Disal',cont:'Daniel Palma',cargo:'Gerente Corporativo',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15},
-  {id:25,emp:'Grupo K',cont:'Sebastian Khamis',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:5,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15},
-  {id:26,emp:'Leco Consortium',cont:'Luis Cárcamo',cargo:'Gerente General',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15},
-  {id:27,emp:'Salfa',cont:'Derek Bull',cargo:'Gerente Logística',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15},
-  {id:28,emp:'DHL',cont:'Alejandro Trello',cargo:'Operation Manager',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15},
-  {id:29,emp:'Neulin Graneles',cont:'Carlos Pineda',cargo:'Gerente/Socio/Director',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15},
-  {id:30,emp:'Dmerco',cont:'Marco',cargo:'Dueño',status:'Reunión',canal:'WhatsApp',dias:14,uf:3.0,horas:20,accion:'Confirmar fecha reunión jue/vie',notas:'Próxima semana. Vive en incendios.',com:15},
-  {id:31,emp:'RockTruck',cont:'-',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento',notas:'Era de finanzas, compartirá contacto',com:15},
-  {id:32,emp:'Casablanca',cont:'-',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento',notas:'No ha contestado',com:15},
-  {id:33,emp:'Antofagasta Terminal',cont:'Alex Munoz',cargo:'Ops Manager',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento hoy — abrió email',notas:'Abrió email Instantly ✅',com:15},
-  {id:34,emp:'Puerto San Antonio',cont:'Jorge Santos',cargo:'Gerente Operaciones',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento hoy — abrió email',notas:'Abrió email Instantly ✅',com:15},
-  {id:35,emp:'Almar Water',cont:'Yilian Collao',cargo:'Subgerente Ops',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento hoy — abrió email',notas:'Abrió email Instantly ✅',com:15},
-  {id:36,emp:'Implementos Chile',cont:'Hans Meyer',cargo:'Jefe Ops CD',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento hoy — abrió email',notas:'Abrió email Instantly ✅',com:15},
-  {id:37,emp:'ULOG',cont:'Manuel Salazar',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15},
-  {id:38,emp:'Transportes Maquehua',cont:'Igor Jofre',cargo:'Asst. Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15},
-  {id:39,emp:'Empresas Marval',cont:'Javier Droguett',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15},
-  {id:40,emp:'Grupo MBO',cont:'Carlos Corvalan',cargo:'Supply Chain Mgr',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15},
-  {id:41,emp:'APRO',cont:'Consuelo Camaggi',cargo:'Supply Chain Corp.',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15},
-  {id:42,emp:'Miniso Chile',cont:'Gonzalo Salgueiro',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15},
-  {id:43,emp:'La Fête Chocolat',cont:'Martin Bunster',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15},
-  {id:44,emp:'ID Logistics',cont:'Franco Salinas',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15},
-  {id:45,emp:'RFP Logistica',cont:'Mauricio Contreras',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15},
-  {id:46,emp:'Recibelo.cl',cont:'Mauricio Rivera',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15},
-  {id:47,emp:'RPM Parts',cont:'Valentina Rayman',cargo:'Supply Chain Mgr',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15},
-  {id:48,emp:'Caja Los Héroes',cont:'(vía Berna)',cargo:'-',status:'Por contactar',canal:'Referido',dias:0,uf:0,horas:0,accion:'Pedir contacto a Berna',notas:'Papá de Berna trabaja ahí',com:15},
-  {id:49,emp:'Alemán Experto',cont:'(vía Sofi)',cargo:'Dueño',status:'Por contactar',canal:'Referido',dias:0,uf:0,horas:0,accion:'Contactar por Sofi/Berna',notas:'Sofi es esposa del dueño',com:15},
+  {id:1,emp:'Niu Sushi',cont:'Alan Schoihet',cargo:'Dueño',status:'No',canal:'',dias:30,uf:0,horas:0,accion:'',notas:'No respondió',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:2,emp:'Japi Jane',cont:'Mail de contacto',cargo:'Dueño',status:'No',canal:'',dias:30,uf:0,horas:0,accion:'',notas:'No respondió',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:3,emp:'Coca Cola',cont:'Romina Elgueta',cargo:'Mejora continua',status:'No',canal:'',dias:30,uf:0,horas:0,accion:'',notas:'Eligieron otra empresa',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:4,emp:'Benbo',cont:'Nicolás Borobio',cargo:'Dueño',status:'On hold',canal:'',dias:20,uf:0,horas:0,accion:'Esperar que se ordenen',notas:'Esperando a ordenarse',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:5,emp:'Tagler Foods',cont:'Luis Cheriff',cargo:'Gerente Operaciones',status:'Reunión',canal:'Reunión',dias:21,uf:3.5,horas:40,accion:'Cobrar y entregar informe',notas:'Informe visita pendiente, pago atrasado',com:15,email:'',fechaContacto:'2026-05-14',historial:[{fecha:'2026-05-14',tipo:'Reunión',texto:'Primera reunión realizada. Informe de visita pendiente.'}]},
+  {id:6,emp:'HDG',cont:'Seba',cargo:'Producción',status:'Contactado',canal:'Email',dias:10,uf:0,horas:0,accion:'Seguimiento email',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[{fecha:'2026-05-25',tipo:'Email',texto:'Email inicial enviado.'}]},
+  {id:7,emp:'Coca Cola',cont:'Cristina Arancibia',cargo:'Mejora continua',status:'On hold',canal:'',dias:15,uf:0,horas:0,accion:'Esperar info',notas:'Sin info por ahora',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:8,emp:'Forus',cont:'Caro',cargo:'Gerente Marketing',status:'On hold',canal:'',dias:21,uf:0,horas:0,accion:'Investigar antes de contactar',notas:'',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:9,emp:'Arauco',cont:'Luciano Villarroel',cargo:'-',status:'On hold',canal:'',dias:30,uf:0,horas:0,accion:'Retomar en 2 semanas',notas:'',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:10,emp:'Neumaérica',cont:'Gabriela Rodriguez',cargo:'Gerente Comercial',status:'Contactado',canal:'Email',dias:21,uf:0,horas:0,accion:'Mail seguimiento',notas:'',com:15,email:'',fechaContacto:'2026-05-14',historial:[{fecha:'2026-05-14',tipo:'Email',texto:'Email inicial enviado.'}]},
+  {id:11,emp:'Transportes Jofre Hidalgo',cont:'-',cargo:'-',status:'Contactado',canal:'',dias:14,uf:0,horas:0,accion:'Seguimiento',notas:'',com:15,email:'',fechaContacto:'2026-05-21',historial:[]},
+  {id:12,emp:'Transportes Sahid',cont:'Enrique Peña / Felipe Armijo',cargo:'Dueño',status:'Contactado',canal:'WhatsApp',dias:14,uf:0,horas:0,accion:'Seguimiento WhatsApp',notas:'',com:15,email:'',fechaContacto:'2026-05-21',historial:[{fecha:'2026-05-21',tipo:'WhatsApp',texto:'Primer contacto.'}]},
+  {id:13,emp:'Transportes Dliverys',cont:'Cristopher Olguin',cargo:'Dueño',status:'En proceso',canal:'WhatsApp',dias:7,uf:2.5,horas:16,accion:'Insistir — dejó en visto',notas:'No llegó a reunión acordada',com:15,email:'',fechaContacto:'2026-05-28',historial:[{fecha:'2026-05-28',tipo:'WhatsApp',texto:'Acordaron reunión pero no llegó.'}]},
+  {id:14,emp:'Transportes Concha',cont:'Victor Muñoz',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento WhatsApp',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[]},
+  {id:15,emp:'Wild Foods',cont:'Javier Castro',cargo:'Co Founder & CEO',status:'Por contactar',canal:'LinkedIn',dias:5,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:16,emp:'Transportes Nazar',cont:'José Miguel Gelvez',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:5,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:17,emp:'Loginsa',cont:'Tomás Cox',cargo:'Gerente General',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[]},
+  {id:18,emp:'Clínica Bupa',cont:'Rafael Córdova',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:19,emp:'Karün',cont:'Ignacio Ureta',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:20,emp:'Casa Idea',cont:'Cedric Moller',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:21,emp:'Dimarc',cont:'Valentin Flores',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:22,emp:'Prisa',cont:'Martín Grosso',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:23,emp:'Dimerc',cont:'Karim Eltit',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:24,emp:'Disal',cont:'Daniel Palma',cargo:'Gerente Corporativo',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:25,emp:'Grupo K',cont:'Sebastian Khamis',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:5,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:26,emp:'Leco Consortium',cont:'Luis Cárcamo',cargo:'Gerente General',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[]},
+  {id:27,emp:'Salfa',cont:'Derek Bull',cargo:'Gerente Logística',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[]},
+  {id:28,emp:'DHL',cont:'Alejandro Trello',cargo:'Operation Manager',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[]},
+  {id:29,emp:'Neulin Graneles',cont:'Carlos Pineda',cargo:'Gerente/Socio/Director',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[]},
+  {id:30,emp:'Dmerco',cont:'Marco',cargo:'Dueño',status:'Reunión',canal:'WhatsApp',dias:14,uf:3.0,horas:20,accion:'Confirmar fecha reunión jue/vie',notas:'Próxima semana. Vive en incendios.',com:15,email:'',fechaContacto:'2026-05-21',historial:[{fecha:'2026-05-21',tipo:'WhatsApp',texto:'Contacto inicial. Dijo que se juntarían próxima semana.'}]},
+  {id:31,emp:'RockTruck',cont:'-',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento',notas:'Era de finanzas, compartirá contacto',com:15,email:'',fechaContacto:'2026-05-25',historial:[]},
+  {id:32,emp:'Casablanca',cont:'-',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento',notas:'No ha contestado',com:15,email:'',fechaContacto:'2026-05-25',historial:[]},
+  {id:33,emp:'Antofagasta Terminal',cont:'Alex Munoz',cargo:'Ops Manager',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento — abrió email',notas:'Abrió email Instantly ✅',com:15,email:'amunoz@atiport.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}]},
+  {id:34,emp:'Puerto San Antonio',cont:'Jorge Santos',cargo:'Gerente Operaciones',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento — abrió email',notas:'Abrió email Instantly ✅',com:15,email:'jsantos@puertosanantonio.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}]},
+  {id:35,emp:'Almar Water',cont:'Yilian Collao',cargo:'Subgerente Ops',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento — abrió email',notas:'Abrió email Instantly ✅',com:15,email:'yilian.collao@almarwaterservices.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}]},
+  {id:36,emp:'Implementos Chile',cont:'Hans Meyer',cargo:'Jefe Ops CD',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento — abrió email',notas:'Abrió email Instantly ✅',com:15,email:'hans.meyer@implementos.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}]},
+  {id:37,emp:'ULOG',cont:'Manuel Salazar',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'msalazar@ulog.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}]},
+  {id:38,emp:'Transportes Maquehua',cont:'Igor Jofre',cargo:'Asst. Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'ijofre@maquehua.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}]},
+  {id:39,emp:'Empresas Marval',cont:'Javier Droguett',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'jdroguett@marval.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}]},
+  {id:40,emp:'Grupo MBO',cont:'Carlos Corvalan',cargo:'Supply Chain Mgr',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'carlos.corvalan@grupombo.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}]},
+  {id:41,emp:'APRO',cont:'Consuelo Camaggi',cargo:'Supply Chain Corp.',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'consuelo.camaggi@apro.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}]},
+  {id:42,emp:'Miniso Chile',cont:'Gonzalo Salgueiro',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'gonzalo.salgueiro@miniso.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}]},
+  {id:43,emp:'La Fête Chocolat',cont:'Martin Bunster',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'mbunster@lafetechocolat.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}]},
+  {id:44,emp:'ID Logistics',cont:'Franco Salinas',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'fsalinas@id-logistics.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}]},
+  {id:45,emp:'RFP Logistica',cont:'Mauricio Contreras',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'mcontreras@rfplogistica.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}]},
+  {id:46,emp:'Recibelo.cl',cont:'Mauricio Rivera',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'mauricio@recibelo.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}]},
+  {id:47,emp:'RPM Parts',cont:'Valentina Rayman',cargo:'Supply Chain Mgr',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'vrayman@rpm.parts',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}]},
+  {id:48,emp:'Caja Los Héroes',cont:'(vía Berna)',cargo:'-',status:'Por contactar',canal:'Referido',dias:0,uf:0,horas:0,accion:'Pedir contacto a Berna',notas:'Papá de Berna trabaja ahí',com:15,email:'',fechaContacto:'',historial:[]},
+  {id:49,emp:'Alemán Experto',cont:'(vía Sofi)',cargo:'Dueño',status:'Por contactar',canal:'Referido',dias:0,uf:0,horas:0,accion:'Contactar por Sofi/Berna',notas:'Sofi es esposa del dueño',com:15,email:'',fechaContacto:'',historial:[]},
 ];
 
-let nextId=60,activeFilter='todos',editingId=null;
+let nextId=60,activeFilter='todos',editingId=null,histId=null,consejoMsg='';
 
 function calcV(c){return c.uf&&c.horas?Math.round(c.uf*c.horas*UF):0;}
 function calcC(c){return Math.round(calcV(c)*(c.com||15)/100);}
 function urg(c){
+  const d=getDias(c);
   if(['No','Ganado'].includes(c.status)) return 'l';
-  if(c.status==='Reunión'&&c.dias>5) return 'h';
-  if(c.status==='Respondió'&&c.dias>2) return 'h';
-  if(c.status==='En proceso'&&c.dias>7) return 'h';
-  if(['Contactado','Por contactar'].includes(c.status)&&c.dias>14) return 'h';
-  if(c.dias>7) return 'm';
+  if(c.status==='Reunión'&&d>5) return 'h';
+  if(c.status==='Respondió'&&d>6) return 'h';
+  if(c.status==='En proceso'&&d>7) return 'h';
+  if(['Contactado','Por contactar'].includes(c.status)&&d>14) return 'h';
+  if(d>7) return 'm';
   return 'l';
 }
 const UCOL={h:'#ef4444',m:'#f59e0b',l:'#22c55e'};
 
+function saveLS(){
+  try{localStorage.setItem('ryc_contacts',JSON.stringify(contacts));}catch(e){}
+}
+
 function renderRecs(){
   const now=new Date(),day=DIAS[now.getDay()];
-  const abrieron=contacts.filter(c=>c.status==='Respondió'&&c.dias<=2);
   const recs=[];
-  if(abrieron.length) recs.push({cls:'fire',ico:'🔥',label:'Acción inmediata',text:`${abrieron.map(c=>c.emp).join(', ')} abrieron tu email. Escríbeles HOY. Mensaje: "Hola [nombre], ¿pudiste revisar mi email? Me gustaría mostrarte cómo logramos reducir costos operacionales en empresas similares."`});
-  if(contacts.find(c=>c.emp==='Tagler Foods'&&c.status!=='Ganado')) recs.push({cls:'warn',ico:'💰',label:'Cobro pendiente',text:'Tagler Foods: tienes trabajo hecho sin cobrar. Mensaje: "Luis, ¿cómo va el proceso de pago? Una vez confirmado te mando el informe completo."'});
-  if(contacts.find(c=>c.emp==='Dmerco')) recs.push({cls:'clock',ico:'📅',label:'Reunión por confirmar',text:`Dmerco (Marco): ${['Jueves','Viernes'].includes(day)?'hoy es buen día para insistir.':'insiste jueves o viernes.'} Mensaje: "Marco, ¿quedamos la próxima semana? Propongo lunes o martes a las 10am."`});
+  const listos=contacts.filter(c=>c.status==='Respondió'&&getDias(c)>=3);
+  const esperando=contacts.filter(c=>c.status==='Respondió'&&getDias(c)<3);
+  if(listos.length) recs.push({cls:'fire',ico:'🔥',label:'Escríbeles hoy',text:`${listos.map(c=>c.emp).join(', ')} llevan ${getDias(listos[0])}d desde que abrieron — momento ideal.`,msg:`Hola [nombre], quería saber si pudiste revisar mi mensaje. ¿Vale 15 minutos esta semana?`});
+  if(esperando.length) recs.push({cls:'tip',ico:'⏳',label:'Espera un poco más',text:`${esperando.map(c=>c.emp).join(', ')} abrieron hace menos de 3 días. El timing ideal es día 3-5.`});
+  if(contacts.find(c=>c.emp==='Tagler Foods'&&c.status!=='Ganado')) recs.push({cls:'warn',ico:'💰',label:'Cobro pendiente',text:'Tagler Foods: tienes trabajo hecho sin cobrar.',msg:'Luis, ¿cómo va el proceso de pago? Una vez confirmado te mando el informe completo.'});
+  if(contacts.find(c=>c.emp==='Dmerco')) recs.push({cls:'clock',ico:'📅',label:'Reunión por confirmar',text:`Dmerco (Marco): ${['Jueves','Viernes'].includes(day)?'hoy es buen día para insistir.':'insiste jueves o viernes.'}`,msg:'Marco, ¿quedamos la próxima semana? Propongo lunes o martes a las 10am.'});
   const refs=contacts.filter(c=>c.canal==='Referido'&&c.status==='Por contactar');
-  if(refs.length) recs.push({cls:'tip',ico:'👥',label:'Referidos sin usar',text:`${refs.map(c=>c.emp).join(', ')} — tienes acceso directo. Los referidos cierran 4x más rápido que cold outreach.`});
+  if(refs.length) recs.push({cls:'tip',ico:'👥',label:'Referidos sin usar',text:`${refs.map(c=>c.emp).join(', ')} — tienes acceso directo. Cierran 4x más rápido.`});
   if(!recs.length) recs.push({cls:'tip',ico:'✅',label:'Pipeline bajo control',text:'No hay urgencias hoy. Buen momento para agregar nuevos prospectos en Apollo.'});
-  document.getElementById('recs-grid').innerHTML=recs.map(r=>`<div class="rec-item ${r.cls}"><div class="rec-icon">${r.ico}</div><div><div class="rec-label">${r.label}</div><div class="rec-text">${r.text}</div></div></div>`).join('');
+  document.getElementById('recs-grid').innerHTML=recs.map(r=>`
+    <div class="rec-item ${r.cls}">
+      <div class="rec-icon">${r.ico}</div>
+      <div style="flex:1">
+        <div class="rec-label">${r.label}</div>
+        <div class="rec-text">${r.text}</div>
+        ${r.msg?`<div class="rec-msg" onclick="copyText('${r.msg.replace(/'/g,"\\'")}')">📋 "${r.msg}" <span style="font-size:10px;opacity:0.6">(clic para copiar)</span></div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function copyText(t){
+  navigator.clipboard.writeText(t).then(()=>showToast('✅ Copiado')).catch(()=>showToast('Copia manualmente'));
 }
 
 function renderStats(){
@@ -310,8 +430,8 @@ function renderStats(){
   document.getElementById('stats').innerHTML=`
     <div class="stat"><div class="stat-label">Pipeline</div><div class="stat-val">${act.length}</div><div class="stat-sub">${contacts.filter(c=>c.status==='No').length} descartados</div></div>
     <div class="stat"><div class="stat-label">Comisión est.</div><div class="stat-val" style="color:var(--blue)">$${comEst?Math.round(comEst/1000)+'k':'-'}</div><div class="stat-sub">CLP · 15%</div></div>
-    <div class="stat"><div class="stat-label">Urgentes</div><div class="stat-val" style="color:${urg_n?'var(--red)':'var(--green)'}">${urg_n}</div><div class="stat-sub">sin contacto</div></div>
-    <div class="stat"><div class="stat-label">Calientes</div><div class="stat-val" style="color:var(--amber)">${contacts.filter(c=>c.status==='Respondió').length}</div><div class="stat-sub">abrieron email</div></div>`;
+    <div class="stat"><div class="stat-label">Para escribir hoy</div><div class="stat-val" style="color:${urg_n?'var(--red)':'var(--green)'}">${urg_n}</div><div class="stat-sub">según timing</div></div>
+    <div class="stat"><div class="stat-label">Abrieron email</div><div class="stat-val" style="color:var(--amber)">${contacts.filter(c=>c.status==='Respondió').length}</div><div class="stat-sub">leads calientes</div></div>`;
 }
 
 function renderFunnel(){
@@ -332,15 +452,34 @@ function setF(f){activeFilter=f;renderFilters();renderFunnel();renderContacts();
 
 function renderContacts(){
   const list=activeFilter==='todos'?contacts.filter(c=>c.status!=='No'):contacts.filter(c=>c.status===activeFilter);
-  const sorted=[...list].sort((a,b)=>(ORD[a.status]||9)-(ORD[b.status]||9)||b.dias-a.dias);
+  const sorted=[...list].sort((a,b)=>(ORD[a.status]||9)-(ORD[b.status]||9)||getDias(b)-getDias(a));
   document.getElementById('clist').innerHTML=sorted.map(c=>{
-    const com=calcC(c),u=urg(c);
-    return `<div class="ccard"><div class="udot" style="background:${UCOL[u]}"></div><div><div class="cc-name">${c.emp}</div><div class="cc-sub">${[c.cont,c.cargo].filter(x=>x&&x!=='-').join(' · ')}</div>${c.accion?`<div class="cc-action">${c.accion}</div>`:''}<div class="cc-btns"><button class="cc-btn" onclick="openModal(${c.id})">✏️ Editar</button><button class="cc-btn ask" onclick="window.open('https://claude.ai','_blank')">🎯 Pedir consejo</button></div></div><div class="cc-right"><span class="badge ${bc(c.status)}">${c.status}</span>${com?`<span class="cc-com">$${Math.round(com/1000)}k</span>`:''}<span class="cc-dias${u==='h'?' hot':''}">${c.dias===0?'nuevo':c.dias+'d'}</span></div></div>`;
+    const com=calcC(c),u=urg(c),d=getDias(c),t=timing(c),h=(c.historial||[]).length;
+    return `<div class="ccard">
+      <div class="udot" style="background:${UCOL[u]};margin-top:4px"></div>
+      <div>
+        <div class="cc-name">${c.emp}</div>
+        <div class="cc-sub">${[c.cont,c.cargo].filter(x=>x&&x!=='-').join(' · ')}</div>
+        ${c.accion?`<div class="cc-action">${c.accion}</div>`:''}
+        ${t?`<div class="cc-timing" style="color:${t.color}">⏱ ${t.txt}</div>`:''}
+        <div class="cc-btns">
+          <button class="cc-btn" onclick="openModal(${c.id})">✏️ Editar</button>
+          <button class="cc-btn hist" onclick="openHist(${c.id})">📋 Historial${h?` (${h})`:''}</button>
+          <button class="cc-btn ask" onclick="openConsejo(${c.id})">🎯 Consejo</button>
+        </div>
+      </div>
+      <div class="cc-right">
+        <span class="badge ${bc(c.status)}">${c.status}</span>
+        ${com?`<span class="cc-com">$${Math.round(com/1000)}k</span>`:''}
+        <span class="cc-dias${u==='h'?' hot':''}">${d===0?'hoy':d+'d'}</span>
+      </div>
+    </div>`;
   }).join('');
 }
 
 function renderAll(){renderStats();renderFunnel();renderRecs();renderFilters();renderContacts();}
 
+// INSTANTLY
 async function syncInstantly(){
   const btn=document.getElementById('sync-btn');
   btn.textContent='⏳ Sync...';btn.disabled=true;
@@ -350,15 +489,69 @@ async function syncInstantly(){
     if(d.error) throw new Error(d.error);
     if(d.leads) d.leads.forEach(l=>{
       if(l.opened_count>0){
-        const c=contacts.find(c=>c.notas?.includes('Instantly')&&c.status==='Contactado');
-        if(c){c.status='Respondió';c.accion='Seguimiento — abrió el email ✅';}
+        const email=(l.email||'').toLowerCase();
+        const c=contacts.find(c=>(c.email||'').toLowerCase()===email);
+        if(c&&c.status==='Contactado'){
+          c.status='Respondió';
+          c.accion='Seguimiento — abrió el email ✅';
+          if(!c.historial) c.historial=[];
+          c.historial.push({fecha:new Date().toISOString().split('T')[0],tipo:'Email',texto:'Abrió el email de Instantly ✅'});
+        }
       }
     });
-    showToast('✅ Instantly sincronizado');renderAll();
+    saveLS();showToast('✅ Instantly sincronizado');renderAll();
   }catch(e){showToast('⚠️ '+e.message);}
   btn.textContent='⚡ Sync Instantly';btn.disabled=false;
 }
 
+// HISTORIAL
+function openHist(id){
+  histId=id;
+  const c=contacts.find(x=>x.id===id);if(!c) return;
+  document.getElementById('hist-title').textContent='Historial — '+c.emp;
+  renderHistEntries(c);
+  document.getElementById('hist-overlay').classList.add('open');
+}
+
+function renderHistEntries(c){
+  const entries=(c.historial||[]).slice().reverse();
+  document.getElementById('hist-entries').innerHTML=entries.length
+    ?entries.map(e=>`<div class="hist-entry"><div class="hist-type">${e.tipo}</div><div class="hist-date">${e.fecha}</div><div class="hist-text">${e.texto}</div></div>`).join('')
+    :'<div style="font-size:12px;color:#94a3b8;padding:0.5rem 0">Sin historial. Agrega la primera entrada.</div>';
+}
+
+function addHist(){
+  const txt=document.getElementById('hist-input').value.trim();
+  if(!txt) return;
+  const tipo=document.getElementById('hist-type').value;
+  const c=contacts.find(x=>x.id===histId);if(!c) return;
+  if(!c.historial) c.historial=[];
+  c.historial.push({fecha:new Date().toISOString().split('T')[0],tipo,texto:txt});
+  c.fechaContacto=new Date().toISOString().split('T')[0];
+  document.getElementById('hist-input').value='';
+  saveLS();renderHistEntries(c);renderContacts();showToast('✅ Guardado');
+}
+
+function closeHist(){document.getElementById('hist-overlay').classList.remove('open');}
+
+// CONSEJO
+function openConsejo(id){
+  const c=contacts.find(x=>x.id===id);if(!c) return;
+  const m=getMensaje(c);
+  consejoMsg=m.msg;
+  document.getElementById('consejo-title').textContent='🎯 '+c.emp+' — '+c.status;
+  document.getElementById('consejo-ctx').textContent=m.ctx;
+  document.getElementById('consejo-msg').textContent=m.msg;
+  document.getElementById('consejo-overlay').classList.add('open');
+}
+
+function copyConsejo(){
+  navigator.clipboard.writeText(consejoMsg).then(()=>showToast('✅ Mensaje copiado')).catch(()=>showToast('Copia manualmente'));
+}
+
+function closeConsejo(){document.getElementById('consejo-overlay').classList.remove('open');}
+
+// MODAL EDITAR
 function openModal(id){
   editingId=id||null;
   document.getElementById('btn-del').style.display=id?'block':'none';
@@ -372,47 +565,72 @@ function openModal(id){
     document.getElementById('f-canal').value=c.canal||'';
     document.getElementById('f-uf').value=c.uf||'';
     document.getElementById('f-horas').value=c.horas||'';
-    document.getElementById('f-dias').value=c.dias||0;
+    document.getElementById('f-fecha').value=c.fechaContacto||'';
     document.getElementById('f-com').value=c.com||15;
+    document.getElementById('f-email').value=c.email||'';
     document.getElementById('f-accion').value=c.accion||'';
     document.getElementById('f-notas').value=c.notas||'';
   }else{
     document.getElementById('modal-title').textContent='Nuevo contacto';
-    ['f-emp','f-cont','f-cargo','f-uf','f-horas','f-accion','f-notas'].forEach(f=>document.getElementById(f).value='');
-    document.getElementById('f-dias').value=0;
+    ['f-emp','f-cont','f-cargo','f-uf','f-horas','f-accion','f-notas','f-email'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('f-fecha').value='';
     document.getElementById('f-com').value=15;
     document.getElementById('f-status').value='Por contactar';
     document.getElementById('f-canal').value='';
   }
   document.getElementById('overlay').classList.add('open');
 }
+
 function closeModal(){document.getElementById('overlay').classList.remove('open');}
+
 function deleteContact(){
   if(!editingId||!confirm('¿Eliminar?')) return;
   contacts=contacts.filter(x=>x.id!==editingId);
-  localStorage.setItem('ryc_contacts', JSON.stringify(contacts));
-  closeModal();showToast('Eliminado');renderAll();
+  closeModal();saveLS();showToast('Eliminado');renderAll();
 }
+
 function saveContact(){
   const emp=document.getElementById('f-emp').value.trim();
   if(!emp){alert('Ingresa el nombre de la empresa');return;}
-  const data={emp,cont:document.getElementById('f-cont').value.trim(),cargo:document.getElementById('f-cargo').value.trim(),status:document.getElementById('f-status').value,canal:document.getElementById('f-canal').value,uf:parseFloat(document.getElementById('f-uf').value)||0,horas:parseInt(document.getElementById('f-horas').value)||0,dias:parseInt(document.getElementById('f-dias').value)||0,com:parseFloat(document.getElementById('f-com').value)||15,accion:document.getElementById('f-accion').value.trim(),notas:document.getElementById('f-notas').value.trim()};
-  if(editingId){const i=contacts.findIndex(x=>x.id===editingId);if(i>=0)contacts[i]={...contacts[i],...data};}
-  else contacts.push({id:nextId++,...data});
-  localStorage.setItem('ryc_contacts', JSON.stringify(contacts));
-  closeModal();showToast('✅ Guardado');renderAll();
+  const data={
+    emp,cont:document.getElementById('f-cont').value.trim(),
+    cargo:document.getElementById('f-cargo').value.trim(),
+    status:document.getElementById('f-status').value,
+    canal:document.getElementById('f-canal').value,
+    uf:parseFloat(document.getElementById('f-uf').value)||0,
+    horas:parseInt(document.getElementById('f-horas').value)||0,
+    fechaContacto:document.getElementById('f-fecha').value,
+    com:parseFloat(document.getElementById('f-com').value)||15,
+    email:document.getElementById('f-email').value.trim(),
+    accion:document.getElementById('f-accion').value.trim(),
+    notas:document.getElementById('f-notas').value.trim()
+  };
+  if(editingId){
+    const i=contacts.findIndex(x=>x.id===editingId);
+    if(i>=0) contacts[i]={...contacts[i],...data};
+  } else {
+    contacts.push({id:nextId++,...data,historial:[]});
+  }
+  closeModal();saveLS();showToast('✅ Guardado');renderAll();
 }
-document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+['overlay','hist-overlay','consejo-overlay'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+});
+
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
 
 const now=new Date();
 document.getElementById('day-pill').textContent=DIAS[now.getDay()]+' '+now.getDate()+'/'+String(now.getMonth()+1).padStart(2,'0');
-// Load from localStorage
-const saved = localStorage.getItem('ryc_contacts');
-if(saved) try{ contacts = JSON.parse(saved); nextId = Math.max(...contacts.map(c=>c.id))+1; }catch(e){}
+
+// Load localStorage
+try{
+  const saved=localStorage.getItem('ryc_contacts');
+  if(saved){const d=JSON.parse(saved);contacts=d;nextId=Math.max(...d.map(c=>c.id))+1;}
+}catch(e){}
 
 renderAll();
-localStorage.setItem('ryc_contacts', JSON.stringify(contacts));
+saveLS();
 syncInstantly();
 </script>
 </body>
