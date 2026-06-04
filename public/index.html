@@ -63,8 +63,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 .s-pct{font-size:10px;color:#94a3b8;margin-top:1px}
 .s-bar{height:3px;border-radius:2px;margin-top:5px;background:#e2e8f0}
 .s-bar-fill{height:3px;border-radius:2px}
-.s-porcontactar{background:#f1f5f9}.s-contactado{background:#f1f5f9}.s-respondio{background:#f1f5f9}
-.s-reunion{background:#f1f5f9}.s-propuesta{background:#f1f5f9}.s-ganado{background:#f1f5f9}
 .funnel-totals{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:#94a3b8}
 .funnel-totals span{color:var(--ink);font-weight:600}
 .section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
@@ -74,22 +72,27 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 .filter-btns{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:7px}
 .fb{font-size:11px;padding:3px 9px;border-radius:99px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer}
 .fb.on{background:var(--blue);color:white;border-color:var(--blue)}
-.clist{display:flex;flex-direction:column;gap:4px}
-.ccard{display:grid;grid-template-columns:8px 1fr auto;gap:8px;align-items:start;padding:9px 11px;border:1px solid var(--border);border-radius:9px;background:white}
-.ccard:hover{border-color:var(--blue-m)}
-.udot{width:7px;height:7px;border-radius:50%;margin-top:4px}
-.cc-name{font-size:13px;font-weight:600}
-.cc-sub{font-size:11px;color:#94a3b8;margin-top:1px}
-.cc-action{font-size:10px;color:#64748b;margin-top:2px;font-style:italic}
-.cc-timing{font-size:10px;margin-top:3px;font-weight:500}
-.cc-btns{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
-.cc-btn{font-size:10px;padding:2px 8px;border-radius:5px;border:1px solid var(--border);background:white;cursor:pointer;color:#64748b}
-.cc-btn:hover{background:var(--blue-l);color:var(--blue)}
-.cc-btn.ask{color:var(--purple);border-color:#ddd6fe}
-.cc-btn.ask:hover{background:var(--purple-l)}
-.cc-btn.hist{color:var(--green);border-color:#bbf7d0}
-.cc-btn.hist:hover{background:#f0fdf4}
-.cc-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+
+/* TABLA COMPACTA */
+.table-wrap{background:white;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1rem}
+.ctable{width:100%;border-collapse:collapse;table-layout:fixed}
+.ctable th{font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;padding:8px 10px;background:#f8f9fc;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.ctable td{font-size:12px;padding:6px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+.ctable tr:last-child td{border-bottom:none}
+.ctable tr:hover td{background:#fafbfd}
+.col-dot{width:18px}
+.col-emp{width:18%}
+.col-cont{width:18%}
+.col-status{width:100px}
+.col-timing{width:16%}
+.col-dias{width:44px;text-align:right}
+.col-acc{width:130px}
+.td-emp{font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.td-cont{font-size:11px;color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.td-cargo{font-size:10px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.td-dias{font-size:11px;color:#cbd5e1;text-align:right}
+.td-dias.hot{color:var(--red);font-weight:600}
+.udot{display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .badge{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:500;white-space:nowrap}
 .b-pc{background:#f1f5f9;color:#475569}
 .b-co{background:#dbeafe;color:#1e40af}
@@ -100,9 +103,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 .b-oh{background:#f3f4f6;color:#374151}
 .b-no{background:#fee2e2;color:#991b1b}
 .b-ep{background:#dbeafe;color:#1e40af}
-.cc-com{font-size:10px;color:var(--blue);font-weight:600}
-.cc-dias{font-size:10px;color:#cbd5e1}
-.cc-dias.hot{color:var(--red);font-weight:600}
+.timing-txt{font-size:10px;white-space:nowrap}
+.row-btns{display:flex;gap:3px;align-items:center}
+.rb{font-size:10px;padding:2px 6px;border-radius:4px;border:1px solid var(--border);background:white;cursor:pointer;color:#64748b;white-space:nowrap}
+.rb:hover{background:var(--blue-l);color:var(--blue)}
+.rb.ask{color:var(--purple);border-color:#ddd6fe}
+.rb.ask:hover{background:var(--purple-l)}
+.rb.hist{color:var(--green);border-color:#bbf7d0}
+.rb.hist:hover{background:#f0fdf4}
+
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:center;justify-content:center}
 .overlay.open{display:flex}
 .modal{background:white;border-radius:14px;padding:1.5rem;width:460px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.15)}
@@ -117,7 +126,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 .btn-c{font-size:13px;padding:7px 15px;border-radius:7px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer}
 .btn-s{font-size:13px;padding:7px 15px;border-radius:7px;border:none;background:var(--blue);color:white;cursor:pointer;font-weight:500}
 .btn-del{font-size:13px;padding:7px 15px;border-radius:7px;border:none;background:var(--red-l);color:var(--red);cursor:pointer;font-weight:500;margin-right:auto}
-/* HISTORIAL */
 .hist-entries{display:flex;flex-direction:column;gap:7px;margin-top:0.75rem;max-height:280px;overflow-y:auto}
 .hist-entry{padding:8px 11px;background:var(--cream);border-radius:8px;border:1px solid var(--border)}
 .hist-type{font-size:10px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:0.4px}
@@ -128,19 +136,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 .hist-input:focus{border-color:var(--blue)}
 .hist-sel{font-size:12px;padding:7px 8px;border:1px solid var(--border);border-radius:7px;outline:none;background:white}
 .hist-add-btn{font-size:12px;padding:7px 12px;border:none;background:var(--blue);color:white;border-radius:7px;cursor:pointer;white-space:nowrap}
-/* CONSEJO */
 .consejo-ctx{font-size:12px;color:#64748b;margin-bottom:10px;line-height:1.5}
 .consejo-msg{background:#eff6ff;border:1px solid var(--blue-m);border-radius:8px;padding:12px 14px;font-size:13px;color:#1e40af;line-height:1.6;margin-bottom:10px}
 .copy-btn{font-size:12px;padding:6px 14px;border:none;background:var(--blue);color:white;border-radius:6px;cursor:pointer}
 .copy-btn:hover{background:#1d4ed8}
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:8px 16px;border-radius:8px;font-size:12px;opacity:0;transition:opacity 0.3s;z-index:200;pointer-events:none}
 .toast.show{opacity:1}
-.table-wrap{background:white;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1rem}
-.ctable{width:100%;border-collapse:collapse}
-.ctable th{font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;padding:9px 12px;background:#f8f9fc;border-bottom:1px solid var(--border);text-align:left}
-.ctable td{font-size:12px;padding:9px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
-.ctable tr:last-child td{border-bottom:none}
-.ctable tr:hover td{background:#fafafa}
 </style>
 </head>
 <body>
@@ -169,9 +170,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
       <button class="add-btn" onclick="openModal()">+ Nuevo contacto</button>
     </div>
     <div class="filter-btns" id="filter-btns"></div>
-   <div class="table-wrap">
-  <table class="ctable" id="clist"></table>
-</div>
+    <div class="table-wrap">
+      <table class="ctable" id="clist"></table>
+    </div>
   </div>
 
   <div class="panel">
@@ -274,20 +275,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 
 <script>
 const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const UF=38500;
 const STAGES=[
-  {k:'Por contactar',ico:'',cls:'s-porcontactar',color:'#94a3b8'},
-  {k:'Contactado',ico:'',cls:'s-contactado',color:'#94a3b8'},
-  {k:'Respondió',ico:'',cls:'s-respondio',color:'#94a3b8'},
-  {k:'Reunión',ico:'',cls:'s-reunion',color:'#94a3b8'},
-  {k:'Propuesta',ico:'',cls:'s-propuesta',color:'#94a3b8'},
-  {k:'Ganado',ico:'',cls:'s-ganado',color:'#94a3b8'},
+  {k:'Por contactar',ico:'',cls:'',color:'#94a3b8'},
+  {k:'Contactado',ico:'',cls:'',color:'#94a3b8'},
+  {k:'Respondió',ico:'',cls:'',color:'#94a3b8'},
+  {k:'Reunión',ico:'',cls:'',color:'#94a3b8'},
+  {k:'Propuesta',ico:'',cls:'',color:'#94a3b8'},
+  {k:'Ganado',ico:'',cls:'',color:'#94a3b8'},
 ];
 const ORD={'Reunión':0,'Respondió':1,'Propuesta':2,'En proceso':3,'Contactado':4,'Por contactar':5,'On hold':6,'Ganado':7,'No':8};
 function bc(s){return {'Por contactar':'b-pc','Contactado':'b-co','Respondió':'b-re','Reunión':'b-ru','Propuesta':'b-pr','Ganado':'b-ga','On hold':'b-oh','No':'b-no','En proceso':'b-ep'}[s]||'b-pc';}
 
-// Días automáticos desde fecha
 function getDias(c){
   if(c.fechaContacto){
     const d=Math.floor((new Date()-new Date(c.fechaContacto))/(1000*60*60*24));
@@ -296,28 +295,26 @@ function getDias(c){
   return c.dias||0;
 }
 
-// Timing inteligente
 function timing(c){
   const d=getDias(c);
   if(c.status==='Respondió'){
-    if(d<3) return {txt:`Espera ${3-d} día${3-d>1?'s':''} más`,color:'#22c55e'};
-    if(d<=6) return {txt:'Momento ideal para escribir',color:'#f59e0b'};
-    return {txt:'Urgente: escríbele hoy',color:'#ef4444'};
+    if(d<3) return {txt:`Espera ${3-d}d más`,color:'#22c55e'};
+    if(d<=6) return {txt:'Momento ideal',color:'#f59e0b'};
+    return {txt:'Urgente: escríbele',color:'#ef4444'};
   }
   if(c.status==='Contactado'){
-    if(d<5) return {txt:`Seguimiento en ${5-d} días`,color:'#22c55e'};
-    if(d<=8) return {txt:'Momento ideal para seguimiento',color:'#f59e0b'};
-    return {txt:'Llevas mucho tiempo sin contacto',color:'#ef4444'};
+    if(d<5) return {txt:`Seguimiento en ${5-d}d`,color:'#22c55e'};
+    if(d<=8) return {txt:'Momento ideal',color:'#f59e0b'};
+    return {txt:'Sin contacto hace mucho',color:'#ef4444'};
   }
   if(c.status==='Reunión'){
     if(d<=3) return {txt:'Reunión reciente',color:'#22c55e'};
-    if(d<=7) return {txt:'Confirma próximos pasos',color:'#f59e0b'};
+    if(d<=7) return {txt:'Confirma siguientes pasos',color:'#f59e0b'};
     return {txt:'Urgente: confirma avance',color:'#ef4444'};
   }
   return null;
 }
 
-// Mensaje sugerido por estado
 function getMensaje(c){
   const nombre=c.cont?.split(' ')[0]||'[Nombre]';
   const dias=getDias(c);
@@ -337,7 +334,7 @@ let contacts=[
   {id:2,emp:'Japi Jane',cont:'Mail de contacto',cargo:'Dueño',status:'No',canal:'',dias:30,uf:0,horas:0,accion:'',notas:'No respondió',com:15,email:'',fechaContacto:'',historial:[]},
   {id:3,emp:'Coca Cola',cont:'Romina Elgueta',cargo:'Mejora continua',status:'No',canal:'',dias:30,uf:0,horas:0,accion:'',notas:'Eligieron otra empresa',com:15,email:'',fechaContacto:'',historial:[]},
   {id:4,emp:'Benbo',cont:'Nicolás Borobio',cargo:'Dueño',status:'On hold',canal:'',dias:20,uf:0,horas:0,accion:'Esperar que se ordenen',notas:'Esperando a ordenarse',com:15,email:'',fechaContacto:'',historial:[]},
-  {id:5,emp:'Tagler Foods',cont:'Luis Cheriff',cargo:'Gerente Operaciones',status:'Reunión',canal:'Reunión',dias:21,uf:3.5,horas:40,accion:'Cobrar y entregar informe',notas:'Informe visita pendiente, pago atrasado',com:15,email:'',fechaContacto:'2026-05-14',historial:[{fecha:'2026-05-14',tipo:'Reunión',texto:'Primera reunión realizada. Informe de visita pendiente.'}]},
+  {id:5,emp:'Tagler Foods',cont:'Luis Cheriff',cargo:'Gerente Operaciones',status:'Reunión',canal:'Reunión',dias:21,uf:3.5,horas:40,accion:'Cobrar y entregar informe',notas:'Informe visita pendiente, pago atrasado',com:15,email:'',fechaContacto:'2026-05-14',historial:[{fecha:'2026-05-14',tipo:'Reunión',texto:'Primera reunión realizada.'}]},
   {id:6,emp:'HDG',cont:'Seba',cargo:'Producción',status:'Contactado',canal:'Email',dias:10,uf:0,horas:0,accion:'Seguimiento email',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[{fecha:'2026-05-25',tipo:'Email',texto:'Email inicial enviado.'}]},
   {id:7,emp:'Coca Cola',cont:'Cristina Arancibia',cargo:'Mejora continua',status:'On hold',canal:'',dias:15,uf:0,horas:0,accion:'Esperar info',notas:'Sin info por ahora',com:15,email:'',fechaContacto:'',historial:[]},
   {id:8,emp:'Forus',cont:'Caro',cargo:'Gerente Marketing',status:'On hold',canal:'',dias:21,uf:0,horas:0,accion:'Investigar antes de contactar',notas:'',com:15,email:'',fechaContacto:'',historial:[]},
@@ -362,7 +359,7 @@ let contacts=[
   {id:27,emp:'Salfa',cont:'Derek Bull',cargo:'Gerente Logística',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[]},
   {id:28,emp:'DHL',cont:'Alejandro Trello',cargo:'Operation Manager',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[]},
   {id:29,emp:'Neulin Graneles',cont:'Carlos Pineda',cargo:'Gerente/Socio/Director',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[]},
-  {id:30,emp:'Dmerco',cont:'Marco',cargo:'Dueño',status:'Reunión',canal:'WhatsApp',dias:14,uf:3.0,horas:20,accion:'Confirmar fecha reunión jue/vie',notas:'Próxima semana. Vive en incendios.',com:15,email:'',fechaContacto:'2026-05-21',historial:[{fecha:'2026-05-21',tipo:'WhatsApp',texto:'Contacto inicial. Dijo que se juntarían próxima semana.'}]},
+  {id:30,emp:'Dmerco',cont:'Marco',cargo:'Dueño',status:'Reunión',canal:'WhatsApp',dias:14,uf:3.0,horas:20,accion:'Confirmar fecha reunión jue/vie',notas:'Próxima semana. Vive en incendios.',com:15,email:'',fechaContacto:'2026-05-21',historial:[{fecha:'2026-05-21',tipo:'WhatsApp',texto:'Contacto inicial.'}]},
   {id:31,emp:'RockTruck',cont:'-',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento',notas:'Era de finanzas, compartirá contacto',com:15,email:'',fechaContacto:'2026-05-25',historial:[]},
   {id:32,emp:'Casablanca',cont:'-',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento',notas:'No ha contestado',com:15,email:'',fechaContacto:'2026-05-25',historial:[]},
   {id:33,emp:'Antofagasta Terminal',cont:'Alex Munoz',cargo:'Ops Manager',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento — abrió email',notas:'Abrió email Instantly ✅',com:15,email:'amunoz@atiport.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}]},
@@ -400,9 +397,7 @@ function urg(c){
 }
 const UCOL={h:'#ef4444',m:'#f59e0b',l:'#22c55e'};
 
-function saveLS(){
-  try{localStorage.setItem('ryc_contacts',JSON.stringify(contacts));}catch(e){}
-}
+function saveLS(){try{localStorage.setItem('ryc_contacts',JSON.stringify(contacts));}catch(e){}}
 
 function renderRecs(){
   const now=new Date(),day=DIAS[now.getDay()];
@@ -446,7 +441,7 @@ function renderFunnel(){
   const act=contacts.filter(c=>c.status!=='No'),tot=act.length||1;
   document.getElementById('funnel-stages').innerHTML=STAGES.map(s=>{
     const n=contacts.filter(c=>c.status===s.k).length,pct=Math.round(n/tot*100);
-    return `<div class="stage ${s.cls}${activeFilter===s.k?' active':''}" onclick="setF('${s.k}')"><div class="s-icon">${s.ico}</div><div class="s-name">${s.k}</div><div class="s-num">${n}</div><div class="s-pct">${pct}%</div><div class="s-bar"><div class="s-bar-fill" style="width:${pct}%;background:${s.color}"></div></div></div>`;
+    return `<div class="stage${activeFilter===s.k?' active':''}" onclick="setF('${s.k}')"><div class="s-icon">${s.ico}</div><div class="s-name">${s.k}</div><div class="s-num">${n}</div><div class="s-pct">${pct}%</div><div class="s-bar"><div class="s-bar-fill" style="width:${pct}%;background:${s.color}"></div></div></div>`;
   }).join('');
   document.getElementById('funnel-totals').innerHTML=`<span>Total activos: <span>${act.length}</span></span><span>Ganados: <span>${contacts.filter(c=>c.status==='Ganado').length}</span></span><span>Descartados: <span>${contacts.filter(c=>c.status==='No').length}</span></span>`;
 }
@@ -461,33 +456,50 @@ function setF(f){activeFilter=f;renderFilters();renderFunnel();renderContacts();
 function renderContacts(){
   const list=activeFilter==='todos'?contacts.filter(c=>c.status!=='No'):contacts.filter(c=>c.status===activeFilter);
   const sorted=[...list].sort((a,b)=>(ORD[a.status]||9)-(ORD[b.status]||9)||getDias(b)-getDias(a));
-  document.getElementById('clist').innerHTML=sorted.map(c=>{
+
+  const thead=`<thead>
+    <tr>
+      <th class="col-dot"></th>
+      <th class="col-emp">Empresa</th>
+      <th class="col-cont">Contacto</th>
+      <th class="col-status">Status</th>
+      <th class="col-timing">Timing</th>
+      <th class="col-dias">Días</th>
+      <th class="col-acc">Acciones</th>
+    </tr>
+  </thead>`;
+
+  const rows=sorted.map(c=>{
     const com=calcC(c),u=urg(c),d=getDias(c),t=timing(c),h=(c.historial||[]).length;
-    return `<div class="ccard">
-      <div class="udot" style="background:${UCOL[u]};margin-top:4px"></div>
-      <div>
-        <div class="cc-name">${c.emp}</div>
-        <div class="cc-sub">${[c.cont,c.cargo].filter(x=>x&&x!=='-').join(' · ')}</div>
-        ${c.accion?`<div class="cc-action">${c.accion}</div>`:''}
-        ${t?`<div class="cc-timing" style="color:${t.color}">⏱ ${t.txt}</div>`:''}
-        <div class="cc-btns">
-          <button class="cc-btn" onclick="openModal(${c.id})">✏️ Editar</button>
-          <button class="cc-btn hist" onclick="openHist(${c.id})">📋 Historial${h?` (${h})`:''}</button>
-          <button class="cc-btn ask" onclick="openConsejo(${c.id})">🎯 Consejo</button>
+    const timingHtml=t?`<span class="timing-txt" style="color:${t.color}">${t.txt}</span>`:`<span style="color:#e2e8f0;font-size:10px">—</span>`;
+    return `<tr>
+      <td class="col-dot"><span class="udot" style="background:${UCOL[u]}"></span></td>
+      <td class="col-emp">
+        <div class="td-emp">${c.emp}</div>
+        ${c.accion?`<div style="font-size:10px;color:#94a3b8;font-style:italic;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.accion}</div>`:''}
+      </td>
+      <td class="col-cont">
+        <div class="td-cont">${c.cont&&c.cont!=='-'?c.cont:'—'}</div>
+        <div class="td-cargo">${c.cargo&&c.cargo!=='-'?c.cargo:''}</div>
+      </td>
+      <td class="col-status"><span class="badge ${bc(c.status)}">${c.status}</span>${com?`<div style="font-size:10px;color:var(--blue);font-weight:600;margin-top:2px">$${Math.round(com/1000)}k</div>`:''}</td>
+      <td class="col-timing">${timingHtml}</td>
+      <td class="col-dias"><span class="td-dias${u==='h'?' hot':''}">${d===0?'hoy':d+'d'}</span></td>
+      <td class="col-acc">
+        <div class="row-btns">
+          <button class="rb" onclick="openModal(${c.id})">✏️</button>
+          <button class="rb hist" onclick="openHist(${c.id})">📋${h?` ${h}`:''}</button>
+          <button class="rb ask" onclick="openConsejo(${c.id})">🎯</button>
         </div>
-      </div>
-      <div class="cc-right">
-        <span class="badge ${bc(c.status)}">${c.status}</span>
-        ${com?`<span class="cc-com">$${Math.round(com/1000)}k</span>`:''}
-        <span class="cc-dias${u==='h'?' hot':''}">${d===0?'hoy':d+'d'}</span>
-      </div>
-    </div>`;
+      </td>
+    </tr>`;
   }).join('');
+
+  document.getElementById('clist').innerHTML=thead+`<tbody>${rows}</tbody>`;
 }
 
 function renderAll(){renderStats();renderFunnel();renderRecs();renderFilters();renderContacts();}
 
-// INSTANTLY
 async function syncInstantly(){
   const btn=document.getElementById('sync-btn');
   btn.textContent='⏳ Sync...';btn.disabled=true;
@@ -512,7 +524,6 @@ async function syncInstantly(){
   btn.textContent='⚡ Sync Instantly';btn.disabled=false;
 }
 
-// HISTORIAL
 function openHist(id){
   histId=id;
   const c=contacts.find(x=>x.id===id);if(!c) return;
@@ -542,7 +553,6 @@ function addHist(){
 
 function closeHist(){document.getElementById('hist-overlay').classList.remove('open');}
 
-// CONSEJO
 function openConsejo(id){
   const c=contacts.find(x=>x.id===id);if(!c) return;
   const m=getMensaje(c);
@@ -559,7 +569,6 @@ function copyConsejo(){
 
 function closeConsejo(){document.getElementById('consejo-overlay').classList.remove('open');}
 
-// MODAL EDITAR
 function openModal(id){
   editingId=id||null;
   document.getElementById('btn-del').style.display=id?'block':'none';
@@ -631,7 +640,6 @@ function showToast(m){const t=document.getElementById('toast');t.textContent=m;t
 const now=new Date();
 document.getElementById('day-pill').textContent=DIAS[now.getDay()]+' '+now.getDate()+'/'+String(now.getMonth()+1).padStart(2,'0');
 
-// Load localStorage
 try{
   const saved=localStorage.getItem('ryc_contacts');
   if(saved){const d=JSON.parse(saved);contacts=d;nextId=Math.max(...d.map(c=>c.id))+1;}
