@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Coach — Rave & Crutchik</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1a1a2e;--bg:#f0f2f8;--white:#fff;--cream:#f8f9fc;
+  --blue:#2563eb;--blue-l:#eff6ff;--blue-m:#bfdbfe;
+  --green:#16a34a;--green-l:#f0fdf4;
+  --red:#dc2626;--red-l:#fef2f2;
+  --amber:#d97706;--amber-l:#fffbeb;
+  --purple:#7c3aed;--purple-l:#f5f3ff;
+  --border:#e2e8f0;--shadow:0 1px 12px rgba(0,0,0,0.06);
+  --serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',sans-serif;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+.header{background:white;border-bottom:1px solid var(--border);padding:0.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
+.logo{font-family:var(--serif);font-size:18px}
+.logo em{color:var(--blue);font-style:italic}
+.header-right{display:flex;align-items:center;gap:10px}
+.day-pill{font-size:11px;background:var(--blue-l);color:var(--blue);padding:4px 12px;border-radius:99px;font-weight:500}
+.sync-btn{font-size:12px;padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer;display:flex;align-items:center;gap:5px}
+.sync-btn:hover{background:var(--blue-l);color:var(--blue);border-color:var(--blue-m)}
+.sync-btn.loading{opacity:0.6;pointer-events:none}
+.layout{display:grid;grid-template-columns:1fr 320px;flex:1;height:calc(100vh - 53px)}
+.main{overflow-y:auto;padding:1.25rem}
+.sidebar{background:white;border-left:1px solid var(--border);display:flex;flex-direction:column}
+
+/* BRIEFING */
+.briefing{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:white;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;position:relative;overflow:hidden}
+.briefing::after{content:'☀️';position:absolute;right:1.25rem;top:1rem;font-size:28px;opacity:0.25}
+.brief-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.55);margin-bottom:5px}
+.brief-title{font-family:var(--serif);font-size:18px;color:white;margin-bottom:10px}
+.brief-title em{color:#93c5fd;font-style:italic}
+.brief-items{display:flex;flex-direction:column;gap:5px}
+.brief-item{font-size:12px;color:rgba(255,255,255,0.9);padding:7px 10px;background:rgba(255,255,255,0.1);border-radius:8px;border:1px solid rgba(255,255,255,0.08)}
+
+/* INSTANTLY BANNER */
+.instantly-banner{background:var(--green-l);border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;font-size:12px}
+.ib-left{color:var(--green);font-weight:500}
+.ib-right{color:#86efac;font-size:11px}
+.instantly-banner.error{background:var(--amber-l);border-color:#fde68a}
+.instantly-banner.error .ib-left{color:var(--amber)}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.stat{background:white;border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.stat-label{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px;font-weight:500;margin-bottom:3px}
+.stat-val{font-size:20px;font-weight:700;color:var(--ink)}
+.stat-sub{font-size:10px;color:#94a3b8;margin-top:1px}
+
+/* FUNNEL */
+.funnel{background:white;border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem}
+.funnel-title{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px}
+.funnel-stages{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.stage{border-radius:8px;padding:10px 6px;text-align:center;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s}
+.stage:hover{border-color:#cbd5e1}
+.stage.active{border-color:var(--blue);background:var(--blue-l)}
+.s-icon{font-size:16px;margin-bottom:4px}
+.s-name{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;color:#64748b;margin-bottom:4px}
+.s-num{font-size:20px;font-weight:700;color:var(--ink);line-height:1}
+.s-pct{font-size:10px;color:#94a3b8;margin-top:1px}
+.s-frio{background:#f1f5f9}
+.s-contactado{background:#eff6ff}
+.s-respondio{background:#fffbeb}
+.s-reunion{background:#f5f3ff}
+.s-propuesta{background:#fff7ed}
+.s-ganado{background:#f0fdf4}
+.funnel-totals{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:#94a3b8}
+.funnel-totals span{color:var(--ink);font-weight:600}
+
+/* CONTACTS */
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.section-title{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px}
+.add-btn{font-size:12px;padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:white;color:var(--blue);cursor:pointer;font-weight:500}
+.add-btn:hover{background:var(--blue);color:white;border-color:var(--blue)}
+.filter-btns{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.fb{font-size:11px;padding:3px 10px;border-radius:99px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer;transition:all 0.15s}
+.fb.on{background:var(--blue);color:white;border-color:var(--blue)}
+.clist{display:flex;flex-direction:column;gap:4px}
+.ccard{display:grid;grid-template-columns:8px 1fr auto;gap:8px;align-items:center;padding:9px 12px;border:1px solid var(--border);border-radius:9px;cursor:pointer;background:white;transition:all 0.15s}
+.ccard:hover{border-color:var(--blue);box-shadow:var(--shadow)}
+.udot{width:7px;height:7px;border-radius:50%}
+.cc-name{font-size:13px;font-weight:600}
+.cc-sub{font-size:11px;color:#94a3b8;margin-top:1px}
+.cc-action{font-size:10px;color:#64748b;margin-top:2px;font-style:italic}
+.cc-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500;white-space:nowrap}
+.b-Frío{background:#f1f5f9;color:#475569}
+.b-Contactado{background:#dbeafe;color:#1e40af}
+.b-Respondió{background:#fef9c3;color:#854d0e}
+.b-Reunión{background:#f5f3ff;color:#6d28d9}
+.b-Propuesta{background:#fff7ed;color:#c2410c}
+.b-Ganado{background:#dcfce7;color:#166534}
+.b-En\ proceso{background:#dbeafe;color:#1e40af}
+.b-Por\ contactar{background:#fef9c3;color:#854d0e}
+.b-On\ hold{background:#f3f4f6;color:#374151}
+.b-No{background:#fee2e2;color:#991b1b}
+.cc-com{font-size:11px;color:var(--blue);font-weight:600}
+.cc-dias{font-size:10px;color:#cbd5e1}
+.cc-dias.hot{color:var(--red);font-weight:600}
+
+/* INSTANTLY LEADS SECTION */
+.instantly-section{background:white;border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem}
+.is-title{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.is-camp{margin-bottom:8px}
+.is-camp-name{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.is-stats{display:flex;gap:8px;flex-wrap:wrap}
+.is-stat{font-size:11px;padding:3px 8px;border-radius:99px;background:var(--bg);color:#64748b}
+.is-stat.open{background:var(--green-l);color:var(--green)}
+
+/* CHAT */
+.chat-hdr{padding:0.85rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--cream)}
+.coach-av{width:30px;height:30px;background:linear-gradient(135deg,#2563eb,#7c3aed);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.chat-name{font-size:13px;font-weight:600}
+.chat-online{font-size:11px;color:var(--green)}
+.msgs{flex:1;overflow-y:auto;padding:0.85rem;display:flex;flex-direction:column;gap:8px;background:var(--cream)}
+.msg{max-width:95%}
+.msg.coach{align-self:flex-start}
+.msg.user{align-self:flex-end}
+.mbub{font-size:12.5px;line-height:1.55;padding:9px 12px;border-radius:11px}
+.msg.coach .mbub{background:white;border:1px solid var(--border);border-bottom-left-radius:3px;box-shadow:var(--shadow)}
+.msg.user .mbub{background:var(--blue);color:white;border-bottom-right-radius:3px}
+.mtime{font-size:10px;color:#cbd5e1;margin-top:2px;padding:0 3px}
+.msg.user .mtime{text-align:right}
+.typing{display:flex;gap:3px;align-items:center;padding:9px 12px;background:white;border:1px solid var(--border);border-radius:11px;border-bottom-left-radius:3px;width:fit-content}
+.typing span{width:5px;height:5px;background:#94a3b8;border-radius:50%;animation:bonce 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bonce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+.pills{display:flex;flex-wrap:wrap;gap:4px;padding:0.5rem;border-top:1px solid var(--border)}
+.pill{font-size:11px;padding:3px 9px;border-radius:99px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer;transition:all 0.15s}
+.pill:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-l)}
+.cinput-area{padding:0.6rem;border-top:1px solid var(--border);display:flex;gap:5px}
+.cinput{flex:1;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;outline:none;font-family:var(--sans);background:var(--cream);resize:none;min-height:36px;max-height:80px}
+.cinput:focus{border-color:var(--blue);background:white}
+.sbtn{width:34px;height:34px;background:var(--blue);border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sbtn:hover{background:#1d4ed8}
+.sbtn svg{width:14px;height:14px;fill:white}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:white;border-radius:14px;padding:1.5rem;width:430px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.15)}
+.modal h3{font-family:var(--serif);font-size:20px;margin-bottom:1.25rem}
+.field{margin-bottom:11px}
+.field label{font-size:11px;color:#64748b;display:block;margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px}
+.field input,.field select,.field textarea{width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:7px;outline:none;font-family:var(--sans);background:var(--cream)}
+.field input:focus,.field select:focus{border-color:var(--blue);background:white}
+.field textarea{height:60px;resize:none}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem}
+.btn-c{font-size:13px;padding:8px 16px;border-radius:7px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer}
+.btn-s{font-size:13px;padding:8px 16px;border-radius:7px;border:none;background:var(--blue);color:white;cursor:pointer;font-weight:500}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:9px 18px;border-radius:8px;font-size:13px;opacity:0;transition:opacity 0.3s;z-index:200;pointer-events:none}
+.toast.show{opacity:1}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{height:450px;border-top:1px solid var(--border)}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .funnel-stages{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Rave <em>&</em> Crutchik <span style="font-size:12px;color:#94a3b8;font-family:var(--sans);font-weight:400;margin-left:6px">Sales Coach</span></div>
+  <div class="header-right">
+    <span class="day-pill" id="day-pill"></span>
+    <button class="sync-btn" id="sync-btn" onclick="syncInstantly()">⚡ Sync Instantly</button>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="main">
+    <div class="briefing">
+      <div class="brief-label">☀️ Briefing de hoy</div>
+      <div class="brief-title" id="brief-title">Buenos días, Jael.</div>
+      <div class="brief-items" id="brief-items"></div>
+    </div>
+
+    <div id="instantly-banner" style="display:none"></div>
+    <div id="instantly-section" style="display:none"></div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="funnel">
+      <div class="funnel-title">Embudo de ventas</div>
+      <div class="funnel-stages" id="funnel-stages"></div>
+      <div class="funnel-totals" id="funnel-totals"></div>
+    </div>
+
+    <div class="section-hdr">
+      <div class="section-title">Pipeline</div>
+      <button class="add-btn" onclick="openModal()">+ Nuevo contacto</button>
+    </div>
+    <div class="filter-btns" id="filter-btns"></div>
+    <div class="clist" id="clist"></div>
+  </div>
+
+  <div class="sidebar">
+    <div class="chat-hdr">
+      <div class="coach-av">🎯</div>
+      <div>
+        <div class="chat-name">Sales Coach</div>
+        <div class="chat-online">● En línea</div>
+      </div>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="pills">
+      <span class="pill" onclick="sq('¿A quién contacto hoy y qué le digo exactamente?')">¿A quién hoy?</span>
+      <span class="pill" onclick="sq('¿Cómo hago seguimiento a Dmerco sin parecer pesada?')">Seguir Dmerco</span>
+      <span class="pill" onclick="sq('¿Cómo cierro a Tagler y cobro el informe?')">Cerrar Tagler</span>
+      <span class="pill" onclick="sq('Dame un tip de ventas para hoy')">Tip del día</span>
+      <span class="pill" onclick="sq('¿Cuánta comisión potencial tengo?')">Ver comisión</span>
+      <span class="pill" onclick="sq('Alguien me dejó en visto, ¿qué hago?')">Me dejaron en visto</span>
+    </div>
+    <div class="cinput-area">
+      <textarea class="cinput" id="cinput" placeholder="Pregunta al coach..." onkeydown="hkey(event)"></textarea>
+      <button class="sbtn" onclick="send()">
+        <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h3 id="modal-title">Nuevo contacto</h3>
+    <div class="field"><label>Empresa *</label><input id="f-emp" type="text" placeholder="Nombre empresa"></div>
+    <div class="field-row">
+      <div class="field"><label>Contacto</label><input id="f-cont" type="text" placeholder="Nombre"></div>
+      <div class="field"><label>Cargo</label><input id="f-cargo" type="text" placeholder="Cargo"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Etapa</label>
+        <select id="f-status">
+          <option>Frío</option><option>Contactado</option><option>Respondió</option>
+          <option>Reunión</option><option>Propuesta</option><option>Ganado</option>
+          <option>On hold</option><option>No</option>
+        </select>
+      </div>
+      <div class="field"><label>Canal</label>
+        <select id="f-canal">
+          <option value="">-</option><option>Email</option><option>LinkedIn</option>
+          <option>WhatsApp</option><option>Llamada</option><option>Referido</option><option>Reunión</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>UF/hora</label><input id="f-uf" type="number" placeholder="ej: 3.0" step="0.1" min="0"></div>
+      <div class="field"><label>Horas estimadas</label><input id="f-horas" type="number" placeholder="ej: 20" min="0"></div>
+    </div>
+    <div class="field"><label>Próxima acción</label><input id="f-accion" type="text" placeholder="ej: llamar jueves"></div>
+    <div class="field"><label>Notas</label><textarea id="f-notas" placeholder="Contexto, historia, comentarios..."></textarea></div>
+    <div class="modal-btns">
+      <button class="btn-c" onclick="closeModal()">Cancelar</button>
+      <button class="btn-s" onclick="saveContact()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const UF=38500,COM=0.15;
+const STAGES=[
+  {k:'Frío',ico:'🧊',cls:'s-frio'},
+  {k:'Contactado',ico:'📬',cls:'s-contactado'},
+  {k:'Respondió',ico:'💬',cls:'s-respondio'},
+  {k:'Reunión',ico:'🤝',cls:'s-reunion'},
+  {k:'Propuesta',ico:'📄',cls:'s-propuesta'},
+  {k:'Ganado',ico:'🏆',cls:'s-ganado'},
+];
+
+let contacts=[
+  {id:1,emp:'Niu Sushi',cont:'Alan Schoihet',cargo:'Dueño',status:'No',canal:'',dias:30,uf:0,horas:0,accion:'',notas:'No respondió'},
+  {id:2,emp:'Japi Jane',cont:'Mail de contacto',cargo:'Dueño',status:'No',canal:'',dias:30,uf:0,horas:0,accion:'',notas:'No respondió'},
+  {id:3,emp:'Coca Cola',cont:'Romina Elgueta',cargo:'Mejora continua',status:'No',canal:'',dias:30,uf:0,horas:0,accion:'',notas:'Eligieron otra empresa'},
+  {id:4,emp:'Benbo',cont:'Nicolás Borobio',cargo:'Dueño',status:'On hold',canal:'',dias:20,uf:0,horas:0,accion:'Esperar que se ordenen',notas:'Esperando a ordenarse'},
+  {id:5,emp:'Tagler Foods',cont:'Luis Cheriff',cargo:'Gerente Operaciones',status:'Reunión',canal:'Reunión',dias:21,uf:3.5,horas:40,accion:'Cobrar y entregar informe de visita',notas:'Informe visita pendiente, pago atrasado'},
+  {id:6,emp:'HDG',cont:'Seba',cargo:'Producción',status:'Contactado',canal:'Email',dias:10,uf:0,horas:0,accion:'Seguimiento email',notas:''},
+  {id:7,emp:'Coca Cola',cont:'Cristina Arancibia',cargo:'Mejora continua',status:'On hold',canal:'',dias:15,uf:0,horas:0,accion:'Esperar info',notas:'Sin info por ahora'},
+  {id:8,emp:'Forus',cont:'Caro',cargo:'Gerente Marketing',status:'On hold',canal:'',dias:21,uf:0,horas:0,accion:'Investigar antes de contactar',notas:''},
+  {id:9,emp:'Arauco',cont:'Luciano Villarroel',cargo:'-',status:'On hold',canal:'',dias:30,uf:0,horas:0,accion:'Retomar en 2 semanas',notas:''},
+  {id:10,emp:'Neumaérica',cont:'Gabriela Rodriguez',cargo:'Gerente Comercial',status:'Contactado',canal:'Email',dias:21,uf:0,horas:0,accion:'Mail seguimiento',notas:''},
+  {id:11,emp:'Transportes Jofre Hidalgo',cont:'-',cargo:'-',status:'Contactado',canal:'',dias:14,uf:0,horas:0,accion:'Seguimiento',notas:''},
+  {id:12,emp:'Transportes Sahid',cont:'Enrique Peña / Felipe Armijo',cargo:'Dueño',status:'Contactado',canal:'WhatsApp',dias:14,uf:0,horas:0,accion:'Seguimiento WhatsApp',notas:''},
+  {id:13,emp:'Transportes Dliverys',cont:'Cristopher Olguin',cargo:'Dueño',status:'En proceso',canal:'WhatsApp',dias:7,uf:2.5,horas:16,accion:'Insistir — dejó en visto',notas:'No llegó a reunión acordada'},
+  {id:14,emp:'Transportes Concha',cont:'Victor Muñoz',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento WhatsApp',notas:''},
+  {id:15,emp:'Wild Foods',cont:'Javier Castro',cargo:'Co Founder & CEO',status:'Frío',canal:'LinkedIn',dias:5,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn'},
+  {id:16,emp:'Transportes Nazar',cont:'José Miguel Gelvez',cargo:'Gerente General',status:'Frío',canal:'LinkedIn',dias:5,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn'},
+  {id:17,emp:'Loginsa',cont:'Tomás Cox',cargo:'Gerente General',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:''},
+  {id:18,emp:'Clínica Bupa',cont:'Rafael Córdova',cargo:'Gerente General',status:'Frío',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn'},
+  {id:19,emp:'Karün',cont:'Ignacio Ureta',cargo:'Gerente General',status:'Frío',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn'},
+  {id:20,emp:'Casa Idea',cont:'Cedric Moller',cargo:'Gerente General',status:'Frío',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn'},
+  {id:21,emp:'Dimarc',cont:'Valentin Flores',cargo:'Gerente General',status:'Frío',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn'},
+  {id:22,emp:'Prisa',cont:'Martín Grosso',cargo:'Gerente General',status:'Frío',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn'},
+  {id:23,emp:'Dimerc',cont:'Karim Eltit',cargo:'Gerente General',status:'Frío',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn'},
+  {id:24,emp:'Disal',cont:'Daniel Palma',cargo:'Gerente Corporativo',status:'Frío',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn'},
+  {id:25,emp:'Grupo K',cont:'Sebastian Khamis',cargo:'Gerente General',status:'Frío',canal:'LinkedIn',dias:5,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn'},
+  {id:26,emp:'Leco Consortium',cont:'Luis Cárcamo',cargo:'Gerente General',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:''},
+  {id:27,emp:'Salfa',cont:'Derek Bull',cargo:'Gerente Logística',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:''},
+  {id:28,emp:'DHL',cont:'Alejandro Trello',cargo:'Operation Manager',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:''},
+  {id:29,emp:'Neulin Graneles',cont:'Carlos Pineda',cargo:'Gerente/Socio/Director',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:''},
+  {id:30,emp:'Dmerco',cont:'Marco',cargo:'Dueño',status:'Reunión',canal:'WhatsApp',dias:14,uf:3.0,horas:20,accion:'Confirmar fecha reunión jue/vie',notas:'Próxima semana'},
+  {id:31,emp:'RockTruck',cont:'-',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento',notas:'Era de finanzas, compartirá contacto'},
+  {id:32,emp:'Casablanca',cont:'-',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento',notas:'No ha contestado'},
+  {id:33,emp:'Antofagasta Terminal',cont:'Alex Munoz',cargo:'Ops Manager',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento hoy',notas:'Abrió email Instantly ✅'},
+  {id:34,emp:'Puerto San Antonio',cont:'Jorge Santos',cargo:'Gerente Operaciones',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento hoy',notas:'Abrió email Instantly ✅'},
+  {id:35,emp:'Almar Water',cont:'Yilian Collao',cargo:'Subgerente Ops',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento hoy',notas:'Abrió email Instantly ✅'},
+  {id:36,emp:'Implementos Chile',cont:'Hans Meyer',cargo:'Jefe Ops CD',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento hoy',notas:'Abrió email Instantly ✅'},
+  {id:37,emp:'ULOG',cont:'Manuel Salazar',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly'},
+  {id:38,emp:'Transportes Maquehua',cont:'Igor Jofre',cargo:'Asst. Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly'},
+  {id:39,emp:'Empresas Marval',cont:'Javier Droguett',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly'},
+  {id:40,emp:'Grupo MBO',cont:'Carlos Corvalan',cargo:'Supply Chain Mgr',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly'},
+  {id:41,emp:'APRO',cont:'Consuelo Camaggi',cargo:'Supply Chain Corp.',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly'},
+  {id:42,emp:'Miniso Chile',cont:'Gonzalo Salgueiro',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly'},
+  {id:43,emp:'La Fête Chocolat',cont:'Martin Bunster',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly'},
+  {id:44,emp:'ID Logistics',cont:'Franco Salinas',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly'},
+  {id:45,emp:'RFP Logistica',cont:'Mauricio Contreras',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly'},
+  {id:46,emp:'Recibelo.cl',cont:'Mauricio Rivera',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly'},
+  {id:47,emp:'RPM Parts',cont:'Valentina Rayman',cargo:'Supply Chain Mgr',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly'},
+  {id:48,emp:'Caja Los Héroes',cont:'(vía Berna)',cargo:'-',status:'Frío',canal:'Referido',dias:0,uf:0,horas:0,accion:'Pedir contacto a Berna',notas:'Papá de Berna trabaja ahí'},
+  {id:49,emp:'Alemán Experto',cont:'(vía Sofi)',cargo:'Dueño',status:'Frío',canal:'Referido',dias:0,uf:0,horas:0,accion:'Contactar por Sofi/Berna',notas:'Sofi es esposa del dueño'},
+];
+
+let nextId=60,chatMsgs=[],activeFilter='todos',editingId=null,instantlyData=null;
+
+function calcV(uf,h){return uf&&h?Math.round(uf*h*UF):0;}
+function calcC(v){return Math.round(v*COM);}
+function urg(c){
+  if(['No','Ganado'].includes(c.status)) return 'l';
+  if(c.status==='Reunión'&&c.dias>5) return 'h';
+  if(c.status==='Respondió'&&c.dias>2) return 'h';
+  if(c.status==='En proceso'&&c.dias>7) return 'h';
+  if(['Contactado','Por contactar'].includes(c.status)&&c.dias>14) return 'h';
+  if(c.dias>7) return 'm';
+  return 'l';
+}
+const UCOL={h:'#ef4444',m:'#f59e0b',l:'#22c55e'};
+const ORD={'Reunión':0,'Respondió':1,'Propuesta':2,'En proceso':3,'Contactado':4,'Frío':5,'Por contactar':5,'On hold':6,'Ganado':7,'No':8};
+
+// INSTANTLY SYNC
+async function syncInstantly(){
+  const btn=document.getElementById('sync-btn');
+  btn.classList.add('loading');btn.textContent='⏳ Sincronizando...';
+  try{
+    const r=await fetch('/api/instantly');
+    const data=await r.json();
+    if(data.error) throw new Error(data.error);
+    instantlyData=data;
+    renderInstantlyBanner(data);
+    renderInstantlySection(data);
+    // Update contacts with Instantly data
+    updateContactsFromInstantly(data);
+    showToast('✅ Instantly sincronizado');
+  }catch(e){
+    document.getElementById('instantly-banner').style.display='block';
+    document.getElementById('instantly-banner').innerHTML=`<div class="instantly-banner error"><div class="ib-left">⚠️ Error al conectar con Instantly: ${e.message}</div></div>`;
+    showToast('Error al sincronizar Instantly');
+  }
+  btn.classList.remove('loading');btn.textContent='⚡ Sync Instantly';
+}
+
+function renderInstantlyBanner(data){
+  const el=document.getElementById('instantly-banner');
+  el.style.display='block';
+  const camps=data.campaigns?.length||0;
+  const leads=data.leads?.length||0;
+  const opened=data.leads?.filter(l=>l.opened_count>0).length||0;
+  el.innerHTML=`<div class="instantly-banner"><div class="ib-left">⚡ Instantly conectado — ${camps} campaña${camps!==1?'s':''}, ${leads} leads, ${opened} abrieron</div><div class="ib-right">Actualizado ahora</div></div>`;
+}
+
+function renderInstantlySection(data){
+  const el=document.getElementById('instantly-section');
+  if(!data.campaigns?.length){el.style.display='none';return;}
+  el.style.display='block';
+  el.innerHTML=`<div class="instantly-section">
+    <div class="is-title"><span>⚡ Campañas Instantly</span></div>
+    ${data.campaigns.map(c=>{
+      const campLeads=data.leads?.filter(l=>l.campaign_id===c.id)||[];
+      const opened=campLeads.filter(l=>l.opened_count>0).length;
+      const bounced=campLeads.filter(l=>l.status==='bounced').length;
+      const completed=campLeads.filter(l=>l.status==='completed').length;
+      return `<div class="is-camp">
+        <div class="is-camp-name">${c.name}</div>
+        <div class="is-stats">
+          <span class="is-stat">${campLeads.length} leads</span>
+          <span class="is-stat">${completed} enviados</span>
+          ${opened?`<span class="is-stat open">📬 ${opened} abrieron</span>`:''}
+          ${bounced?`<span class="is-stat">⚠️ ${bounced} rebotaron</span>`:''}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function updateContactsFromInstantly(data){
+  if(!data.leads) return;
+  data.leads.forEach(lead=>{
+    const name=lead.first_name||lead.email?.split('@')[0]||'';
+    const existing=contacts.find(c=>
+      c.cont?.toLowerCase().includes(name.toLowerCase())||
+      c.notas?.includes('Instantly')
+    );
+    if(existing){
+      if(lead.opened_count>0&&existing.status==='Contactado'){
+        existing.status='Respondió';
+        existing.accion='Seguimiento — abrió el email';
+        existing.notas=(existing.notas||'')+' ✅ Abrió email';
+      }
+    }
+  });
+  renderAll();
+}
+
+function renderStats(){
+  const act=contacts.filter(c=>c.status!=='No');
+  const comEst=act.reduce((s,c)=>s+calcC(calcV(c.uf,c.horas)),0);
+  const urg_n=contacts.filter(c=>urg(c)==='h').length;
+  const ganados=contacts.filter(c=>c.status==='Ganado').length;
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><div class="stat-label">Pipeline activo</div><div class="stat-val">${act.length}</div><div class="stat-sub">${ganados} ganados</div></div>
+    <div class="stat"><div class="stat-label">Comisión est.</div><div class="stat-val" style="color:var(--blue)">$${comEst?Math.round(comEst/1000)+'k':'-'}</div><div class="stat-sub">CLP · 15%</div></div>
+    <div class="stat"><div class="stat-label">Urgentes</div><div class="stat-val" style="color:${urg_n?'var(--red)':'var(--green)'}">${urg_n}</div><div class="stat-sub">sin contacto reciente</div></div>
+    <div class="stat"><div class="stat-label">Respondieron</div><div class="stat-val" style="color:var(--amber)">${contacts.filter(c=>c.status==='Respondió').length}</div><div class="stat-sub">leads calientes</div></div>
+  `;
+}
+
+function renderFunnel(){
+  const act=contacts.filter(c=>c.status!=='No');
+  const tot=act.length||1;
+  document.getElementById('funnel-stages').innerHTML=STAGES.map(s=>{
+    const n=contacts.filter(c=>c.status===s.k).length;
+    const pct=Math.round(n/tot*100);
+    return `<div class="stage ${s.cls} ${activeFilter===s.k?'active':''}" onclick="setF('${s.k}')">
+      <div class="s-icon">${s.ico}</div>
+      <div class="s-name">${s.k}</div>
+      <div class="s-num">${n}</div>
+      <div class="s-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+  document.getElementById('funnel-totals').innerHTML=`
+    <span>Total activos: <span>${act.length}</span></span>
+    <span>Ganados: <span>${contacts.filter(c=>c.status==='Ganado').length}</span></span>
+    <span>Descartados: <span>${contacts.filter(c=>c.status==='No').length}</span></span>
+  `;
+}
+
+function renderBriefing(){
+  const now=new Date();
+  document.getElementById('brief-title').innerHTML=`Buenos días, Jael. Hoy es <em>${DIAS[now.getDay()]} ${now.getDate()} de ${MESES[now.getMonth()]}</em>.`;
+  const urgentes=contacts.filter(c=>urg(c)==='h');
+  const abrieron=contacts.filter(c=>c.status==='Respondió'&&c.dias<=2);
+  const referidos=contacts.filter(c=>c.canal==='Referido'&&c.status==='Frío');
+  const items=[];
+  if(abrieron.length) items.push(`🔥 ${abrieron.length} abrieron tu email — ${abrieron.map(c=>c.emp).join(', ')}. Escríbeles HOY.`);
+  if(urgentes.length) items.push(`⏰ ${urgentes.length} urgentes: ${urgentes.slice(0,3).map(c=>c.emp).join(', ')}.`);
+  if(referidos.length) items.push(`👥 ${referidos.length} referidos sin contactar — ${referidos.map(c=>c.emp).join(', ')}.`);
+  if(!items.length) items.push('✅ Pipeline bajo control. Buen día para prospectar nuevas empresas.');
+  document.getElementById('brief-items').innerHTML=items.map(t=>`<div class="brief-item">${t}</div>`).join('');
+}
+
+function renderFilters(){
+  const statuses=['todos',...[...new Set(contacts.filter(c=>c.status!=='No').map(c=>c.status))]];
+  document.getElementById('filter-btns').innerHTML=statuses.map(s=>`
+    <button class="fb ${s===activeFilter?'on':''}" onclick="setF('${s}')">${s==='todos'?'Todos':s}</button>`).join('');
+}
+
+function setF(f){activeFilter=f;renderFilters();renderFunnel();renderContacts();}
+
+function renderContacts(){
+  const list=activeFilter==='todos'?contacts.filter(c=>c.status!=='No'):contacts.filter(c=>c.status===activeFilter);
+  const sorted=[...list].sort((a,b)=>(ORD[a.status]||9)-(ORD[b.status]||9)||b.dias-a.dias);
+  document.getElementById('clist').innerHTML=sorted.map(c=>{
+    const v=calcV(c.uf,c.horas),com=calcC(v),u=urg(c);
+    const bcls=`b-${c.status}`.replace(/ /g,'\\ ');
+    return `<div class="ccard" onclick="askAbout(${c.id})">
+      <div class="udot" style="background:${UCOL[u]}"></div>
+      <div>
+        <div class="cc-name">${c.emp}</div>
+        <div class="cc-sub">${[c.cont,c.cargo].filter(x=>x&&x!=='-').join(' · ')}</div>
+        ${c.accion?`<div class="cc-action">${c.accion}</div>`:''}
+      </div>
+      <div class="cc-right">
+        <span class="badge ${bcls}">${c.status}</span>
+        ${com?`<span class="cc-com">$${Math.round(com/1000)}k com.</span>`:''}
+        <span class="cc-dias ${u==='h'?'hot':''}">${c.dias===0?'nuevo':c.dias+'d'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAll(){renderStats();renderFunnel();renderBriefing();renderFilters();renderContacts();}
+
+function askAbout(id){
+  const c=contacts.find(x=>x.id===id);if(!c) return;
+  sq(`Consejo concreto sobre ${c.emp} (${c.cont}, ${c.cargo}). Etapa: ${c.status}. ${c.dias}d sin contacto. Acción pendiente: "${c.accion}". ${c.notas?'Notas: '+c.notas:''} ¿Qué hago exactamente hoy con este contacto?`);
+}
+
+// CHAT
+function buildSys(){
+  const now=new Date();
+  const act=contacts.filter(c=>c.status!=='No');
+  const pipeline=act.map(c=>`- ${c.emp} (${c.cont}, ${c.cargo}): ${c.status}, ${c.dias}d sin contacto, "${c.accion||'-'}", notas="${c.notas||''}"`).join('\n');
+  const instCtx=instantlyData?`\nINSTANTLY: ${instantlyData.campaigns?.length||0} campañas, ${instantlyData.leads?.length||0} leads, ${instantlyData.leads?.filter(l=>l.opened_count>0).length||0} abrieron emails.`:'';
+  return `Eres el Sales Coach personal de Jael Crutchik Pedemonte. Capta clientes para Rave & Crutchik (consultora chilena de excelencia operacional y supply chain). Comisión: 15%.
+
+JAEL: +10 años operaciones en Nestlé y Unilever. Sin experiencia formal en ventas — esa es su fortaleza, habla el idioma de sus prospectos. R&C: 9.8% reducción costos, +USD 2M ahorros.
+
+HOY: ${DIAS[now.getDay()]} ${now.getDate()} de ${MESES[now.getMonth()]} ${now.getFullYear()}. Martes/miércoles = mejores días para emails.${instCtx}
+
+PIPELINE (${act.length} activos):
+${pipeline}
+
+PRIORIDADES CLAVE:
+- Los "Respondió" con email abierto de Instantly: seguimiento HOY mismo
+- Tagler Foods: reunión hecha pero no han pagado ni recibido informe — cobrar primero
+- Dmerco (Marco): reunión casi confirmada, insistir para fecha concreta
+- Referidos (Caja Los Héroes, Alemán Experto): acceso directo, máxima prioridad
+
+ESTILO: Directa, cálida, motivadora. Como amiga experta en ventas. Consejos concretos con mensajes listos para copiar. Máximo 120 palabras.`;
+}
+
+async function callCoach(msg){
+  chatMsgs.push({role:'user',content:msg});
+  try{
+    const r=await fetch('/api/coach',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:chatMsgs,systemPrompt:buildSys()})
+    });
+    const d=await r.json();
+    const rep=d.reply||d.error||'Error al conectar.';
+    chatMsgs.push({role:'assistant',content:rep});
+    return rep;
+  }catch(e){return 'Error de conexión.';}
+}
+
+function addMsg(txt,role,disp){
+  const wrap=document.getElementById('msgs');
+  const now=new Date(),time=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  const div=document.createElement('div');div.className=`msg ${role}`;
+  div.innerHTML=`<div class="mbub">${(disp||txt).replace(/\n/g,'<br>')}</div><div class="mtime">${time}</div>`;
+  wrap.appendChild(div);wrap.scrollTop=wrap.scrollHeight;
+}
+function showTyp(){
+  const w=document.getElementById('msgs');
+  const d=document.createElement('div');d.className='msg coach';d.id='typ';
+  d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';
+  w.appendChild(d);w.scrollTop=w.scrollHeight;
+}
+function hideTyp(){const t=document.getElementById('typ');if(t)t.remove();}
+
+async function sq(t,disp){
+  addMsg(disp||t,'user');showTyp();
+  const r=await callCoach(t);hideTyp();addMsg(r,'coach');
+}
+async function send(){
+  const inp=document.getElementById('cinput');
+  const t=inp.value.trim();if(!t) return;inp.value='';await sq(t);
+}
+function hkey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
+
+// MODAL
+function openModal(id){
+  editingId=id||null;
+  if(id){
+    const c=contacts.find(x=>x.id===id);if(!c) return;
+    document.getElementById('modal-title').textContent='Editar — '+c.emp;
+    document.getElementById('f-emp').value=c.emp;
+    document.getElementById('f-cont').value=c.cont||'';
+    document.getElementById('f-cargo').value=c.cargo||'';
+    document.getElementById('f-status').value=c.status;
+    document.getElementById('f-canal').value=c.canal||'';
+    document.getElementById('f-uf').value=c.uf||'';
+    document.getElementById('f-horas').value=c.horas||'';
+    document.getElementById('f-accion').value=c.accion||'';
+    document.getElementById('f-notas').value=c.notas||'';
+  }else{
+    document.getElementById('modal-title').textContent='Nuevo contacto';
+    ['f-emp','f-cont','f-cargo','f-uf','f-horas','f-accion','f-notas'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('f-status').value='Frío';document.getElementById('f-canal').value='';
+  }
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal(){document.getElementById('overlay').classList.remove('open');}
+function saveContact(){
+  const emp=document.getElementById('f-emp').value.trim();
+  if(!emp){alert('Ingresa el nombre de la empresa');return;}
+  const data={emp,cont:document.getElementById('f-cont').value.trim(),cargo:document.getElementById('f-cargo').value.trim(),status:document.getElementById('f-status').value,canal:document.getElementById('f-canal').value,uf:parseFloat(document.getElementById('f-uf').value)||0,horas:parseInt(document.getElementById('f-horas').value)||0,accion:document.getElementById('f-accion').value.trim(),notas:document.getElementById('f-notas').value.trim(),dias:0};
+  if(editingId){const idx=contacts.findIndex(x=>x.id===editingId);if(idx>=0)contacts[idx]={...contacts[idx],...data};}
+  else contacts.push({id:nextId++,...data});
+  closeModal();showToast('✅ Guardado');renderAll();
+}
+document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+// INIT
+const now=new Date();
+document.getElementById('day-pill').textContent=DIAS[now.getDay()]+' '+now.getDate()+'/'+String(now.getMonth()+1).padStart(2,'0');
+renderAll();
+
+// Auto briefing del coach
+setTimeout(async()=>{
+  const now2=new Date();
+  showTyp();
+  const r=await callCoach(`Hola Jael! Briefing para este ${DIAS[now2.getDay()]}. Considera: los 4 que abrieron email de Instantly (calientes), Tagler Foods pendiente de cobro, Dmerco con reunión pendiente, y referidos Caja Los Héroes y Alemán Experto. Dame 3 acciones concretas para hoy. Sé directa.`);
+  hideTyp();addMsg(r,'coach');
+},600);
+</script>
+</body>
+</html>
