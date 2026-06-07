@@ -352,6 +352,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
     </div>
 
     <div class="diag-section">
+      <div class="diag-section-title"><span>💰</span> ¿Cuánto vale esto para ellos?</div>
+      <div class="diag-generated" id="diag-valor-gen"></div>
+      <label class="diag-edit-label">Tu estimación (editable):</label>
+      <textarea class="diag-edit" id="diag-valor-edit" placeholder="Estima cuánto les cuesta el problema hoy. Ej: si tienen 5 camiones con 2h muertas/día a $20k/h = $200k/mes. Eso es lo que vale resolverlo."></textarea>
+    </div>
+
+    <div class="diag-section">
       <div class="diag-section-title"><span>🔍</span> Qué está pasando realmente</div>
       <div class="diag-generated" id="diag-real-gen"></div>
       <label class="diag-edit-label">Tu lectura (editable):</label>
@@ -1101,6 +1108,26 @@ function calcBloqueador(c){
   return 'Sin bloqueo claro';
 }
 
+function generarValorEstimado(c){
+  var nivel=nivelCargo(c);
+  var rubro=inferRubro(c.emp)||'default';
+  var nombre=c.cont?c.cont.split(' ')[0]:'el contacto';
+
+  var intro='Antes de proponer, estima cuanto les cuesta el problema hoy. ';
+  var guias={
+    'Transporte/Logistica':'Ejercicio: cuantos vehiculos tienen x horas muertas/dia x costo hora. Eso es lo minimo que vale resolverlo. Si no lo sabes, preguntaselo a '+nombre+' en la reunion antes de hablar de precio.',
+    'Puertos/Operaciones':'Ejercicio: cuantas horas de espera no planificada tienen al mes x costo hora de berth o equipo. Ese numero puesto sobre la mesa antes del precio cambia toda la conversacion.',
+    'Retail/Consumo':'Ejercicio: cuantas unidades pierden por quiebre de stock al mes x margen por unidad, mas costo de despachos tarde y devoluciones. Eso es lo que vale resolverlo.',
+    'Alimentos':'Ejercicio: porcentaje de merma actual x volumen x costo. Mas el costo potencial de un recall si la trazabilidad falla. Ese segundo numero suele ser el que mueve la decision.',
+    '3PL/Operadores':'Ejercicio: cuantos clientes tienen x margen promedio por cliente. Si el margen real es 30% menor al estimado por ineficiencias, eso es lo que vale medir y resolver.',
+    'Mineria/Industria':'Ejercicio: cuantas horas de parada no programada tuvieron el ultimo trimestre x costo hora de produccion parada. Ese numero suele ser 10x el costo de prevenirlo.',
+    'Salud':'Ejercicio: cuantas horas clinicas se van en admin por semana x costo hora clinico. Mas el costo de quiebres de insumos que generan atencion de menor calidad.',
+    'default':'Ejercicio: cuanto tiempo pierde el equipo en el problema por semana x costo de ese tiempo. Mas el costo de las decisiones que se toman sin buena informacion. Si no puedes estimarlo, no tienes suficiente informacion para proponer todavia.'
+  };
+
+  return intro+(guias[rubro]||guias['default'])+' Recuerda: el precio correcto no lo defines desde tus horas. Lo defines desde lo que vale para ellos.';
+}
+
 // --- MODAL DIAGNÓSTICO ---
 function openDiag(id){
   diagId=id;
@@ -1126,10 +1153,12 @@ function openDiag(id){
   document.getElementById('diag-bloq-val').textContent = bloq;
   
   document.getElementById('diag-dolor-gen').textContent = generarDolor(c);
+  document.getElementById('diag-valor-gen').textContent = generarValorEstimado(c);
   document.getElementById('diag-real-gen').textContent = generarDiagReal(c);
   document.getElementById('diag-accion-gen').textContent = generarDiagAccion(c);
   
   document.getElementById('diag-dolor-edit').value = c.diagDolor||'';
+  document.getElementById('diag-valor-edit').value = c.diagValor||'';
   document.getElementById('diag-real-edit').value = c.diagReal||'';
   document.getElementById('diag-accion-edit').value = c.diagAccion||'';
   
@@ -1142,6 +1171,7 @@ function saveDiag(){
   const realEdit=document.getElementById('diag-real-edit').value.trim();
   const accionEdit=document.getElementById('diag-accion-edit').value.trim();
   c.diagDolor=dolorEdit||document.getElementById('diag-dolor-gen').textContent.trim();
+  c.diagValor=document.getElementById('diag-valor-edit').value.trim()||document.getElementById('diag-valor-gen').textContent.trim();
   c.diagReal=realEdit||document.getElementById('diag-real-gen').textContent.trim();
   c.diagAccion=accionEdit||document.getElementById('diag-accion-gen').textContent.trim();
   saveLS();renderAll();closeDiag();showToast('✅ Diagnóstico guardado');
@@ -1156,36 +1186,51 @@ function openNeg(id){
   var pregunta=getPreguntaDolor(c);
   document.getElementById('neg-title').textContent='Propuesta - '+c.emp;
   var cards=[
-    {color:'#2563eb',titulo:'Antes de presentar el precio',items:[
-      'Confirma que el dolor esta claro: "'+pregunta+'" Si no lo saben, no estan listos para recibir una propuesta.',
+    {color:'#7c3aed',titulo:'PASO 0: Ancla el valor antes del precio (Francisco)',items:[
+      'El precio no lo defines desde tus horas. Lo defines desde lo que vale resolver el problema para ellos.',
+      'Antes de decir el numero, haz que ellos pongan el numero: "cuanto te cuesta al mes este problema?" Si no lo saben, ayudalos a estimarlo.',
+      'Si '+c.emp+' pierde $X al mes en este problema, tu propuesta de $Y no es cara, es barata. Eso es valor relativo.',
+      '"Las cosas valen lo que valen para el que las recibe." El café cuesta lo que cuesta en el aeropuerto porque ahi lo necesitas. Tu servicio vale lo que vale para ellos en este momento.',
+      'No compitas con otras consultoras. No tienes tiempo para mirar lo que hacen. Tu unico objetivo: que no les caguen con una solucion generica que no funciona en su operacion real.'
+    ]},
+    {color:'#2563eb',titulo:'PASO 1: Confirma el dolor y el valor antes del precio',items:[
+      'Pregunta directa: "'+pregunta+'"',
+      'Luego pregunta: cuanto te cuesta ese problema al mes? Ayudalos a estimarlo si no saben. Ese numero es tu ancla.',
+      'Si no saben responder ni el dolor ni el costo, no estan listos. Retrocede y diagnostica.',
       'No justifiques el precio antes de que lo pidan. El que justifica primero negocia contra si mismo.',
-      'Presenta el costo de NO resolver el problema antes del precio de resolverlo.',
-      'Recuerda: no te estan haciendo un favor. Tu resuelves algo que les cuesta plata o tiempo.'
+      'La negociacion no se trata de tu tiempo ni de lo que te demoras. Se trata de cuanto vale para ellos.'
     ]},
-    {color:'#16a34a',titulo:'Como presentar el precio',items:[
-      'Di el numero con confianza y calla. Los 3 segundos de silencio son del otro, no tuyos.',
-      'No redondees ni te disculpes: "son X UF" - punto. Sin mas o menos ni dependeria.',
-      'Ancla el precio al dolor: "resolver esto vale X, no resolverlo probablemente cuesta mas que eso al mes".',
-      'Si preguntan por el desglose, da solo lo necesario. No itemices o negociaran linea por linea.'
+    {color:'#475569',titulo:'PASO 1.5: Fija expectativas antes de cerrar',items:[
+      'Antes de que firmen, di en voz alta que incluye y que NO incluye. No como clausula legal, como conversacion honesta.',
+      'Define como se mide el exito: que tiene que pasar para que en 3 meses ambos digan que esto funciono.',
+      'Define cuando termina el proyecto y que pasa despues. La ambiguedad genera conflicto.',
+      'Fijar expectativas no es protegerte a ti. Es respetar al otro. Y te ahorra el 80% de los problemas post-cierre.'
     ]},
-    {color:'#d97706',titulo:'Si piden descuento (regla CC)',items:[
+    {color:'#16a34a',titulo:'PASO 2: Presenta el precio con confianza',items:[
+      'Di el numero y calla. Los 3 segundos de silencio son del otro, no tuyos.',
+      '"Son X UF." Punto. Sin mas o menos, sin dependeria, sin disculpa.',
+      'Si preguntan por el desglose: da solo lo necesario. Si itemizas todo, negociaran linea por linea.',
+      'No te estan haciendo un favor por escucharte. Tu resuelves algo que les cuesta plata. Eso tiene valor.'
+    ]},
+    {color:'#d97706',titulo:'PASO 3: Si piden descuento (regla CC)',items:[
       'Nunca des descuento a cambio de nada. Concesion siempre con condicion.',
       '"Que presupuesto tienes? Asi veo que puedo darte por esa plata." Reduce el scope, no el precio.',
-      '"Puedo ajustar el precio si sacamos X de la propuesta. Que priorizas?" Ellos deciden que pierden.',
+      '"Puedo ajustar si sacamos X de la propuesta. Que priorizas tu?" Ellos deciden que pierden.',
       '"No hago descuentos, pero si cerramos esta semana puedo incluir X sin costo adicional."',
-      'Hacer descuento a cambio de nada es admitir que el precio estaba inflado.'
+      'Hacer descuento a cambio de nada es admitir que el precio estaba inflado. No lo hagas.'
     ]},
-    {color:'#dc2626',titulo:'Si dicen que lo van a pensar',items:[
-      '"Perfecto, cotiza en otro lado. Si nada te convence, aca vamos a estar." Desprendimiento real.',
-      '"Que necesitarias ver para tomar la decision?" Si no saben, el problema es otro.',
-      '"Hay algo que no quedo claro de la propuesta?" El lo pienso a veces es una objecion disfrazada.',
-      'No persigas. El que se ve mas desesperado, cierra menos. Tienes mas de 50 contactos en el pipeline.'
+    {color:'#dc2626',titulo:'PASO 4: Si dicen que lo van a pensar',items:[
+      '"Perfecto, cotiza en otro lado y revisa que hay en el mercado. Si nada te convence, aca vamos a estar." Desprendimiento real, no performance.',
+      '"Que necesitarias ver para decidir?" Si no saben, el problema no es el precio.',
+      '"Hay algo que no quedo claro?" El lo pienso suele ser una objecion disfrazada.',
+      'No persigas. Tienes 50 contactos en el pipeline. El sindrome del adolescente es creer que este es el unico.'
     ]},
-    {color:'#7c3aed',titulo:'Recordatorios de Francisco',items:[
-      'La negociacion depende del otro, no de ti. Su necesidad, no tu ansiedad.',
-      'Sobrevaloras las alternativas que tiene el otro. Probablemente no conoce tu competencia tan bien.',
-      'El exceso de empatia te juega en contra. Escucha, pero no negocies por el.',
-      'Te prestigia perder clientes por no transar lo que no va. No todos son tu cliente.'
+    {color:'#1a1a2e',titulo:'Mindset de cierre (Francisco)',items:[
+      'No te importa lo que digan de ti. Cuando vas adelantado te critican. Eso es senal de que vas bien.',
+      'No mires a la competencia. No tienes tiempo. Enfocate en el dolor de este cliente.',
+      'El poder en la negociacion lo dan las alternativas del otro. Probablemente tiene menos de las que crees.',
+      'Te prestigia perder clientes por no transar lo que no va. No todos son tu cliente y esta bien.',
+      'El que se ve mas desesperado, cierra menos. Ve con confianza y desprendimiento real.'
     ]}
   ];
   document.getElementById('neg-body').innerHTML=cards.map(function(card){
@@ -1330,7 +1375,7 @@ function saveContact(){
     const i=contacts.findIndex(x=>x.id===editingId);
     if(i>=0) contacts[i]={...contacts[i],...data};
   } else {
-    contacts.push({id:nextId++,...data,historial:[],diagReal:'',diagAccion:'',diagDolor:'',ciudad:'',region:''});
+    contacts.push({id:nextId++,...data,historial:[],diagReal:'',diagAccion:'',diagDolor:'',diagValor:'',ciudad:'',region:''});
   }
   closeModal();saveLS();showToast('✅ Guardado');renderAll();loadTips();
 }
@@ -1349,7 +1394,7 @@ try{
   if(saved){
     const d=JSON.parse(saved);
     // Merge: preserve saved data, add new fields if missing
-    contacts=d.map(c=>({diagReal:'',diagAccion:'',diagDolor:'',ciudad:'',region:'',...c}));
+    contacts=d.map(c=>({diagReal:'',diagAccion:'',diagDolor:'',diagValor:'',ciudad:'',region:'',...c}));
     nextId=Math.max(...d.map(c=>c.id))+1;
   }
 }catch(e){}
