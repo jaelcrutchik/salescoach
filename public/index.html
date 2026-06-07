@@ -89,13 +89,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 .ctable td{font-size:12px;padding:6px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ctable tr:last-child td{border-bottom:none}
 .ctable tr:hover td{background:#fafbfd}
-.col-emp{width:22%}
-.col-cont{width:18%}
-.col-status{width:70px}
-.col-temp{width:100px}
-.col-timing{width:18%}
-.col-dias{width:48px;text-align:center}
-.col-acc{width:88px}
+.col-emp{width:140px}
+.col-cont{width:120px}
+.col-status{width:90px;text-align:center}
+.col-score{width:75px;text-align:center}
+.col-timing{width:130px}
+.col-dias{width:44px;text-align:center}
+.col-acc{width:90px;text-align:center}
 .td-emp{font-weight:600;font-size:12px}
 .td-cont{font-size:11px;color:#475569}
 .td-cargo{font-size:10px;color:#94a3b8}
@@ -528,7 +528,7 @@ let contacts=[
   {id:50,emp:'Ferreterías Lonza',cont:'Simón Lonza',cargo:'Ejecutivo',status:'Contactado',canal:'Email',dias:0,uf:0,horas:0,accion:'Seguimiento en 5 días',notas:'Referido de Luzma. Perfil emprendedor, ecoturismo.',com:15,email:'',fechaContacto:'2026-06-06',historial:[{fecha:'2026-06-06',tipo:'Email',texto:'Correo personalizado enviado vía Luzma.'}],diagReal:'',diagAccion:''},
 ];
 
-let nextId=60,activeFilter='todos',editingId=null,histId=null,diagId=null,consejoMsg='';
+let nextId=60,activeFilter='todos',editingId=null,histId=null,diagId=null,consejoMsg='',sortCol='default',sortDesc=true;
 
 function calcV(c){return c.uf&&c.horas?Math.round(c.uf*c.horas*UF):0;}
 function calcC(c){return Math.round(calcV(c)*(c.com||15)/100);}
@@ -580,9 +580,9 @@ function renderLearnings(){
 
   document.getElementById('learn-grid').innerHTML=`
     <div class="learn-card">
-      <div class="learn-card-label">Temperatura pipeline</div>
-      <div class="learn-card-val"><span style="color:#dc2626">●</span> ${calientes} · <span style="color:#d97706">●</span> ${tibios} · <span style="color:#94a3b8">●</span> ${frios}</div>
-      <div class="learn-card-sub">Calientes · Tibios · Fríos</div>
+            <div class="learn-card-label">Estado del pipeline</div>
+      <div class="learn-card-val"><span style="color:#dc2626">● ${calientes}</span> &nbsp;·&nbsp; <span style="color:#d97706">● ${tibios}</span> &nbsp;·&nbsp; <span style="color:#94a3b8">● ${frios}</span></div>
+      <div class="learn-card-sub">Prioridad alta &nbsp;·&nbsp; Media &nbsp;·&nbsp; Baja</div>
     </div>
     <div class="learn-card">
       <div class="learn-card-label">Score promedio</div>
@@ -643,13 +643,18 @@ function renderContacts(){
   const q=(document.getElementById('search-input')?.value||'').toLowerCase().trim();
   let list=activeFilter==='todos'?contacts.filter(c=>c.status!=='No'):contacts.filter(c=>c.status===activeFilter);
   if(q) list=list.filter(c=>(c.emp||'').toLowerCase().includes(q)||(c.cont||'').toLowerCase().includes(q));
-  const sorted=[...list].sort((a,b)=>(ORD[a.status]||9)-(ORD[b.status]||9)||getDias(b)-getDias(a));
+  const sorted=[...list].sort((a,b)=>{
+    if(sortCol==='score') return sortDesc?calcScore(b)-calcScore(a):calcScore(a)-calcScore(b);
+    if(sortCol==='status') return sortDesc?(ORD[a.status]||9)-(ORD[b.status]||9):(ORD[b.status]||9)-(ORD[a.status]||9);
+    if(sortCol==='emp') return sortDesc?a.emp.localeCompare(b.emp):b.emp.localeCompare(a.emp);
+    return (ORD[a.status]||9)-(ORD[b.status]||9)||getDias(b)-getDias(a);
+  });
 
   const thead=`<thead><tr>
-    <th class="col-emp">Empresa</th>
+    <th class="col-emp" style="cursor:pointer" onclick="toggleSort('emp')">Empresa ↕</th>
     <th class="col-cont">Contacto</th>
-    <th class="col-status">Status</th>
-    <th class="col-temp">Temperatura</th>
+    <th class="col-status" style="text-align:center;cursor:pointer" onclick="toggleSort('status')">Status ↕</th>
+    <th class="col-score" style="text-align:center;cursor:pointer" onclick="toggleSort('score')" title="Ordenar por prioridad">Prioridad ↕</th>
     <th class="col-timing">Timing</th>
     <th class="col-dias" style="text-align:center">Días</th>
     <th class="col-acc" style="text-align:center">Acciones</th>
@@ -670,8 +675,8 @@ function renderContacts(){
         <div class="td-cont">${c.cont&&c.cont!=='-'?c.cont:' - '}</div>
         <div class="td-cargo">${c.cargo&&c.cargo!=='-'?c.cargo:''}</div>
       </td>
-      <td class="col-status"><span class="badge ${bc(c.status)}">${c.status}</span></td>
-      <td class="col-temp"><span style="font-size:11px;font-weight:600;color:${temp.color}">${temp.label}</span><br><span style="font-size:10px;color:#94a3b8">${score}/10</span></td>
+      <td class="col-status" style="text-align:center"><span class="badge ${bc(c.status)}">${c.status}</span></td>
+      <td class="col-score" style="text-align:center"><span style="font-size:15px;font-weight:700;color:${scoreColor}">${score}</span><span style="font-size:10px;color:#94a3b8">/10</span></td>
       <td class="col-timing">${timingHtml}</td>
       <td class="col-dias" style="text-align:center"><span class="td-dias${u==='h'?' hot':''}">${d===0?'hoy':d+'d'}</span></td>
       <td class="col-acc" style="text-align:center">
@@ -686,6 +691,11 @@ function renderContacts(){
   }).join('');
 
   document.getElementById('clist').innerHTML=thead+`<tbody>${rows}</tbody>`;
+}
+
+function toggleSort(col){
+  if(sortCol===col){sortDesc=!sortDesc;}else{sortCol=col;sortDesc=true;}
+  renderContacts();
 }
 
 function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderLearnings();}
@@ -770,39 +780,51 @@ function generarDolor(c){
 function calcScore(c){
   let score = 0;
   const d = getDias(c);
-  
-  // Status
-  if(c.status === 'Reunión') score += 30;
-  else if(c.status === 'Respondió') score += 20;
-  else if(c.status === 'Propuesta') score += 35;
-  else if(c.status === 'En proceso') score += 15;
-  else if(c.status === 'Contactado') score += 5;
-  else if(c.status === 'Por contactar') score += 2;
-  
-  // Canal
-  if(c.canal === 'Referido') score += 20;
-  else if(c.canal === 'Reunión') score += 15;
-  else if(c.canal === 'WhatsApp') score += 8;
-  else if(c.canal === 'LinkedIn') score += 5;
-  else if(c.canal === 'Email') score += 5;
-
-  // Cargo decisor
   const cargo = (c.cargo||'').toLowerCase();
-  if(cargo.includes('dueño') || cargo.includes('ceo') || cargo.includes('founder') || cargo.includes('gerente general')) score += 15;
-  else if(cargo.includes('gerente') || cargo.includes('director') || cargo.includes('socio')) score += 10;
-  else if(cargo.includes('jefe') || cargo.includes('manager') || cargo.includes('mgr')) score += 5;
+  const emp = (c.emp||'').toLowerCase();
+  const notas = (c.notas||'').toLowerCase();
 
-  // Dolor documentado
-  if(c.diagAccion && c.diagAccion.length > 10) score += 10;
-  
-  // Timing  -  penalizar si lleva muchos días sin acción
-  if(d > 20) score -= 10;
-  else if(d > 10) score -= 5;
-  
-  // Historial  -  más touchpoints = más interés
+  // 1. SEÑALES DE INTERES REALES (peso mas alto)
+  if(c.status === 'Respondió') score += 30;  // abrio o respondio = señal concreta
+  if(c.status === 'Reunión') score += 28;
+  if(c.status === 'Propuesta') score += 32;
+  if(c.status === 'En proceso') score += 15;
+  if(c.status === 'Contactado') score += 5;
+  if(c.status === 'Por contactar') score += 3;
+
+  // 2. NEXO O REFERIDO (confianza ya instalada)
+  if(c.canal === 'Referido') score += 25;
+  else if(c.canal === 'Reunión') score += 10;
+  else if(c.canal === 'WhatsApp') score += 6;
+  else if(c.canal === 'LinkedIn' || c.canal === 'Email') score += 3;
+
+  // 3. PODER DE DECISION
+  if(cargo.includes('dueño') || cargo.includes('ceo') || cargo.includes('founder') || cargo.includes('co founder')) score += 18;
+  else if(cargo.includes('gerente general') || cargo.includes('director general') || cargo.includes('socio')) score += 15;
+  else if(cargo.includes('gerente') || cargo.includes('director') || cargo.includes('subgerente')) score += 10;
+  else if(cargo.includes('jefe') || cargo.includes('manager') || cargo.includes('mgr') || cargo.includes('coord')) score += 5;
+
+  // 4. FIT CON LA PROPUESTA (operacion compleja = dolor obvio)
+  const altaFit = ['terminal','puerto','port','logis','transport','distribuc','bodega','cd ','supply','operac','granel','mineria','sqm','arauco'];
+  const mediaFit = ['food','aliment','chocolat','retail','tienda','wild','karün','karün','bupa','clinica','ferreteri'];
+  const bajaFit = ['dhl','coca cola','id logistics','rfp'];  // corporativos grandes
+  if(altaFit.some(k => emp.includes(k))) score += 15;
+  else if(mediaFit.some(k => emp.includes(k))) score += 8;
+  else if(bajaFit.some(k => emp.includes(k))) score -= 10;
+
+  // 5. HISTORIAL - touchpoints demuestran interes sostenido
   const h = (c.historial||[]).length;
   if(h >= 3) score += 10;
   else if(h >= 2) score += 5;
+
+  // 6. DOLOR DOCUMENTADO
+  if(c.diagDolor && c.diagDolor.length > 10) score += 8;
+
+  // 7. PENALIZACIONES
+  if(d > 20 && c.status === 'Contactado') score -= 12;  // mucho tiempo sin respuesta
+  else if(d > 10 && c.status === 'Contactado') score -= 5;
+  if(c.status === 'On hold') score -= 15;
+  if(notas.includes('no respondio') || notas.includes('no contesto')) score -= 8;
 
   return Math.min(10, Math.max(1, Math.round(score / 10)));
 }
