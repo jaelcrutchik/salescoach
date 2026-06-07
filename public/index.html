@@ -268,6 +268,30 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
       <div class="field"><label>Comisión %</label><input id="f-com" type="number" placeholder="15" min="0" max="100"></div>
     </div>
     <div class="field"><label>Email</label><input id="f-email" type="email" placeholder="email@empresa.cl"></div>
+    <div class="field-row">
+      <div class="field"><label>Ciudad</label><input id="f-ciudad" type="text" placeholder="ej: Antofagasta"></div>
+      <div class="field"><label>Región</label>
+        <select id="f-region">
+          <option value="">-</option>
+          <option>Arica y Parinacota</option>
+          <option>Tarapacá</option>
+          <option>Antofagasta</option>
+          <option>Atacama</option>
+          <option>Coquimbo</option>
+          <option>Valparaíso</option>
+          <option>Metropolitana</option>
+          <option>O'Higgins</option>
+          <option>Maule</option>
+          <option>Ñuble</option>
+          <option>Biobío</option>
+          <option>La Araucanía</option>
+          <option>Los Ríos</option>
+          <option>Los Lagos</option>
+          <option>Aysén</option>
+          <option>Magallanes</option>
+        </select>
+      </div>
+    </div>
     <div class="field"><label>Próxima acción</label><input id="f-accion" type="text" placeholder="ej: llamar jueves"></div>
     <div class="field"><label>Notas</label><textarea id="f-notas" placeholder="Contexto, historia, estado actual..."></textarea></div>
     <div class="modal-btns">
@@ -344,6 +368,20 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
     <div class="modal-btns">
       <button class="btn-c" onclick="closeDiag()">Cancelar</button>
       <button class="btn-s" onclick="saveDiag()">Guardar diagnóstico</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NEGOCIACION -->
+<div class="overlay" id="neg-overlay">
+  <div class="modal" style="width:560px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h3 id="neg-title" style="margin-bottom:0">Modulo de propuesta</h3>
+      <span style="font-size:11px;background:#f5f3ff;color:#7c3aed;padding:3px 10px;border-radius:99px;font-weight:500">Francisco mode</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="neg-body"></div>
+    <div class="modal-btns" style="margin-top:1rem">
+      <button class="btn-s" onclick="closeNeg()">Cerrar</button>
     </div>
   </div>
 </div>
@@ -461,87 +499,223 @@ function generarDiagAccion(c){
   return `Revisar estado con ${nombre} y definir si sigue en pipeline o se descarta. No dejar contactos en limbo sin acción definida.`;
 }
 
+function nivelCargo(c){
+  var cargo=(c.cargo||'').toLowerCase();
+  if(cargo.includes('dueño')||cargo.includes('ceo')||cargo.includes('founder')||cargo.includes('co founder')||cargo.includes('socio')) return 'dueño';
+  if(cargo.includes('gerente general')||cargo.includes('director general')) return 'gg';
+  if(cargo.includes('gerente')||cargo.includes('director')||cargo.includes('subgerente')) return 'gerente';
+  if(cargo.includes('jefe')||cargo.includes('manager')||cargo.includes('mgr')||cargo.includes('coord')) return 'jefe';
+  return 'general';
+}
+
 function getDolorCorto(c){
-  const rubro = inferRubro(c.emp) || 'default';
-  const frases = {
-    'Transporte/Logistica': 'procesos de flota y coordinacion que quizas ya no estan escalando igual',
-    'Puertos/Operaciones': 'coordinacion entre areas que a veces genera tiempos muertos que no siempre son visibles',
-    'Retail/Consumo': 'operacion de despacho y stock que con el crecimiento se vuelve mas dificil de controlar',
-    'Alimentos': 'trazabilidad y control de procesos que con el volumen se complican',
-    '3PL/Operadores': 'indicadores de servicio y margen por cliente que a veces cuesta tener claros',
-    'Mineria/Industria': 'procesos de turno y mantenimiento que dependen demasiado de personas clave',
-    'Salud': 'flujos internos que consumen tiempo que deberia ir a lo clinico',
-    'default': 'procesos que quizas ya no estan escalando igual que antes'
+  var rubro=inferRubro(c.emp)||'default';
+  var nivel=nivelCargo(c);
+
+  var dolores={
+    'Transporte/Logistica':{
+      'dueño':'cada mes gastas mas en flota y no sabes exactamente por que',
+      'gg':'el negocio crece pero el margen no acompaña y la operacion es cada vez mas dificil de controlar',
+      'gerente':'coordinar rutas, choferes y clientes depende de llamadas y planillas que nadie actualiza igual',
+      'jefe':'los tiempos muertos entre rutas se comen la productividad y nadie los esta midiendo bien',
+      'general':'la operacion crece pero se vuelve mas cara y menos predecible'
+    },
+    'Puertos/Operaciones':{
+      'dueño':'cada hora de espera no planificada te cuesta plata que no ves en ningun reporte',
+      'gg':'la coordinacion entre areas funciona hasta que algo falla, y cuando falla es caro',
+      'gerente':'la informacion esta en silos y para saber que esta pasando hay que llamar a tres personas',
+      'jefe':'los turnos dependen de que todos hagan lo mismo pero nadie lo tiene escrito igual',
+      'general':'la operacion portuaria tiene costos ocultos que se ven solo cuando ya es tarde'
+    },
+    'Retail/Consumo':{
+      'dueño':'tienes quiebres de stock o despachos tarde que te cuestan clientes y no sabes cuanto',
+      'gg':'crecer en ventas no sirve si la operacion no escala y el margen se erosiona',
+      'gerente':'el picking, el despacho y las devoluciones consumen mas tiempo y plata de lo que deberian',
+      'jefe':'cada dia hay apagados de incendio que podrian evitarse si los procesos estuvieran mas claros',
+      'general':'la operacion de tienda y bodega se complica a medida que crece el volumen'
+    },
+    'Alimentos':{
+      'dueño':'si tuvieras un problema de calidad hoy, cuanto tardarias en saber de que lote viene',
+      'gg':'el crecimiento en volumen trae riesgo si los procesos no estan estandarizados',
+      'gerente':'cumplir las normas consume tiempo manual que podria ir a producir mas',
+      'jefe':'la merma y los reprocesos cuestan mas de lo que aparece en los numeros',
+      'general':'con el crecimiento los procesos de control se vuelven el cuello de botella'
+    },
+    '3PL/Operadores':{
+      'dueño':'sabes exactamente cuanto margen te deja cada cliente despues de los costos reales',
+      'gg':'diferenciarte de la competencia es cada vez mas dificil si la operacion no es mas eficiente que la de ellos',
+      'gerente':'el onboarding de clientes nuevos es lento y manual y eso tiene un costo',
+      'jefe':'los SLA se incumplen porque no hay alertas tempranas, solo apagados despues',
+      'general':'operar para otros exige niveles de servicio que son dificiles de mantener sin procesos solidos'
+    },
+    'Mineria/Industria':{
+      'dueño':'cada parada no programada te cuesta mas de lo que cuesta prevenirla',
+      'gg':'la operacion depende demasiado de personas clave y eso es un riesgo que nadie quiere ver hasta que pasa',
+      'gerente':'el mantenimiento reactivo sale mas caro que el preventivo pero igual seguimos apagando incendios',
+      'jefe':'los turnos no estan estandarizados y cada uno los hace a su manera',
+      'general':'en mineria el costo de no tener los procesos claros se mide en horas de produccion perdidas'
+    },
+    'Salud':{
+      'dueño':'cuanto tiempo clinico se esta yendo en tareas que no son clinicas',
+      'gg':'el flujo de pacientes tiene cuellos de botella que afectan la experiencia y el ingreso',
+      'gerente':'el abastecimiento de insumos tiene quiebres que generan problemas operacionales todos los meses',
+      'jefe':'los procesos administrativos consumen tiempo que deberia ir a atencion',
+      'general':'en salud la ineficiencia operacional tiene un costo clinico ademas del economico'
+    },
+    'default':{
+      'dueño':'cuanto tiempo de tu semana se va en cosas que deberian funcionar solas',
+      'gg':'el negocio crece pero cada vez dependes mas de ti mismo para que las cosas salgan bien',
+      'gerente':'los procesos que funcionaban antes ya no escalan con el tamano actual del equipo',
+      'jefe':'hay cosas que se hacen diferente segun quien este y eso genera errores que se repiten',
+      'general':'hay un punto en el crecimiento donde lo que funcionaba antes deja de funcionar'
+    }
   };
-  return frases[rubro] || frases['default'];
+
+  var rubDolores=dolores[rubro]||dolores['default'];
+  return rubDolores[nivel]||rubDolores['general'];
+}
+
+function getPreguntaDolor(c){
+  var rubro=inferRubro(c.emp)||'default';
+  var nivel=nivelCargo(c);
+
+  var preguntas={
+    'Transporte/Logistica':{
+      'dueño':'Sabes exactamente cuanto te cuesta cada camion al mes, incluyendo los tiempos muertos?',
+      'gg':'Si tuvieras que explicar por que el margen no crece igual que las ventas, que dirias?',
+      'gerente':'Cuantas llamadas hace tu equipo al dia para coordinar cosas que podrian ser automaticas?',
+      'jefe':'Cuanto tiempo muerto hay entre rutas y quien lo esta midiendo hoy?',
+      'general':'Si algo sale mal en la operacion hoy, cuanto tardas en saber que paso y por que?'
+    },
+    'Puertos/Operaciones':{
+      'dueño':'Sabes cuanto te cuesta en promedio cada hora de espera no planificada?',
+      'gg':'Cuantas areas distintas tienen que coordinarse para que una operacion salga bien?',
+      'gerente':'Cuando hay un problema operacional, cuanto tiempo pasa hasta que llegas a la causa raiz?',
+      'jefe':'Los turnos se hacen igual independiente de quien este o depende de quien llego ese dia?',
+      'general':'Si tuvieras que mostrar el estado de la operacion ahora mismo, en cuanto tiempo lo tendrias?'
+    },
+    'Retail/Consumo':{
+      'dueño':'Cuantas veces al mes pierdes una venta por quiebre de stock o despacho tarde?',
+      'gg':'El margen esta creciendo al mismo ritmo que las ventas o se esta erosionando?',
+      'gerente':'Cuanto tiempo se va en resolver problemas de despacho o devolucion que se repiten todos los meses?',
+      'jefe':'El proceso de picking y despacho es igual todos los dias o depende de quien este?',
+      'general':'Si tuvieras que identificar donde se pierde mas plata en la operacion, donde apuntarias?'
+    },
+    'Alimentos':{
+      'dueño':'Si tuvieras un problema de calidad hoy, en cuanto tiempo sabes de que lote viene?',
+      'gg':'El crecimiento en volumen esta trayendo mas problemas operacionales de los que esperabas?',
+      'gerente':'Cuanto tiempo manual consume el cumplimiento normativo en tu equipo cada semana?',
+      'jefe':'La merma actual es un porcentaje que conoces o es algo que se descubre al final del mes?',
+      'general':'Los procesos de control estan documentados o viven en la cabeza de las personas?'
+    },
+    '3PL/Operadores':{
+      'dueño':'Sabes exactamente cuanto margen te deja cada cliente despues de todos los costos?',
+      'gg':'Como te diferencias hoy de otro operador que ofrece lo mismo por menos precio?',
+      'gerente':'Cuanto tarda en promedio onboardear un cliente nuevo desde que firma hasta que opera?',
+      'jefe':'Cuando se incumple un SLA, cuanto tiempo pasa hasta que te enteras?',
+      'general':'Si un cliente te preguntara por que elegirte a ti, que le dirias que no puede conseguir en otro lado?'
+    },
+    'Mineria/Industria':{
+      'dueño':'Cuanto te costo la ultima parada no programada, incluyendo todo lo que no esta en la factura?',
+      'gg':'Si la persona que mas sabe de un proceso critico se va manana, que pasa?',
+      'gerente':'Que porcentaje del mantenimiento es reactivo versus preventivo hoy?',
+      'jefe':'Los procedimientos de turno estan escritos o cada uno los hace a su manera?',
+      'general':'Cuantas horas de produccion se perdieron el mes pasado por causas que podrian haberse evitado?'
+    },
+    'Salud':{
+      'dueño':'Cuanto tiempo clinico se esta yendo en tareas administrativas cada semana?',
+      'gg':'El flujo de pacientes tiene cuellos de botella que sabes donde estan pero no has podido resolver?',
+      'gerente':'Con que frecuencia hay quiebres de insumos que generan problemas en la atencion?',
+      'jefe':'Los procesos administrativos estan documentados o dependen de quien los aprendio primero?',
+      'general':'Si tuvieras que mejorar una sola cosa en la operacion para que todo fluyera mejor, que seria?'
+    },
+    'default':{
+      'dueño':'Cuanto tiempo de tu semana se va en cosas que deberian funcionar solas sin ti?',
+      'gg':'Si el negocio creciera el doble manana, la operacion actual lo aguantaria?',
+      'gerente':'Los procesos que tienes hoy son los mismos que habia cuando la empresa era la mitad del tamano?',
+      'jefe':'Cuando alguien nuevo entra al equipo, cuanto tarda en operar de forma autonoma?',
+      'general':'Si tuvieras que identificar el mayor cuello de botella de la operacion hoy, donde apuntarias?'
+    }
+  };
+
+  var rubPreguntas=preguntas[rubro]||preguntas['default'];
+  return rubPreguntas[nivel]||rubPreguntas['general'];
 }
 
 function getMensaje(c){
   const nombre=c.cont?.split(' ')[0]||'[Nombre]';
   const dias=getDias(c);
   const dolor=getDolorCorto(c);
+  const pregunta=getPreguntaDolor(c);
   const canal=c.canal||'Email';
+  const esNorte=['Antofagasta','Iquique','Arica','Calama','Tocopilla','Tarapaca','Arica y Parinacota'].some(z=>(c.ciudad||'').includes(z)||(c.region||'').includes(z));
+  const contextoNorte=esNorte?' Ademas, en este momento estamos con un proyecto activo en Antofagasta, asi que estamos cerca.':'';
 
+  // RESPONDIO - leyo pero no respondio
   if(c.status==='Respondió'){
     if(dias<=3)
       return {
-        ctx:nombre+' leyo tu mensaje hace '+dias+' dias. Todavia es pronto, el momentum esta activo.',
-        msg:'Hola '+nombre+', te reenvio esto por si se perdio en el camino. Pense que podia hacer sentido mirarlo desde '+dolor+'. ¿Tienes 20 minutos esta semana?'
+        ctx:'Leyo tu mensaje hace '+dias+' dias. Tono directo, seguro, no perseguidor. Planta el dolor y pregunta.',
+        msg:'Hola '+nombre+', quede pensando en algo especifico de '+c.emp+'. '+pregunta+' Si la respuesta te genera algo de ruido, probablemente vale conversar 20 minutos. Sin compromiso.'
       };
     else
       return {
-        ctx:nombre+' leyo tu mensaje hace '+dias+' dias. El momentum se esta enfriando, mensaje consultivo.',
-        msg:'Hola '+nombre+', queria retomar esto. Estuve pensando en lo que suele pasar en empresas como la tuya: '+dolor+'. Si eso resuena aunque sea un poco, probablemente vale conversar 20 minutos. ¿Te acomoda esta semana?'
+        ctx:'Han pasado '+dias+' dias. Segundo toque con angulo nuevo, no repetir el primero.',
+        msg:'Hola '+nombre+', te escribo de nuevo con un angulo distinto. Trabajamos con empresas donde '+dolor+'. Cuando eso pasa, el costo no siempre es visible hasta que alguien lo mide. Si quieres saber cuanto te esta costando hoy, eso lo podemos ver en 20 minutos. ¿Te acomoda esta semana?'
       };
   }
 
+  // CONTACTADO - sin respuesta
   if(c.status==='Contactado'&&dias>=7)
     return {
-      ctx:'Llevas '+dias+' dias sin respuesta. Segundo toque consultivo, no repetir el primer mensaje.',
-      msg:'Hola '+nombre+', te escribo de nuevo porque me parece que hay algo relevante para lo que estan haciendo en '+c.emp+'. Muchas empresas en tu rubro llegan a un punto donde '+dolor+'. Si eso esta pasando, vale conversar. ¿Tienes 20 minutos?'
+      ctx:''+dias+' dias sin respuesta. Ultimo intento con pregunta directa al dolor. Si no responde, cerrar loop.',
+      msg:'Hola '+nombre+', ultimo mensaje de mi parte. Una pregunta directa: '+pregunta+' Si la respuesta es "no lo se bien", eso es exactamente lo que resolvemos. Si no es el momento, sin problema, acá van a estar las puertas abiertas.'
     };
 
   if(c.status==='Contactado'&&dias>=3)
     return {
-      ctx:'Han pasado '+dias+' dias. Momento ideal para un segundo toque breve.',
-      msg:'Hola '+nombre+', te reenvio esto por si se perdio. ¿Tienes 20 minutos esta semana?'
+      ctx:''+dias+' dias desde el primer contacto. Segundo toque con angulo consultivo, no vender.',
+      msg:'Hola '+nombre+', quede pensando en algo que suele pasar en empresas como '+c.emp+': '+dolor+'. ¿Es algo que estan viendo hoy? Si resuena aunque sea un poco, vale 20 minutos.'
     };
 
+  // REUNION
   if(c.status==='Reunión'){
     if(dias>5)
       return {
-        ctx:'Reunion hace '+dias+' dias sin propuesta. Urgente cerrar el siguiente paso.',
-        msg:'Hola '+nombre+', queria retomar lo que conversamos. Estuve pensando en como podriamos estructurar un primer paso concreto para '+c.emp+'. ¿Tienes 20 minutos esta semana para alinearnos?'
+        ctx:'Reunion hace '+dias+' dias sin propuesta. Cierra el siguiente paso con confianza, no con disculpa.',
+        msg:'Hola '+nombre+', queria retomar lo que conversamos. Estuve estructurando como podria verse un primer paso concreto para '+c.emp+' y creo que hay algo que tiene sentido. ¿Tienes 20 minutos esta semana para revisarlo?'
       };
     else
       return {
-        ctx:'Reunion reciente con '+nombre+'. Cierra el siguiente paso antes de que se enfrie.',
-        msg:'Hola '+nombre+', gracias por la reunion. Quedo pensando en lo que conversamos y creo que hay un angulo concreto por donde podriamos partir. ¿Puedo enviarte una propuesta esta semana?'
+        ctx:'Reunion reciente. Cierra propuesta rapidamente, el momentum esta activo.',
+        msg:'Hola '+nombre+', gracias por la reunion. Quedo claro el diagnostico. Esta semana te envio una propuesta concreta con un primer paso que no requiere compromiso de largo plazo. ¿Te parece?'
       };
   }
 
+  // POR CONTACTAR
   if(c.status==='Por contactar'){
     if(c.canal==='Referido')
       return {
-        ctx:'Referido sin contactar. La confianza ya esta instalada, usala.',
-        msg:'Hola '+nombre+', me paso tu contacto alguien en quien confio mucho. Te escribo porque trabajo con Rave & Crutchik, una consultora de operaciones, y pense que podia hacer sentido conversar sobre '+dolor+'. ¿Tienes 20 minutos esta semana?'
+        ctx:'Referido sin contactar. La confianza ya esta instalada, ir directo al dolor.',
+        msg:'Hola '+nombre+', me paso tu contacto alguien en quien confio. Te escribo porque trabajamos con empresas donde '+dolor+'.'+contextoNorte+' Si eso resuena, vale 20 minutos. ¿Te acomoda esta semana?'
       };
     else
       return {
-        ctx:'Nunca contactado. Primer mensaje consultivo, no vendedor.',
-        msg:'Hola '+nombre+', mi nombre es Jael, de Rave & Crutchik. Te escribo porque trabajamos con empresas como '+c.emp+' en un momento especifico: cuando '+dolor+'. Si eso resuena, vale una conversacion de 20 minutos. ¿Te acomoda esta semana?'
+        ctx:'Primer contacto. Ir directo al dolor, sin presentacion corporativa, sin pedir favor.',
+        msg:'Hola '+nombre+', mi nombre es Jael, de Rave & Crutchik. Una pregunta directa: '+pregunta+' Si no lo sabes con certeza, eso es exactamente lo que resolvemos.'+contextoNorte+' ¿Vale 20 minutos esta semana?'
       };
   }
 
+  // EN PROCESO
   if(c.status==='En proceso')
     return {
-      ctx:'En proceso con '+nombre+'. Definir si hay dolor real antes de avanzar.',
-      msg:'Hola '+nombre+', queria retomar nuestra conversacion. Antes de avanzar me gustaria entender mejor como estan operando hoy en '+c.emp+'. ¿Tienes 20 minutos para contarme?'
+      ctx:'En proceso pero sin avance. Definir si hay dolor real o solo interes superficial.',
+      msg:'Hola '+nombre+', queria ser directo contigo. '+pregunta+' Si eso es algo que les preocupa hoy, podemos avanzar. Si no es el momento, igual te lo digo yo primero.'
     };
 
   return {
-    ctx:'Contacto en etapa '+c.status+'.',
-    msg:'Hola '+nombre+', queria retomar el contacto. ¿Tienes 20 minutos esta semana para conversar?'
+    ctx:'Contacto en etapa '+c.status+'. Retomar con pregunta directa al dolor.',
+    msg:'Hola '+nombre+', queria retomar el contacto con una pregunta directa: '+pregunta+' ¿Tienes 20 minutos esta semana?'
   };
 }
 
@@ -739,6 +913,7 @@ function renderContacts(){
     return `<tr>
       <td class="col-emp" style="white-space:normal">
         <div class="td-emp">${c.emp}</div>
+        ${c.ciudad||c.region?`<div style="font-size:10px;color:#94a3b8;margin-top:1px">📍 ${[c.ciudad,c.region].filter(Boolean).join(', ')}</div>`:''}
         ${c.accion?`<div style="font-size:10px;color:#94a3b8;font-style:italic;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.accion}</div>`:''}
       </td>
       <td class="col-cont" style="white-space:normal">
@@ -754,7 +929,7 @@ function renderContacts(){
           <button class="rb" onclick="openModal(${c.id})" title="Editar">✏️</button>
           <button class="rb hist" onclick="openHist(${c.id})" title="Historial">📋</button>
           <button class="rb diag" onclick="openDiag(${c.id})" title="Diagnóstico">🔍</button>
-          <button class="rb ask" onclick="openConsejo(${c.id})" title="Consejo">🎯</button>
+          <button class="rb ask" onclick="openConsejo(${c.id})" title="Consejo">🎯</button>${(c.status==="Propuesta"||c.status==="Reunión")?"<button class=\"rb\" onclick=\"openNeg(${c.id})\" title=\"Negociacion\" style=\"color:#7c3aed\">⚖️</button>":""}
         </div>
       </td>
     </tr>`;
@@ -974,6 +1149,56 @@ function saveDiag(){
 
 function closeDiag(){document.getElementById('diag-overlay').classList.remove('open');}
 
+function openNeg(id){
+  var c=contacts.find(function(x){return x.id===id;});if(!c) return;
+  var nombre=c.cont?c.cont.split(' ')[0]:'el contacto';
+  var dolor=getDolorCorto(c);
+  var pregunta=getPreguntaDolor(c);
+  document.getElementById('neg-title').textContent='Propuesta - '+c.emp;
+  var cards=[
+    {color:'#2563eb',titulo:'Antes de presentar el precio',items:[
+      'Confirma que el dolor esta claro: "'+pregunta+'" Si no lo saben, no estan listos para recibir una propuesta.',
+      'No justifiques el precio antes de que lo pidan. El que justifica primero negocia contra si mismo.',
+      'Presenta el costo de NO resolver el problema antes del precio de resolverlo.',
+      'Recuerda: no te estan haciendo un favor. Tu resuelves algo que les cuesta plata o tiempo.'
+    ]},
+    {color:'#16a34a',titulo:'Como presentar el precio',items:[
+      'Di el numero con confianza y calla. Los 3 segundos de silencio son del otro, no tuyos.',
+      'No redondees ni te disculpes: "son X UF" - punto. Sin mas o menos ni dependeria.',
+      'Ancla el precio al dolor: "resolver esto vale X, no resolverlo probablemente cuesta mas que eso al mes".',
+      'Si preguntan por el desglose, da solo lo necesario. No itemices o negociaran linea por linea.'
+    ]},
+    {color:'#d97706',titulo:'Si piden descuento (regla CC)',items:[
+      'Nunca des descuento a cambio de nada. Concesion siempre con condicion.',
+      '"Que presupuesto tienes? Asi veo que puedo darte por esa plata." Reduce el scope, no el precio.',
+      '"Puedo ajustar el precio si sacamos X de la propuesta. Que priorizas?" Ellos deciden que pierden.',
+      '"No hago descuentos, pero si cerramos esta semana puedo incluir X sin costo adicional."',
+      'Hacer descuento a cambio de nada es admitir que el precio estaba inflado.'
+    ]},
+    {color:'#dc2626',titulo:'Si dicen que lo van a pensar',items:[
+      '"Perfecto, cotiza en otro lado. Si nada te convence, aca vamos a estar." Desprendimiento real.',
+      '"Que necesitarias ver para tomar la decision?" Si no saben, el problema es otro.',
+      '"Hay algo que no quedo claro de la propuesta?" El lo pienso a veces es una objecion disfrazada.',
+      'No persigas. El que se ve mas desesperado, cierra menos. Tienes mas de 50 contactos en el pipeline.'
+    ]},
+    {color:'#7c3aed',titulo:'Recordatorios de Francisco',items:[
+      'La negociacion depende del otro, no de ti. Su necesidad, no tu ansiedad.',
+      'Sobrevaloras las alternativas que tiene el otro. Probablemente no conoce tu competencia tan bien.',
+      'El exceso de empatia te juega en contra. Escucha, pero no negocies por el.',
+      'Te prestigia perder clientes por no transar lo que no va. No todos son tu cliente.'
+    ]}
+  ];
+  document.getElementById('neg-body').innerHTML=cards.map(function(card){
+    return '<div style="background:var(--cream);border-left:3px solid '+card.color+';border-radius:8px;padding:10px 14px;margin-bottom:4px">'+
+      '<div style="font-size:11px;font-weight:600;color:'+card.color+';text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px">'+card.titulo+'</div>'+
+      card.items.map(function(i){return '<div style="font-size:12px;color:#475569;line-height:1.6;margin-bottom:3px">- '+i+'</div>';}).join('')+
+      '</div>';
+  }).join('');
+  document.getElementById('neg-overlay').classList.add('open');
+}
+
+function closeNeg(){document.getElementById('neg-overlay').classList.remove('open');}
+
 async function syncInstantly(){
   const btn=document.getElementById('sync-btn');
   btn.textContent='⏳ Sync...';btn.disabled=true;
@@ -1059,11 +1284,14 @@ function openModal(id){
     document.getElementById('f-fecha').value=c.fechaContacto||'';
     document.getElementById('f-com').value=c.com||15;
     document.getElementById('f-email').value=c.email||'';
+    document.getElementById('f-ciudad').value=c.ciudad||'';
+    document.getElementById('f-region').value=c.region||'';
     document.getElementById('f-accion').value=c.accion||'';
     document.getElementById('f-notas').value=c.notas||'';
   }else{
     document.getElementById('modal-title').textContent='Nuevo contacto';
-    ['f-emp','f-cont','f-cargo','f-uf','f-horas','f-accion','f-notas','f-email'].forEach(f=>document.getElementById(f).value='');
+    ['f-emp','f-cont','f-cargo','f-uf','f-horas','f-accion','f-notas','f-email','f-ciudad'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('f-region').value='';
     document.getElementById('f-fecha').value='';
     document.getElementById('f-com').value=15;
     document.getElementById('f-status').value='Por contactar';
@@ -1093,6 +1321,8 @@ function saveContact(){
     fechaContacto:document.getElementById('f-fecha').value,
     com:parseFloat(document.getElementById('f-com').value)||15,
     email:document.getElementById('f-email').value.trim(),
+    ciudad:document.getElementById('f-ciudad').value.trim(),
+    region:document.getElementById('f-region').value,
     accion:document.getElementById('f-accion').value.trim(),
     notas:document.getElementById('f-notas').value.trim()
   };
@@ -1100,12 +1330,12 @@ function saveContact(){
     const i=contacts.findIndex(x=>x.id===editingId);
     if(i>=0) contacts[i]={...contacts[i],...data};
   } else {
-    contacts.push({id:nextId++,...data,historial:[],diagReal:'',diagAccion:'',diagDolor:''});
+    contacts.push({id:nextId++,...data,historial:[],diagReal:'',diagAccion:'',diagDolor:'',ciudad:'',region:''});
   }
   closeModal();saveLS();showToast('✅ Guardado');renderAll();loadTips();
 }
 
-['overlay','hist-overlay','consejo-overlay','diag-overlay'].forEach(id=>{
+['overlay','hist-overlay','consejo-overlay','diag-overlay','neg-overlay'].forEach(id=>{
   document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
 });
 
@@ -1119,7 +1349,7 @@ try{
   if(saved){
     const d=JSON.parse(saved);
     // Merge: preserve saved data, add new fields if missing
-    contacts=d.map(c=>({diagReal:'',diagAccion:'',diagDolor:'',...c}));
+    contacts=d.map(c=>({diagReal:'',diagAccion:'',diagDolor:'',ciudad:'',region:'',...c}));
     nextId=Math.max(...d.map(c=>c.id))+1;
   }
 }catch(e){}
