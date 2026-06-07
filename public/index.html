@@ -91,9 +91,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 .ctable tr:hover td{background:#fafbfd}
 .col-emp{width:22%}
 .col-cont{width:18%}
-.col-status{width:80px}
+.col-status{width:70px}
+.col-temp{width:100px}
 .col-timing{width:18%}
-.col-diag{width:22%}
 .col-dias{width:48px;text-align:center}
 .col-acc{width:88px}
 .td-emp{font-weight:600;font-size:12px}
@@ -649,8 +649,8 @@ function renderContacts(){
     <th class="col-emp">Empresa</th>
     <th class="col-cont">Contacto</th>
     <th class="col-status">Status</th>
+    <th class="col-temp">Temperatura</th>
     <th class="col-timing">Timing</th>
-    <th class="col-diag">Diagnóstico</th>
     <th class="col-dias" style="text-align:center">Días</th>
     <th class="col-acc" style="text-align:center">Acciones</th>
   </tr></thead>`;
@@ -661,9 +661,6 @@ function renderContacts(){
     const score=calcScore(c);
     const temp=calcTemperatura(c);
     const scoreColor=score>=7?'#16a34a':score>=4?'#d97706':'#94a3b8';
-    const diagText=c.diagDolor||c.diagReal?
-      `<div class="diag-cell">${c.diagDolor||c.diagReal}</div>`:
-      `<div class="diag-cell" style="color:#cbd5e1;font-style:italic">Sin diagnóstico</div>`;
     return `<tr>
       <td class="col-emp" style="white-space:normal">
         <div class="td-emp">${c.emp}</div>
@@ -673,12 +670,9 @@ function renderContacts(){
         <div class="td-cont">${c.cont&&c.cont!=='-'?c.cont:' - '}</div>
         <div class="td-cargo">${c.cargo&&c.cargo!=='-'?c.cargo:''}</div>
       </td>
-      <td class="col-status">
-        <span class="badge ${bc(c.status)}">${c.status}</span>
-        <div style="font-size:10px;margin-top:3px;color:${temp.color}">${temp.label.split(' ').slice(0,2).join(' ')} · ${score}/10</div>
-      </td>
+      <td class="col-status"><span class="badge ${bc(c.status)}">${c.status}</span></td>
+      <td class="col-temp"><span style="font-size:11px;font-weight:600;color:${temp.color}">${temp.label}</span><br><span style="font-size:10px;color:#94a3b8">${score}/10</span></td>
       <td class="col-timing">${timingHtml}</td>
-      <td class="col-diag" style="white-space:normal">${diagText}</td>
       <td class="col-dias" style="text-align:center"><span class="td-dias${u==='h'?' hot':''}">${d===0?'hoy':d+'d'}</span></td>
       <td class="col-acc" style="text-align:center">
         <div class="row-btns" style="justify-content:center">
