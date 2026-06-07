@@ -1075,36 +1075,60 @@ function loadTips(){
 function generarInsights(){
   const activos=contacts.filter(c=>c.status!=='No'&&c.status!=='Ganado');
   const hoy=new Date();const dia=hoy.getDay();const tips=[];
+
+  // TIP 1: siempre el del dia (fijo)
   const tipsDia={
-    1:{icono:'📅',label:'Lunes: activa el pipeline',texto:'El lunes es ideal para enviar primeros contactos  -  los decisores revisan su semana y están más receptivos a propuestas nuevas. Prioriza los "Por contactar" hoy.'},
-    2:{icono:'🔥',label:'Martes: mejor día para escribir',texto:'Martes y miércoles tienen la tasa de respuesta más alta en B2B. Es el mejor momento para hacer seguimientos y escribir a quienes llevan más de 5 días sin responder.'},
-    3:{icono:'🔥',label:'Miércoles: día peak de respuesta',texto:'Miércoles es el día con mayor tasa de apertura de emails B2B en Latinoamérica. Aprovecha para escribirle a los contactos en estado "Respondió" que llevan 3+ días.'},
-    4:{icono:'📞',label:'Jueves: cierra reuniones',texto:'El jueves es ideal para confirmar reuniones de la próxima semana. Si tienes contactos en estado "Reunión" sin fecha confirmada, hoy es el día para insistir.'},
-    5:{icono:'⚡',label:'Viernes: seguimiento express',texto:'Los viernes son buenos para mensajes cortos y directos  -  "¿pudiste revisar?" funciona bien. Evita propuestas largas; guárdalas para la próxima semana.'},
-    6:{icono:'😴',label:'Sábado: planifica el lunes',texto:'Pocas personas responden el fin de semana. Usa este tiempo para revisar tu pipeline, actualizar estados y preparar los mensajes que enviarás el lunes.'},
-    0:{icono:'🗓️',label:'Domingo: prepara tu semana',texto:'Revisa quién lleva más de 7 días sin contacto y prepara 3 mensajes para enviar el lunes. La semana que empieza con plan, cierra más.'},
+    1:{icono:'📅',label:'Lunes: activa el pipeline',texto:'El lunes es ideal para enviar primeros contactos. Los decisores revisan su semana y estan mas receptivos a propuestas nuevas. Prioriza los referidos y los que abrieron tu email.'},
+    2:{icono:'🔥',label:'Martes: mejor dia para escribir',texto:'Martes y miercoles tienen la tasa de respuesta mas alta en B2B. Es el mejor momento para hacer seguimientos y escribir a quienes llevan mas de 5 dias sin responder.'},
+    3:{icono:'🔥',label:'Miercoles: dia peak de respuesta',texto:'Miercoles es el dia con mayor tasa de apertura de emails B2B en Latinoamerica. Aprovecha para escribirle a los contactos que abrieron tu email y aun no han respondido.'},
+    4:{icono:'📞',label:'Jueves: cierra reuniones',texto:'El jueves es ideal para confirmar reuniones de la proxima semana. Si tienes contactos en etapa Reunion sin fecha confirmada, hoy es el dia para insistir.'},
+    5:{icono:'⚡',label:'Viernes: seguimiento express',texto:'Los viernes son buenos para mensajes cortos y directos. Evita propuestas largas, guardalas para la proxima semana. Un mensaje de 2 lineas funciona mejor que uno largo.'},
+    6:{icono:'😴',label:'Sabado: planifica el lunes',texto:'Pocas personas responden el fin de semana. Usa este tiempo para revisar tu pipeline, actualizar estados y preparar los mensajes que enviaras el lunes.'},
+    0:{icono:'🗓️',label:'Domingo: prepara tu semana',texto:'Revisa quien lleva mas de 7 dias sin contacto y prepara 3 mensajes para enviar el lunes. La semana que empieza con plan, cierra mas.'},
   };
   tips.push(tipsDia[dia]);
-  const sinContacto=activos.filter(c=>getDias(c)>7&&c.status==='Contactado');
-  const respondieron=activos.filter(c=>c.status==='Respondió');
-  const porContactar=activos.filter(c=>c.status==='Por contactar');
-  const enReunion=activos.filter(c=>c.status==='Reunión');
-  if(respondieron.length>=3) tips.push({icono:'🎯',label:`${respondieron.length} leads calientes`,texto:`Tienes ${respondieron.length} contactos que abrieron tu email. En promedio, solo el 20% de los que abren responden si no haces seguimiento. Escríbeles antes de que se enfríen.`});
-  else if(sinContacto.length>=4) tips.push({icono:'⚠️',label:`${sinContacto.length} contactos estancados`,texto:`${sinContacto.length} prospectos llevan más de 7 días en "Contactado" sin avance. La mayoría no responde al primer mensaje  -  el segundo mensaje tiene 40% más probabilidad de éxito.`});
-  else if(porContactar.length>=5) tips.push({icono:'🚀',label:`${porContactar.length} sin contactar aún`,texto:`Tienes ${porContactar.length} prospectos que nunca has contactado. Cada día que pasan sin mensaje es oportunidad perdida  -  prioriza los referidos primero, cierran 4x más rápido.`});
-  else if(enReunion.length>=2) tips.push({icono:'💼',label:`${enReunion.length} en etapa reunión`,texto:`Con ${enReunion.length} prospectos en reunión, el siguiente paso crítico es enviar una propuesta en menos de 48 horas post-reunión.`});
-  else tips.push({icono:'📈',label:'Sigue agregando volumen',texto:'Un pipeline saludable necesita al menos 30 prospectos activos para generar 2-3 cierres al mes.'});
-  const rubros={};activos.forEach(c=>{const r=inferRubro(c.emp);if(r) rubros[r]=(rubros[r]||0)+1;});
-  const topRubro=Object.entries(rubros).sort((a,b)=>b[1]-a[1])[0];
-  const canales={};activos.forEach(c=>{if(c.canal) canales[c.canal]=(canales[c.canal]||0)+1;});
-  const topCanal=Object.entries(canales).sort((a,b)=>b[1]-a[1])[0];
-  if(topRubro&&topRubro[1]>=5){
-    const cr={'Transporte/Logística':'Las empresas de transporte deciden rápido cuando el dolor es operativo. Usa casos concretos de ahorro en flota o reducción de tiempos muertos.','Puertos/Operaciones':'El sector portuario tiene ciclos de decisión largos (60-90 días). Necesitas un contacto interno que sea tu champion.','Retail/Consumo':'En retail el foco es velocidad y costo. Muestra ROI en menos de 6 meses.','Alimentos':'Las empresas de alimentos priorizan cumplimiento normativo y trazabilidad.','3PL/Operadores':'Los operadores logísticos buscan diferenciar su servicio. Posiciónate como aliado.'};
-    tips.push({icono:'🏭',label:`Tu rubro principal: ${topRubro[0]}`,texto:cr[topRubro[0]]||`Tienes ${topRubro[1]} prospectos en ${topRubro[0]}.`});
-  } else if(topCanal){
-    const cc={'LinkedIn':'LinkedIn tiene tasa de respuesta del 25-35% en B2B cuando el mensaje es personalizado.','Email':'El email frío funciona mejor con asuntos de menos de 7 palabras y un solo call-to-action.','WhatsApp':'WhatsApp es el canal más efectivo en Chile para PYMES. Un mensaje directo de 2-3 líneas supera cualquier email largo.','Referido':'Los referidos cierran 4x más rápido. Pide a cada contacto que te presente a 2 más.'};
-    tips.push({icono:'📱',label:`Canal principal: ${topCanal[0]}`,texto:cc[topCanal[0]]||`Diversificar a 2-3 canales aumenta tu tasa de respuesta.`});
-  } else tips.push({icono:'🌐',label:'Diversifica tus canales',texto:'Usar solo 1 canal limita tu alcance. La combinación LinkedIn + Email + WhatsApp tiene 3x más probabilidad de respuesta.'});
+
+  // TIP 2: accionable con nombres reales - prioridad maxima del pipeline
+  const abrieron=activos.filter(c=>c.status==='Respondio'||c.status==='Respondió').sort((a,b)=>getDias(b)-getDias(a));
+  const enReunion=activos.filter(c=>c.status==='Reunión').sort((a,b)=>getDias(b)-getDias(a));
+  const referidosSinContactar=activos.filter(c=>c.canal==='Referido'&&c.status==='Por contactar');
+  const estancados=activos.filter(c=>c.status==='Contactado'&&getDias(c)>10).sort((a,b)=>getDias(b)-getDias(a));
+  const porContactarAlta=activos.filter(c=>c.status==='Por contactar'&&calcScore(c)>=4).sort((a,b)=>calcScore(b)-calcScore(a));
+
+  if(abrieron.length>0){
+    const nombres=abrieron.slice(0,2).map(c=>c.cont.split(' ')[0]+' ('+c.emp+')').join(' y ');
+    const extra=abrieron.length>2?' y '+(abrieron.length-2)+' mas':'';
+    tips.push({icono:'🎯',label:'Escribe hoy: abrieron tu mensaje',texto:''+nombres+extra+' leyeron tu mensaje y no respondieron. El segundo toque tiene 40% mas probabilidad de exito. Mensaje corto, pregunta directa.'});
+  } else if(enReunion.length>0){
+    const c=enReunion[0];
+    const d=getDias(c);
+    tips.push({icono:'💼',label:'Reunion sin cierre: '+c.emp,texto:''+c.cont.split(' ')[0]+' ('+c.emp+') lleva '+d+' dias desde la reunion sin propuesta enviada. Cada dia que pasa baja la probabilidad de cierre. Enviala hoy.'});
+  } else if(referidosSinContactar.length>0){
+    const nombres=referidosSinContactar.slice(0,2).map(c=>c.emp).join(' y ');
+    tips.push({icono:'🤝',label:'Referidos sin contactar',texto:'Tienes '+referidosSinContactar.length+' referido(s) sin contactar: '+nombres+'. Son tu mayor probabilidad de cierre rapido. Cierran 4x mas que contacto frio.'});
+  } else if(estancados.length>0){
+    const c=estancados[0];
+    tips.push({icono:'⚠️',label:'Contacto estancado: '+c.emp,texto:''+c.cont.split(' ')[0]+' ('+c.emp+') lleva '+getDias(c)+' dias sin respuesta. Es momento del segundo toque: mensaje corto por '+c.canal+', sin volver a explicar nada.'});
+  }
+
+  // TIP 3: insight de aprendizaje del pipeline
+  const topScore=activos.filter(c=>c.status==='Por contactar'||c.status==='Contactado').sort((a,b)=>calcScore(b)-calcScore(a)).slice(0,3);
+  const reunionesUrgentes=enReunion.filter(c=>getDias(c)>5);
+  const sinDolor=activos.filter(c=>(!c.diagDolor||c.diagDolor.length===0)&&['Reunión','Respondió','En proceso'].includes(c.status));
+
+  if(reunionesUrgentes.length>0){
+    const nombres=reunionesUrgentes.map(c=>c.emp).join(', ');
+    tips.push({icono:'🚨',label:'Reunion(es) sin propuesta urgente',texto:''+nombres+': tuviste reunion pero aun no enviaste propuesta. Sin propuesta no hay cierre. Priorizalos hoy sobre cualquier otro contacto.'});
+  } else if(sinDolor.length>0){
+    const nombres=sinDolor.slice(0,2).map(c=>c.emp).join(' y ');
+    tips.push({icono:'🔍',label:'Diagnostica antes de proponer',texto:''+nombres+' estan avanzados pero no tienes el dolor documentado. Sin dolor claro, la propuesta no tiene ancla. Abre el diagnostico y completa ese campo antes de la reunion.'});
+  } else if(topScore.length>0){
+    const nombres=topScore.map(c=>c.emp).join(', ');
+    tips.push({icono:'📈',label:'Proximos en la fila',texto:'Los contactos con mayor prioridad sin activar son: '+nombres+'. Usalos para llenar huecos entre seguimientos activos.'});
+  } else {
+    tips.push({icono:'💡',label:'Pipeline saludable',texto:'Tienes contactos en todas las etapas del funnel. Mantiene el volumen: agrega 2-3 contactos nuevos por semana para asegurarte cierres sostenidos.'});
+  }
+
   return tips;
 }
 
