@@ -384,45 +384,56 @@ function timing(c){
 function generarDiagReal(c){
   const d=getDias(c);
   const nombre=c.cont?.split(' ')[0]||'el contacto';
-  if(c.status==='Respondió')
-    return `Abrió el email hace ${d} días pero no respondió. Hay interés (abrió), pero falta fricción suficiente para responder. El problema no es el mensaje, es que no basta con abrirlo.`;
+  const canal=c.canal||'desconocido';
+  const ultimoHist=(c.historial||[]).slice(-1)[0];
+  const ultimoTexto=ultimoHist?ultimoHist.texto:'';
+
+  if(c.status==='Respondió'){
+    const via=canal==='Email'?'el email':canal==='WhatsApp'?'tu mensaje de WhatsApp':canal==='LinkedIn'?'tu mensaje de LinkedIn':`tu mensaje de ${canal}`;
+    return `Leyó ${via} hace ${d} días pero no respondió. Hay interés (lo leyó), pero falta fricción suficiente para responder. No es rechazo — es silencio. El segundo toque tiene 40% más probabilidad de éxito.${ultimoTexto?' Contexto: '+ultimoTexto:''}`;
+  }
   if(c.status==='Contactado'&&d>14)
-    return `Lleva ${d} días sin respuesta. Probablemente nunca leyó el mensaje, o lo postergó y se olvidó. No es rechazo — es silencio. Falta un segundo toque.`;
+    return `Lleva ${d} días sin respuesta por ${canal}. Probablemente nunca leyó el mensaje, o lo postergó y se olvidó. No es rechazo — es silencio. Falta un segundo toque.${ultimoTexto?' Último registro: '+ultimoTexto:''}`;
   if(c.status==='Contactado'&&d>7)
-    return `${d} días desde el primer contacto sin respuesta. El momentum se está enfriando. Es el momento ideal para un seguimiento corto.`;
+    return `${d} días desde el primer contacto por ${canal} sin respuesta. El momentum se está enfriando. Momento ideal para un seguimiento corto y directo.`;
   if(c.status==='Contactado')
-    return `Recién contactado hace ${d} días. Demasiado pronto para insistir. El timing está bien — solo hay que esperar.`;
+    return `Recién contactado hace ${d} días por ${canal}. Demasiado pronto para insistir — el timing está bien. Solo hay que esperar.`;
   if(c.status==='Reunión'&&d>7)
-    return `Reunión hace ${d} días sin avance documentado. El riesgo es que pierda prioridad. Falta propuesta o confirmación de siguiente paso.`;
+    return `Reunión hace ${d} días sin avance documentado. El riesgo es que pierda prioridad. ${c.notas?'Contexto: '+c.notas:''} Falta propuesta o confirmación de siguiente paso.`;
   if(c.status==='Reunión')
-    return `Reunión realizada hace ${d} días. El momentum está activo. La propuesta debe llegar antes de 48 horas o la probabilidad de cierre baja.`;
+    return `Reunión realizada hace ${d} días. El momentum está activo. ${c.notas?'Nota: '+c.notas+'. ':''} La propuesta debe llegar antes de 48 horas o la probabilidad de cierre baja.`;
   if(c.status==='Por contactar')
-    return `Nunca contactado. No hay dolor identificado ni canal confirmado. El único bloqueador eres tú — falta enviar el primer mensaje.`;
+    return `Nunca contactado. Canal planificado: ${canal||'sin definir'}. ${c.notas?'Contexto: '+c.notas+'. ':''}El único bloqueador eres tú — falta enviar el primer mensaje.`;
   if(c.status==='On hold')
-    return `En pausa. ${c.notas||'Sin razón documentada'}. El riesgo es que "on hold" se convierta en descarte silencioso.`;
+    return `En pausa. ${c.notas||'Sin razón documentada'}. El riesgo es que "on hold" se convierta en descarte silencioso. Ponle una fecha límite.`;
   if(c.status==='En proceso')
-    return `En proceso pero sin avance claro en ${d} días. ${c.notas||''}. Hay que definir si hay dolor real o solo interés superficial.`;
-  return `Estado: ${c.status}. ${d} días desde último contacto. Revisar si sigue siendo prioritario.`;
+    return `En proceso por ${canal} pero sin avance claro en ${d} días. ${c.notas||''}. Hay que definir si hay dolor real o solo interés superficial.`;
+  return `Estado: ${c.status}. ${d} días desde último contacto por ${canal}. Revisar si sigue siendo prioritario.`;
 }
 
 function generarDiagAccion(c){
   const d=getDias(c);
   const nombre=c.cont?.split(' ')[0]||'el contacto';
+  const canal=c.canal||'mismo canal';
+  const canalMsg=canal==='WhatsApp'?'WhatsApp':canal==='LinkedIn'?'LinkedIn':canal==='Email'?'email':'mensaje';
+
   if(c.status==='Respondió')
-    return `Mandar seguimiento hoy: "Hola ${nombre}, te reenvío esto por si se perdió. ¿Tienes 20 minutos esta semana?" — sin volver a explicar nada.`;
+    return `Seguimiento hoy por ${canal}: "Hola ${nombre}, te reenvío esto por si se perdió. ¿Tienes 20 minutos esta semana?" — sin volver a explicar nada. Cortísimo.`;
   if(c.status==='Contactado'&&d>7)
-    return `Segundo toque esta semana. Mensaje corto por el mismo canal. Si no responde en 5 días más, cerrar el loop y descartar.`;
-  if(c.status==='Contactado')
-    return `Esperar hasta día ${5-d<0?0:5-d} desde el contacto inicial. No insistir antes — parece desesperado.`;
+    return `Segundo toque esta semana por ${canal}. Mensaje corto y directo. Si no responde en 5 días más, cerrar el loop y descartar.`;
+  if(c.status==='Contactado'){
+    const esperar=Math.max(0,5-d);
+    return esperar>0?`Esperar ${esperar} días más antes de insistir. No presionar antes — parece desesperado.`:`Momento ideal para el seguimiento. Mandar mensaje corto por ${canal} hoy.`;
+  }
   if(c.status==='Reunión'&&d>5)
-    return `Enviar propuesta esta semana o confirmar siguiente paso concreto. Sin fecha definida, este contacto se muere.`;
+    return `Enviar propuesta esta semana o confirmar siguiente paso concreto con fecha. Sin fecha definida, este contacto se muere.`;
   if(c.status==='Reunión')
     return `Enviar propuesta en menos de 48 horas. Si ya se envió, confirmar si fue recibida y cuándo tienen respuesta.`;
   if(c.status==='Por contactar')
-    return `Enviar primer mensaje esta semana. Priorizar si hay referido o nexo — cierran 4x más rápido que contacto frío.`;
+    return `Enviar primer mensaje esta semana por ${canal}. ${c.canal==='Referido'?'Es referido — prioridad alta, cierran 4x más rápido.':'Personalizar con algo específico de la empresa antes de enviar.'}`;
   if(c.status==='On hold')
-    return `Poner fecha de revisión en calendario. Si en 2 semanas no hay señal, descartar y liberar energía para otros.`;
-  return `Revisar estado y definir si sigue en pipeline o se descarta. No dejar contactos en limbo.`;
+    return `Definir fecha concreta de revisión. Si en 2 semanas no hay señal, descartar y liberar energía para otros contactos activos.`;
+  return `Revisar estado con ${nombre} y definir si sigue en pipeline o se descarta. No dejar contactos en limbo sin acción definida.`;
 }
 
 function getMensaje(c){
