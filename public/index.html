@@ -299,8 +299,33 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 
 <!-- MODAL DIAGNÓSTICO -->
 <div class="overlay" id="diag-overlay">
-  <div class="modal" style="width:540px">
-    <h3 id="diag-title">Diagnóstico</h3>
+  <div class="modal" style="width:580px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem">
+      <h3 id="diag-title" style="margin-bottom:0">Diagnóstico</h3>
+      <div id="diag-score-badge" style="font-size:13px;font-weight:600;padding:4px 14px;border-radius:99px"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:8px 11px;text-align:center">
+        <div style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px">Temperatura</div>
+        <div id="diag-temp-val" style="font-size:15px;font-weight:600"></div>
+      </div>
+      <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:8px 11px;text-align:center">
+        <div style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px">Score cierre</div>
+        <div id="diag-score-val" style="font-size:15px;font-weight:600;color:var(--blue)"></div>
+      </div>
+      <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:8px 11px;text-align:center">
+        <div style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px">Bloqueador</div>
+        <div id="diag-bloq-val" style="font-size:12px;font-weight:600;color:var(--amber)"></div>
+      </div>
+    </div>
+
+    <div class="diag-section">
+      <div class="diag-section-title"><span>🎯</span> Dolor identificado</div>
+      <div class="diag-generated" id="diag-dolor-gen"></div>
+      <label class="diag-edit-label">Tu validación (editable):</label>
+      <textarea class="diag-edit" id="diag-dolor-edit" placeholder="¿Cuál es el dolor real de este prospecto? Edita o complementa..."></textarea>
+    </div>
 
     <div class="diag-section">
       <div class="diag-section-title"><span>🔍</span> Qué está pasando realmente</div>
@@ -390,20 +415,20 @@ function generarDiagReal(c){
 
   if(c.status==='Respondió'){
     const via=canal==='Email'?'el email':canal==='WhatsApp'?'tu mensaje de WhatsApp':canal==='LinkedIn'?'tu mensaje de LinkedIn':`tu mensaje de ${canal}`;
-    return `Leyó ${via} hace ${d} días pero no respondió. Hay interés (lo leyó), pero falta fricción suficiente para responder. No es rechazo — es silencio. El segundo toque tiene 40% más probabilidad de éxito.${ultimoTexto?' Contexto: '+ultimoTexto:''}`;
+    return `Leyó ${via} hace ${d} días pero no respondió. Hay interés (lo leyó), pero falta fricción suficiente para responder. No es rechazo  -  es silencio. El segundo toque tiene 40% más probabilidad de éxito.${ultimoTexto?' Contexto: '+ultimoTexto:''}`;
   }
   if(c.status==='Contactado'&&d>14)
-    return `Lleva ${d} días sin respuesta por ${canal}. Probablemente nunca leyó el mensaje, o lo postergó y se olvidó. No es rechazo — es silencio. Falta un segundo toque.${ultimoTexto?' Último registro: '+ultimoTexto:''}`;
+    return `Lleva ${d} días sin respuesta por ${canal}. Probablemente nunca leyó el mensaje, o lo postergó y se olvidó. No es rechazo  -  es silencio. Falta un segundo toque.${ultimoTexto?' Último registro: '+ultimoTexto:''}`;
   if(c.status==='Contactado'&&d>7)
     return `${d} días desde el primer contacto por ${canal} sin respuesta. El momentum se está enfriando. Momento ideal para un seguimiento corto y directo.`;
   if(c.status==='Contactado')
-    return `Recién contactado hace ${d} días por ${canal}. Demasiado pronto para insistir — el timing está bien. Solo hay que esperar.`;
+    return `Recién contactado hace ${d} días por ${canal}. Demasiado pronto para insistir  -  el timing está bien. Solo hay que esperar.`;
   if(c.status==='Reunión'&&d>7)
     return `Reunión hace ${d} días sin avance documentado. El riesgo es que pierda prioridad. ${c.notas?'Contexto: '+c.notas:''} Falta propuesta o confirmación de siguiente paso.`;
   if(c.status==='Reunión')
     return `Reunión realizada hace ${d} días. El momentum está activo. ${c.notas?'Nota: '+c.notas+'. ':''} La propuesta debe llegar antes de 48 horas o la probabilidad de cierre baja.`;
   if(c.status==='Por contactar')
-    return `Nunca contactado. Canal planificado: ${canal||'sin definir'}. ${c.notas?'Contexto: '+c.notas+'. ':''}El único bloqueador eres tú — falta enviar el primer mensaje.`;
+    return `Nunca contactado. Canal planificado: ${canal||'sin definir'}. ${c.notas?'Contexto: '+c.notas+'. ':''}El único bloqueador eres tú  -  falta enviar el primer mensaje.`;
   if(c.status==='On hold')
     return `En pausa. ${c.notas||'Sin razón documentada'}. El riesgo es que "on hold" se convierta en descarte silencioso. Ponle una fecha límite.`;
   if(c.status==='En proceso')
@@ -418,19 +443,19 @@ function generarDiagAccion(c){
   const canalMsg=canal==='WhatsApp'?'WhatsApp':canal==='LinkedIn'?'LinkedIn':canal==='Email'?'email':'mensaje';
 
   if(c.status==='Respondió')
-    return `Seguimiento hoy por ${canal}: "Hola ${nombre}, te reenvío esto por si se perdió. ¿Tienes 20 minutos esta semana?" — sin volver a explicar nada. Cortísimo.`;
+    return `Seguimiento hoy por ${canal}: "Hola ${nombre}, te reenvío esto por si se perdió. ¿Tienes 20 minutos esta semana?"  -  sin volver a explicar nada. Cortísimo.`;
   if(c.status==='Contactado'&&d>7)
     return `Segundo toque esta semana por ${canal}. Mensaje corto y directo. Si no responde en 5 días más, cerrar el loop y descartar.`;
   if(c.status==='Contactado'){
     const esperar=Math.max(0,5-d);
-    return esperar>0?`Esperar ${esperar} días más antes de insistir. No presionar antes — parece desesperado.`:`Momento ideal para el seguimiento. Mandar mensaje corto por ${canal} hoy.`;
+    return esperar>0?`Esperar ${esperar} días más antes de insistir. No presionar antes  -  parece desesperado.`:`Momento ideal para el seguimiento. Mandar mensaje corto por ${canal} hoy.`;
   }
   if(c.status==='Reunión'&&d>5)
     return `Enviar propuesta esta semana o confirmar siguiente paso concreto con fecha. Sin fecha definida, este contacto se muere.`;
   if(c.status==='Reunión')
     return `Enviar propuesta en menos de 48 horas. Si ya se envió, confirmar si fue recibida y cuándo tienen respuesta.`;
   if(c.status==='Por contactar')
-    return `Enviar primer mensaje esta semana por ${canal}. ${c.canal==='Referido'?'Es referido — prioridad alta, cierran 4x más rápido.':'Personalizar con algo específico de la empresa antes de enviar.'}`;
+    return `Enviar primer mensaje esta semana por ${canal}. ${c.canal==='Referido'?'Es referido  -  prioridad alta, cierran 4x más rápido.':'Personalizar con algo específico de la empresa antes de enviar.'}`;
   if(c.status==='On hold')
     return `Definir fecha concreta de revisión. Si en 2 semanas no hay señal, descartar y liberar energía para otros contactos activos.`;
   return `Revisar estado con ${nombre} y definir si sigue en pipeline o se descarta. No dejar contactos en limbo sin acción definida.`;
@@ -440,13 +465,13 @@ function getMensaje(c){
   const nombre=c.cont?.split(' ')[0]||'[Nombre]';
   const dias=getDias(c);
   if(c.status==='Respondió')
-    return {ctx:`${nombre} abrió tu email hace ${dias} días. El momentum está ahí — un mensaje corto y directo.`,msg:`Hola ${nombre}, quería saber si pudiste revisar mi mensaje. ¿Vale 15 minutos esta semana para conversar?`};
+    return {ctx:`${nombre} abrió tu email hace ${dias} días. El momentum está ahí  -  un mensaje corto y directo.`,msg:`Hola ${nombre}, quería saber si pudiste revisar mi mensaje. ¿Vale 15 minutos esta semana para conversar?`};
   if(c.status==='Contactado'&&dias>=5)
     return {ctx:`Llevas ${dias} días desde el primer contacto. La mayoría responde al segundo mensaje.`,msg:`Hola ${nombre}, una pregunta directa: ¿están midiendo los indicadores clave de su operación hoy? Si la respuesta es "no del todo", probablemente vale conversar 15 minutos.`};
   if(c.status==='Reunión')
-    return {ctx:`Tuviste reunión con ${nombre}. Es clave confirmar el siguiente paso concreto.`,msg:`Hola ${nombre}, gracias por la reunión. Me gustaría avanzar en lo que conversamos — ¿podemos agendar un siguiente paso esta semana?`};
+    return {ctx:`Tuviste reunión con ${nombre}. Es clave confirmar el siguiente paso concreto.`,msg:`Hola ${nombre}, gracias por la reunión. Me gustaría avanzar en lo que conversamos  -  ¿podemos agendar un siguiente paso esta semana?`};
   if(c.status==='Por contactar')
-    return {ctx:`Aún no has contactado a ${nombre}. Tienes su información — es el momento.`,msg:`Hola ${nombre}, mi nombre es Jael, trabajo con Rave & Crutchik. Venimos de liderar operaciones en Nestlé, Unilever, SQM y Enex. ¿Vale 15 minutos para conversar?`};
+    return {ctx:`Aún no has contactado a ${nombre}. Tienes su información  -  es el momento.`,msg:`Hola ${nombre}, mi nombre es Jael, trabajo con Rave & Crutchik. Venimos de liderar operaciones en Nestlé, Unilever, SQM y Enex. ¿Vale 15 minutos para conversar?`};
   return {ctx:`Contacto en etapa ${c.status}.`,msg:`Hola ${nombre}, ¿cómo van las cosas? Me gustaría retomar nuestra conversación y ver si podemos avanzar.`};
 }
 
@@ -463,7 +488,7 @@ let contacts=[
   {id:10,emp:'Neumaérica',cont:'Gabriela Rodriguez',cargo:'Gerente Comercial',status:'Contactado',canal:'Email',dias:21,uf:0,horas:0,accion:'Mail seguimiento',notas:'',com:15,email:'',fechaContacto:'2026-05-14',historial:[{fecha:'2026-05-14',tipo:'Email',texto:'Email inicial enviado.'}],diagReal:'',diagAccion:''},
   {id:11,emp:'Transportes Jofre Hidalgo',cont:'-',cargo:'-',status:'Contactado',canal:'',dias:14,uf:0,horas:0,accion:'Seguimiento',notas:'',com:15,email:'',fechaContacto:'2026-05-21',historial:[],diagReal:'',diagAccion:''},
   {id:12,emp:'Transportes Sahid',cont:'Enrique Peña / Felipe Armijo',cargo:'Dueño',status:'Contactado',canal:'WhatsApp',dias:14,uf:0,horas:0,accion:'Seguimiento WhatsApp',notas:'',com:15,email:'',fechaContacto:'2026-05-21',historial:[{fecha:'2026-05-21',tipo:'WhatsApp',texto:'Primer contacto.'}],diagReal:'',diagAccion:''},
-  {id:13,emp:'Transportes Dliverys',cont:'Cristopher Olguin',cargo:'Dueño',status:'En proceso',canal:'WhatsApp',dias:7,uf:2.5,horas:16,accion:'Insistir — dejó en visto',notas:'No llegó a reunión acordada',com:15,email:'',fechaContacto:'2026-05-28',historial:[{fecha:'2026-05-28',tipo:'WhatsApp',texto:'Acordaron reunión pero no llegó.'}],diagReal:'',diagAccion:''},
+  {id:13,emp:'Transportes Dliverys',cont:'Cristopher Olguin',cargo:'Dueño',status:'En proceso',canal:'WhatsApp',dias:7,uf:2.5,horas:16,accion:'Insistir  -  dejó en visto',notas:'No llegó a reunión acordada',com:15,email:'',fechaContacto:'2026-05-28',historial:[{fecha:'2026-05-28',tipo:'WhatsApp',texto:'Acordaron reunión pero no llegó.'}],diagReal:'',diagAccion:''},
   {id:14,emp:'Transportes Concha',cont:'Victor Muñoz',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento WhatsApp',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[],diagReal:'',diagAccion:''},
   {id:15,emp:'Wild Foods',cont:'Javier Castro',cargo:'Co Founder & CEO',status:'Por contactar',canal:'LinkedIn',dias:5,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
   {id:16,emp:'Transportes Nazar',cont:'José Miguel Gelvez',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:5,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
@@ -483,10 +508,10 @@ let contacts=[
   {id:30,emp:'Dmerco',cont:'Marco',cargo:'Dueño',status:'Reunión',canal:'WhatsApp',dias:14,uf:3.0,horas:20,accion:'Confirmar fecha reunión jue/vie',notas:'Próxima semana. Vive en incendios.',com:15,email:'',fechaContacto:'2026-05-21',historial:[{fecha:'2026-05-21',tipo:'WhatsApp',texto:'Contacto inicial.'}],diagReal:'',diagAccion:''},
   {id:31,emp:'RockTruck',cont:'-',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento',notas:'Era de finanzas, compartirá contacto',com:15,email:'',fechaContacto:'2026-05-25',historial:[],diagReal:'',diagAccion:''},
   {id:32,emp:'Casablanca',cont:'-',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento',notas:'No ha contestado',com:15,email:'',fechaContacto:'2026-05-25',historial:[],diagReal:'',diagAccion:''},
-  {id:33,emp:'Antofagasta Terminal',cont:'Alex Munoz',cargo:'Ops Manager',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento — abrió email',notas:'Abrió email Instantly ✅',com:15,email:'amunoz@atiport.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}],diagReal:'',diagAccion:''},
-  {id:34,emp:'Puerto San Antonio',cont:'Jorge Santos',cargo:'Gerente Operaciones',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento — abrió email',notas:'Abrió email Instantly ✅',com:15,email:'jsantos@puertosanantonio.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}],diagReal:'',diagAccion:''},
-  {id:35,emp:'Almar Water',cont:'Yilian Collao',cargo:'Subgerente Ops',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento — abrió email',notas:'Abrió email Instantly ✅',com:15,email:'yilian.collao@almarwaterservices.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}],diagReal:'',diagAccion:''},
-  {id:36,emp:'Implementos Chile',cont:'Hans Meyer',cargo:'Jefe Ops CD',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento — abrió email',notas:'Abrió email Instantly ✅',com:15,email:'hans.meyer@implementos.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}],diagReal:'',diagAccion:''},
+  {id:33,emp:'Antofagasta Terminal',cont:'Alex Munoz',cargo:'Ops Manager',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento  -  abrió email',notas:'Abrió email Instantly ✅',com:15,email:'amunoz@atiport.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}],diagReal:'',diagAccion:''},
+  {id:34,emp:'Puerto San Antonio',cont:'Jorge Santos',cargo:'Gerente Operaciones',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento  -  abrió email',notas:'Abrió email Instantly ✅',com:15,email:'jsantos@puertosanantonio.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}],diagReal:'',diagAccion:''},
+  {id:35,emp:'Almar Water',cont:'Yilian Collao',cargo:'Subgerente Ops',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento  -  abrió email',notas:'Abrió email Instantly ✅',com:15,email:'yilian.collao@almarwaterservices.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}],diagReal:'',diagAccion:''},
+  {id:36,emp:'Implementos Chile',cont:'Hans Meyer',cargo:'Jefe Ops CD',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento  -  abrió email',notas:'Abrió email Instantly ✅',com:15,email:'hans.meyer@implementos.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}],diagReal:'',diagAccion:''},
   {id:37,emp:'ULOG',cont:'Manuel Salazar',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'msalazar@ulog.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}],diagReal:'',diagAccion:''},
   {id:38,emp:'Transportes Maquehua',cont:'Igor Jofre',cargo:'Asst. Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'ijofre@maquehua.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}],diagReal:'',diagAccion:''},
   {id:39,emp:'Empresas Marval',cont:'Javier Droguett',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'jdroguett@marval.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}],diagReal:'',diagAccion:''},
@@ -535,41 +560,54 @@ function renderLearnings(){
   activos.forEach(c=>{const r=inferRubro(c.emp);if(r) rubros[r]=(rubros[r]||0)+1;});
   const topRubro=Object.entries(rubros).sort((a,b)=>b[1]-a[1])[0];
 
-  const conDolor=activos.filter(c=>c.diagReal&&c.diagReal.length>0).length;
-  const sinDolor=activos.filter(c=>!c.diagReal||c.diagReal.length===0).length;
+  const conDolor=activos.filter(c=>c.diagDolor&&c.diagDolor.length>0).length;
+  const sinDolor=activos.filter(c=>!c.diagDolor||c.diagDolor.length===0).length;
 
-  const diasPromedio=activos.filter(c=>getDias(c)>0).reduce((s,c,_,a)=>s+getDias(c)/a.length,0);
+  // Score promedio del pipeline
+  const scorePromedio=activos.length>0?Math.round(activos.reduce((s,c)=>s+calcScore(c),0)/activos.length):0;
+  
+  // Calientes vs tibios vs fríos
+  const calientes=activos.filter(c=>calcTemperatura(c).label.includes('Caliente')).length;
+  const tibios=activos.filter(c=>calcTemperatura(c).label.includes('Tibio')).length;
+  const frios=activos.filter(c=>calcTemperatura(c).label.includes('Frío')).length;
+
+  // Rubro que más responde (tiene estado Respondió o Reunión)
+  const rubrosCalientes={};
+  activos.filter(c=>['Respondió','Reunión','Propuesta'].includes(c.status)).forEach(c=>{
+    const r=inferRubro(c.emp);if(r) rubrosCalientes[r]=(rubrosCalientes[r]||0)+1;
+  });
+  const topRubroCaliente=Object.entries(rubrosCalientes).sort((a,b)=>b[1]-a[1])[0];
 
   document.getElementById('learn-grid').innerHTML=`
     <div class="learn-card">
-      <div class="learn-card-label">Canal que más usa</div>
-      <div class="learn-card-val">${topCanal?topCanal[0]:'—'}</div>
-      <div class="learn-card-sub">${topCanal?topCanal[1]+' contactos en este canal':'Sin datos aún'}</div>
+      <div class="learn-card-label">Temperatura pipeline</div>
+      <div class="learn-card-val"><span style="color:#dc2626">●</span> ${calientes} · <span style="color:#d97706">●</span> ${tibios} · <span style="color:#94a3b8">●</span> ${frios}</div>
+      <div class="learn-card-sub">Calientes · Tibios · Fríos</div>
     </div>
     <div class="learn-card">
-      <div class="learn-card-label">Rubro principal</div>
-      <div class="learn-card-val">${topRubro?topRubro[0].split('/')[0]:'—'}</div>
-      <div class="learn-card-sub">${topRubro?topRubro[1]+' prospectos en este rubro':'Sin datos aún'}</div>
+      <div class="learn-card-label">Score promedio</div>
+      <div class="learn-card-val" style="color:${scorePromedio>=6?'var(--green)':scorePromedio>=4?'var(--amber)':'var(--red)'}">${scorePromedio}/10</div>
+      <div class="learn-card-sub">Probabilidad promedio de cierre</div>
     </div>
     <div class="learn-card">
       <div class="learn-card-label">Tasa de apertura</div>
       <div class="learn-card-val" style="color:${tasaRespuesta>20?'var(--green)':'var(--amber)'}">${tasaRespuesta}%</div>
-      <div class="learn-card-sub">${respondieron} abrieron de ${totalContactados} contactados</div>
+      <div class="learn-card-sub">${respondieron} respondieron de ${totalContactados} contactados</div>
     </div>
     <div class="learn-card">
-      <div class="learn-card-label">Días promedio sin acción</div>
-      <div class="learn-card-val" style="color:${diasPromedio>10?'var(--red)':'var(--ink)'}">${Math.round(diasPromedio)}d</div>
-      <div class="learn-card-sub">Promedio del pipeline activo</div>
+      <div class="learn-card-label">Rubro más caliente</div>
+      <div class="learn-card-val">${topRubroCaliente?topRubroCaliente[0].split('/')[0]:' - '}</div>
+      <div class="learn-card-sub">${topRubroCaliente?topRubroCaliente[1]+' con interés confirmado':'Sin señales aún'}</div>
     </div>
     <div class="learn-card">
-      <div class="learn-card-label">Diagnósticos completados</div>
-      <div class="learn-card-val">${conDolor}</div>
-      <div class="learn-card-sub">${sinDolor} contactos sin diagnosticar aún</div>
+      <div class="learn-card-label">Canal principal</div>
+      <div class="learn-card-val">${topCanal?topCanal[0]:' - '}</div>
+      <div class="learn-card-sub">${topCanal?topCanal[1]+' contactos en este canal':'Sin datos'}</div>
     </div>
     <div class="learn-card">
-      <div class="learn-card-label">Referidos en pipeline</div>
-      <div class="learn-card-val" style="color:var(--green)">${activos.filter(c=>c.canal==='Referido').length}</div>
-      <div class="learn-card-sub">Cierran 4x más rápido que frío</div>
+      <div class="learn-card-label">Dolor documentado</div>
+      <div class="learn-card-val" style="color:${conDolor>5?'var(--green)':'var(--amber)'}">${conDolor}</div>
+      <div class="learn-card-sub">${sinDolor} sin dolor identificado  -  prioridad</div>
     </div>
   `;
 }
@@ -619,9 +657,12 @@ function renderContacts(){
 
   const rows=sorted.map(c=>{
     const u=urg(c),d=getDias(c),t=timing(c);
-    const timingHtml=t?`<span class="timing-txt" style="color:${t.color}">${t.txt}</span>`:`<span style="color:#e2e8f0;font-size:10px">—</span>`;
-    const diagText=c.diagReal||c.diagAccion?
-      `<div class="diag-cell">${c.diagReal||c.diagAccion}</div>`:
+    const timingHtml=t?`<span class="timing-txt" style="color:${t.color}">${t.txt}</span>`:`<span style="color:#e2e8f0;font-size:10px"> - </span>`;
+    const score=calcScore(c);
+    const temp=calcTemperatura(c);
+    const scoreColor=score>=7?'#16a34a':score>=4?'#d97706':'#94a3b8';
+    const diagText=c.diagDolor||c.diagReal?
+      `<div class="diag-cell">${c.diagDolor||c.diagReal}</div>`:
       `<div class="diag-cell" style="color:#cbd5e1;font-style:italic">Sin diagnóstico</div>`;
     return `<tr>
       <td class="col-emp" style="white-space:normal">
@@ -629,10 +670,13 @@ function renderContacts(){
         ${c.accion?`<div style="font-size:10px;color:#94a3b8;font-style:italic;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.accion}</div>`:''}
       </td>
       <td class="col-cont" style="white-space:normal">
-        <div class="td-cont">${c.cont&&c.cont!=='-'?c.cont:'—'}</div>
+        <div class="td-cont">${c.cont&&c.cont!=='-'?c.cont:' - '}</div>
         <div class="td-cargo">${c.cargo&&c.cargo!=='-'?c.cargo:''}</div>
       </td>
-      <td class="col-status"><span class="badge ${bc(c.status)}">${c.status}</span></td>
+      <td class="col-status">
+        <span class="badge ${bc(c.status)}">${c.status}</span>
+        <div style="font-size:10px;margin-top:3px;color:${temp.color}">${temp.label.split(' ').slice(0,2).join(' ')} · ${score}/10</div>
+      </td>
       <td class="col-timing">${timingHtml}</td>
       <td class="col-diag" style="white-space:normal">${diagText}</td>
       <td class="col-dias" style="text-align:center"><span class="td-dias${u==='h'?' hot':''}">${d===0?'hoy':d+'d'}</span></td>
@@ -652,20 +696,188 @@ function renderContacts(){
 
 function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderLearnings();}
 
+// --- DOLORES POR RUBRO ---
+const DOLORES_RUBRO = {
+  'Transporte/Logística': [
+    'Tiempos muertos entre rutas  -  conductores esperando sin carga',
+    'Sin visibilidad en tiempo real de dónde están los vehículos',
+    'Coordinación manual entre operaciones, cliente y facturación',
+    'Costos de flota fuera de control sin KPIs claros',
+    'Crecimiento de clientes sin procesos que escalen'
+  ],
+  'Puertos/Operaciones': [
+    'Coordinación manual entre terminales, agentes y aduana',
+    'Sin trazabilidad end-to-end de la carga',
+    'Tiempos de espera en berth que generan penalidades',
+    'Datos de operación en silos, sin dashboard integrado',
+    'Procesos de turno que dependen de personas clave'
+  ],
+  'Retail/Consumo': [
+    'Quiebres de stock frecuentes sin sistema de alerta',
+    'Logística de última milla cara y poco confiable',
+    'Devoluciones sin proceso claro  -  pérdida de margen',
+    'Inventario desactualizado entre tiendas y bodega',
+    'Picking lento en CD que frena el despacho'
+  ],
+  'Alimentos': [
+    'Trazabilidad de lotes débil  -  riesgo de recall',
+    'Cadena de frío sin monitoreo continuo',
+    'Merma alta por mal manejo en bodega y transporte',
+    'Cumplimiento normativo (HACCP, ISO) consume tiempo manual',
+    'Planificación de producción desconectada de la demanda real'
+  ],
+  '3PL/Operadores': [
+    'Onboarding de clientes nuevo lento y manual',
+    'Sin visibilidad de márgenes por cliente o contrato',
+    'Operación depende de personas clave  -  sin documentación',
+    'Tecnología desactualizada frente a competidores',
+    'SLAs incumplidos por falta de alertas tempranas'
+  ],
+  'Minería/Industria': [
+    'Mantenimiento reactivo  -  paradas no programadas',
+    'Gestión de repuestos sin control de stock crítico',
+    'Procesos de turno sin estandarización ni registro',
+    'Indicadores de OEE bajos sin causa raíz identificada',
+    'Contratistas sin integración real al sistema de gestión'
+  ],
+  'Salud': [
+    'Flujo de pacientes con cuellos de botella no mapeados',
+    'Abastecimiento de insumos con quiebres frecuentes',
+    'Indicadores de calidad desconectados de la operación',
+    'Procesos administrativos que consumen tiempo clínico'
+  ],
+  'default': [
+    'Procesos que funcionaban antes pero ya no escalan con el crecimiento',
+    'Decisiones que dependen de pocas personas clave  -  riesgo operacional',
+    'Sin visibilidad real de la operación  -  apagando incendios',
+    'Datos dispersos en planillas Excel sin integración',
+    'Crecimiento desordenado  -  cada área hace lo suyo sin estándar'
+  ]
+};
+
+function generarDolor(c){
+  var rubro = inferRubro(c.emp) || 'default';
+  var dolores = DOLORES_RUBRO[rubro] || DOLORES_RUBRO['default'];
+  var cargo = (c.cargo||'').toLowerCase();
+  var intro = '';
+  if(cargo.includes('gerente general') || cargo.includes('dueño') || cargo.includes('ceo') || cargo.includes('founder'))
+    intro = 'Decisor top - dolor estrategico: ';
+  else if(cargo.includes('ops') || cargo.includes('operac'))
+    intro = 'Rol operacional - dolor tactico: ';
+  else if(cargo.includes('supply') || cargo.includes('cadena'))
+    intro = 'Supply chain - dolor de visibilidad: ';
+  else
+    intro = 'Dolor probable segun rubro/rol: ';
+  var lista = dolores.slice(0,3).map(function(d){ return '- ' + d; }).join(' / ');
+  return intro + lista + ' (Rubro detectado: ' + rubro + '. Valida cual aplica antes de la reunion.)';
+}
+
+// --- SCORE Y TEMPERATURA ---
+function calcScore(c){
+  let score = 0;
+  const d = getDias(c);
+  
+  // Status
+  if(c.status === 'Reunión') score += 30;
+  else if(c.status === 'Respondió') score += 20;
+  else if(c.status === 'Propuesta') score += 35;
+  else if(c.status === 'En proceso') score += 15;
+  else if(c.status === 'Contactado') score += 5;
+  else if(c.status === 'Por contactar') score += 2;
+  
+  // Canal
+  if(c.canal === 'Referido') score += 20;
+  else if(c.canal === 'Reunión') score += 15;
+  else if(c.canal === 'WhatsApp') score += 8;
+  else if(c.canal === 'LinkedIn') score += 5;
+  else if(c.canal === 'Email') score += 5;
+
+  // Cargo decisor
+  const cargo = (c.cargo||'').toLowerCase();
+  if(cargo.includes('dueño') || cargo.includes('ceo') || cargo.includes('founder') || cargo.includes('gerente general')) score += 15;
+  else if(cargo.includes('gerente') || cargo.includes('director') || cargo.includes('socio')) score += 10;
+  else if(cargo.includes('jefe') || cargo.includes('manager') || cargo.includes('mgr')) score += 5;
+
+  // Dolor documentado
+  if(c.diagAccion && c.diagAccion.length > 10) score += 10;
+  
+  // Timing  -  penalizar si lleva muchos días sin acción
+  if(d > 20) score -= 10;
+  else if(d > 10) score -= 5;
+  
+  // Historial  -  más touchpoints = más interés
+  const h = (c.historial||[]).length;
+  if(h >= 3) score += 10;
+  else if(h >= 2) score += 5;
+
+  return Math.min(10, Math.max(1, Math.round(score / 10)));
+}
+
+function calcTemperatura(c){
+  const score = calcScore(c);
+  const d = getDias(c);
+  if(c.status === 'Reunión' || c.status === 'Propuesta') return {label:'\u25CF Caliente', color:'#dc2626'};
+  if(c.status === 'Respondió' && d <= 5) return {label:'\u25CF Caliente', color:'#dc2626'};
+  if(score >= 7) return {label:'\u25CF Tibio', color:'#d97706'};
+  if(score >= 4) return {label:'\u25CF Tibio', color:'#d97706'};
+  return {label:'\u25CF Fr\u00EDo', color:'#64748b'};
+}
+
+function calcBloqueador(c){
+  const d = getDias(c);
+  const h = (c.historial||[]).length;
+  if(c.status === 'Por contactar') return 'Falta primer contacto';
+  if(c.status === 'On hold') return 'Decisión pausada';
+  if(c.status === 'Contactado' && d > 14) return 'Sin respuesta  -  mensaje frío';
+  if(c.status === 'Contactado' && d > 7) return 'Seguimiento pendiente';
+  if(c.status === 'Contactado' && d <= 5) return 'Esperando respuesta';
+  if(c.status === 'Respondió' && d > 5) return 'Perdiendo momentum';
+  if(c.status === 'Respondió') return 'Falta segundo toque';
+  if(c.status === 'Reunión' && d > 7) return 'Sin propuesta enviada';
+  if(c.status === 'Reunión') return 'Falta propuesta';
+  if(c.status === 'En proceso') return 'Definir dolor real';
+  if(c.status === 'Propuesta') return 'Esperando decisión';
+  return 'Sin bloqueo claro';
+}
+
 // --- MODAL DIAGNÓSTICO ---
 function openDiag(id){
   diagId=id;
   const c=contacts.find(x=>x.id===id);if(!c) return;
-  document.getElementById('diag-title').textContent='🔍 Diagnóstico — '+c.emp;
-  document.getElementById('diag-real-gen').textContent=generarDiagReal(c);
-  document.getElementById('diag-accion-gen').textContent=generarDiagAccion(c);
-  document.getElementById('diag-real-edit').value=c.diagReal||'';
-  document.getElementById('diag-accion-edit').value=c.diagAccion||'';
+  
+  const score = calcScore(c);
+  const temp = calcTemperatura(c);
+  const bloq = calcBloqueador(c);
+  
+  document.getElementById('diag-title').textContent='🔍 '+c.emp;
+  
+  // Score badge
+  const badge = document.getElementById('diag-score-badge');
+  const scoreColor = score >= 7 ? '#16a34a' : score >= 4 ? '#d97706' : '#94a3b8';
+  badge.style.background = scoreColor + '18';
+  badge.style.color = scoreColor;
+  badge.style.border = '1px solid ' + scoreColor + '40';
+  badge.textContent = score + '/10 probabilidad';
+  
+  document.getElementById('diag-temp-val').textContent = temp.label;
+  document.getElementById('diag-temp-val').style.color = temp.color;
+  document.getElementById('diag-score-val').textContent = score + ' / 10';
+  document.getElementById('diag-bloq-val').textContent = bloq;
+  
+  document.getElementById('diag-dolor-gen').textContent = generarDolor(c);
+  document.getElementById('diag-real-gen').textContent = generarDiagReal(c);
+  document.getElementById('diag-accion-gen').textContent = generarDiagAccion(c);
+  
+  document.getElementById('diag-dolor-edit').value = c.diagDolor||'';
+  document.getElementById('diag-real-edit').value = c.diagReal||'';
+  document.getElementById('diag-accion-edit').value = c.diagAccion||'';
+  
   document.getElementById('diag-overlay').classList.add('open');
 }
 
 function saveDiag(){
   const c=contacts.find(x=>x.id===diagId);if(!c) return;
+  c.diagDolor=document.getElementById('diag-dolor-edit').value.trim();
   c.diagReal=document.getElementById('diag-real-edit').value.trim();
   c.diagAccion=document.getElementById('diag-accion-edit').value.trim();
   saveLS();renderAll();closeDiag();showToast('✅ Diagnóstico guardado');
@@ -686,7 +898,7 @@ async function syncInstantly(){
         const c=contacts.find(c=>(c.email||'').toLowerCase()===email);
         if(c&&c.status==='Contactado'){
           c.status='Respondió';
-          c.accion='Seguimiento — abrió el email ✅';
+          c.accion='Seguimiento  -  abrió el email ✅';
           if(!c.historial) c.historial=[];
           c.historial.push({fecha:new Date().toISOString().split('T')[0],tipo:'Email',texto:'Abrió el email de Instantly ✅'});
         }
@@ -700,7 +912,7 @@ async function syncInstantly(){
 function openHist(id){
   histId=id;
   const c=contacts.find(x=>x.id===id);if(!c) return;
-  document.getElementById('hist-title').textContent='Historial — '+c.emp;
+  document.getElementById('hist-title').textContent='Historial  -  '+c.emp;
   renderHistEntries(c);
   document.getElementById('hist-overlay').classList.add('open');
 }
@@ -730,7 +942,7 @@ function openConsejo(id){
   const c=contacts.find(x=>x.id===id);if(!c) return;
   const m=getMensaje(c);
   consejoMsg=m.msg;
-  document.getElementById('consejo-title').textContent='🎯 '+c.emp+' — '+c.status;
+  document.getElementById('consejo-title').textContent='🎯 '+c.emp+'  -  '+c.status;
   document.getElementById('consejo-ctx').textContent=m.ctx;
   document.getElementById('consejo-msg').textContent=m.msg;
   document.getElementById('consejo-overlay').classList.add('open');
@@ -747,7 +959,7 @@ function openModal(id){
   document.getElementById('btn-del').style.display=id?'block':'none';
   if(id){
     const c=contacts.find(x=>x.id===id);if(!c) return;
-    document.getElementById('modal-title').textContent='Editar — '+c.emp;
+    document.getElementById('modal-title').textContent='Editar  -  '+c.emp;
     document.getElementById('f-emp').value=c.emp;
     document.getElementById('f-cont').value=c.cont||'';
     document.getElementById('f-cargo').value=c.cargo||'';
@@ -799,7 +1011,7 @@ function saveContact(){
     const i=contacts.findIndex(x=>x.id===editingId);
     if(i>=0) contacts[i]={...contacts[i],...data};
   } else {
-    contacts.push({id:nextId++,...data,historial:[],diagReal:'',diagAccion:''});
+    contacts.push({id:nextId++,...data,historial:[],diagReal:'',diagAccion:'',diagDolor:''});
   }
   closeModal();saveLS();showToast('✅ Guardado');renderAll();loadTips();
 }
@@ -818,7 +1030,7 @@ try{
   if(saved){
     const d=JSON.parse(saved);
     // Merge: preserve saved data, add new fields if missing
-    contacts=d.map(c=>({diagReal:'',diagAccion:'',...c}));
+    contacts=d.map(c=>({diagReal:'',diagAccion:'',diagDolor:'',...c}));
     nextId=Math.max(...d.map(c=>c.id))+1;
   }
 }catch(e){}
@@ -848,11 +1060,11 @@ function generarInsights(){
   const activos=contacts.filter(c=>c.status!=='No'&&c.status!=='Ganado');
   const hoy=new Date();const dia=hoy.getDay();const tips=[];
   const tipsDia={
-    1:{icono:'📅',label:'Lunes: activa el pipeline',texto:'El lunes es ideal para enviar primeros contactos — los decisores revisan su semana y están más receptivos a propuestas nuevas. Prioriza los "Por contactar" hoy.'},
+    1:{icono:'📅',label:'Lunes: activa el pipeline',texto:'El lunes es ideal para enviar primeros contactos  -  los decisores revisan su semana y están más receptivos a propuestas nuevas. Prioriza los "Por contactar" hoy.'},
     2:{icono:'🔥',label:'Martes: mejor día para escribir',texto:'Martes y miércoles tienen la tasa de respuesta más alta en B2B. Es el mejor momento para hacer seguimientos y escribir a quienes llevan más de 5 días sin responder.'},
     3:{icono:'🔥',label:'Miércoles: día peak de respuesta',texto:'Miércoles es el día con mayor tasa de apertura de emails B2B en Latinoamérica. Aprovecha para escribirle a los contactos en estado "Respondió" que llevan 3+ días.'},
     4:{icono:'📞',label:'Jueves: cierra reuniones',texto:'El jueves es ideal para confirmar reuniones de la próxima semana. Si tienes contactos en estado "Reunión" sin fecha confirmada, hoy es el día para insistir.'},
-    5:{icono:'⚡',label:'Viernes: seguimiento express',texto:'Los viernes son buenos para mensajes cortos y directos — "¿pudiste revisar?" funciona bien. Evita propuestas largas; guárdalas para la próxima semana.'},
+    5:{icono:'⚡',label:'Viernes: seguimiento express',texto:'Los viernes son buenos para mensajes cortos y directos  -  "¿pudiste revisar?" funciona bien. Evita propuestas largas; guárdalas para la próxima semana.'},
     6:{icono:'😴',label:'Sábado: planifica el lunes',texto:'Pocas personas responden el fin de semana. Usa este tiempo para revisar tu pipeline, actualizar estados y preparar los mensajes que enviarás el lunes.'},
     0:{icono:'🗓️',label:'Domingo: prepara tu semana',texto:'Revisa quién lleva más de 7 días sin contacto y prepara 3 mensajes para enviar el lunes. La semana que empieza con plan, cierra más.'},
   };
@@ -862,8 +1074,8 @@ function generarInsights(){
   const porContactar=activos.filter(c=>c.status==='Por contactar');
   const enReunion=activos.filter(c=>c.status==='Reunión');
   if(respondieron.length>=3) tips.push({icono:'🎯',label:`${respondieron.length} leads calientes`,texto:`Tienes ${respondieron.length} contactos que abrieron tu email. En promedio, solo el 20% de los que abren responden si no haces seguimiento. Escríbeles antes de que se enfríen.`});
-  else if(sinContacto.length>=4) tips.push({icono:'⚠️',label:`${sinContacto.length} contactos estancados`,texto:`${sinContacto.length} prospectos llevan más de 7 días en "Contactado" sin avance. La mayoría no responde al primer mensaje — el segundo mensaje tiene 40% más probabilidad de éxito.`});
-  else if(porContactar.length>=5) tips.push({icono:'🚀',label:`${porContactar.length} sin contactar aún`,texto:`Tienes ${porContactar.length} prospectos que nunca has contactado. Cada día que pasan sin mensaje es oportunidad perdida — prioriza los referidos primero, cierran 4x más rápido.`});
+  else if(sinContacto.length>=4) tips.push({icono:'⚠️',label:`${sinContacto.length} contactos estancados`,texto:`${sinContacto.length} prospectos llevan más de 7 días en "Contactado" sin avance. La mayoría no responde al primer mensaje  -  el segundo mensaje tiene 40% más probabilidad de éxito.`});
+  else if(porContactar.length>=5) tips.push({icono:'🚀',label:`${porContactar.length} sin contactar aún`,texto:`Tienes ${porContactar.length} prospectos que nunca has contactado. Cada día que pasan sin mensaje es oportunidad perdida  -  prioriza los referidos primero, cierran 4x más rápido.`});
   else if(enReunion.length>=2) tips.push({icono:'💼',label:`${enReunion.length} en etapa reunión`,texto:`Con ${enReunion.length} prospectos en reunión, el siguiente paso crítico es enviar una propuesta en menos de 48 horas post-reunión.`});
   else tips.push({icono:'📈',label:'Sigue agregando volumen',texto:'Un pipeline saludable necesita al menos 30 prospectos activos para generar 2-3 cierres al mes.'});
   const rubros={};activos.forEach(c=>{const r=inferRubro(c.emp);if(r) rubros[r]=(rubros[r]||0)+1;});
