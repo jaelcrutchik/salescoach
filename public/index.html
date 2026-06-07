@@ -893,9 +893,12 @@ function openDiag(id){
 
 function saveDiag(){
   const c=contacts.find(x=>x.id===diagId);if(!c) return;
-  c.diagDolor=document.getElementById('diag-dolor-edit').value.trim();
-  c.diagReal=document.getElementById('diag-real-edit').value.trim();
-  c.diagAccion=document.getElementById('diag-accion-edit').value.trim();
+  const dolorEdit=document.getElementById('diag-dolor-edit').value.trim();
+  const realEdit=document.getElementById('diag-real-edit').value.trim();
+  const accionEdit=document.getElementById('diag-accion-edit').value.trim();
+  c.diagDolor=dolorEdit||document.getElementById('diag-dolor-gen').textContent.trim();
+  c.diagReal=realEdit||document.getElementById('diag-real-gen').textContent.trim();
+  c.diagAccion=accionEdit||document.getElementById('diag-accion-gen').textContent.trim();
   saveLS();renderAll();closeDiag();showToast('✅ Diagnóstico guardado');
 }
 
