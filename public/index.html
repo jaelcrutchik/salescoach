@@ -461,18 +461,88 @@ function generarDiagAccion(c){
   return `Revisar estado con ${nombre} y definir si sigue en pipeline o se descarta. No dejar contactos en limbo sin acción definida.`;
 }
 
+function getDolorCorto(c){
+  const rubro = inferRubro(c.emp) || 'default';
+  const frases = {
+    'Transporte/Logistica': 'procesos de flota y coordinacion que quizas ya no estan escalando igual',
+    'Puertos/Operaciones': 'coordinacion entre areas que a veces genera tiempos muertos que no siempre son visibles',
+    'Retail/Consumo': 'operacion de despacho y stock que con el crecimiento se vuelve mas dificil de controlar',
+    'Alimentos': 'trazabilidad y control de procesos que con el volumen se complican',
+    '3PL/Operadores': 'indicadores de servicio y margen por cliente que a veces cuesta tener claros',
+    'Mineria/Industria': 'procesos de turno y mantenimiento que dependen demasiado de personas clave',
+    'Salud': 'flujos internos que consumen tiempo que deberia ir a lo clinico',
+    'default': 'procesos que quizas ya no estan escalando igual que antes'
+  };
+  return frases[rubro] || frases['default'];
+}
+
 function getMensaje(c){
   const nombre=c.cont?.split(' ')[0]||'[Nombre]';
   const dias=getDias(c);
-  if(c.status==='Respondió')
-    return {ctx:`${nombre} abrió tu email hace ${dias} días. El momentum está ahí  -  un mensaje corto y directo.`,msg:`Hola ${nombre}, quería saber si pudiste revisar mi mensaje. ¿Vale 15 minutos esta semana para conversar?`};
-  if(c.status==='Contactado'&&dias>=5)
-    return {ctx:`Llevas ${dias} días desde el primer contacto. La mayoría responde al segundo mensaje.`,msg:`Hola ${nombre}, una pregunta directa: ¿están midiendo los indicadores clave de su operación hoy? Si la respuesta es "no del todo", probablemente vale conversar 15 minutos.`};
-  if(c.status==='Reunión')
-    return {ctx:`Tuviste reunión con ${nombre}. Es clave confirmar el siguiente paso concreto.`,msg:`Hola ${nombre}, gracias por la reunión. Me gustaría avanzar en lo que conversamos  -  ¿podemos agendar un siguiente paso esta semana?`};
-  if(c.status==='Por contactar')
-    return {ctx:`Aún no has contactado a ${nombre}. Tienes su información  -  es el momento.`,msg:`Hola ${nombre}, mi nombre es Jael, trabajo con Rave & Crutchik. Venimos de liderar operaciones en Nestlé, Unilever, SQM y Enex. ¿Vale 15 minutos para conversar?`};
-  return {ctx:`Contacto en etapa ${c.status}.`,msg:`Hola ${nombre}, ¿cómo van las cosas? Me gustaría retomar nuestra conversación y ver si podemos avanzar.`};
+  const dolor=getDolorCorto(c);
+  const canal=c.canal||'Email';
+
+  if(c.status==='Respondió'){
+    if(dias<=3)
+      return {
+        ctx:nombre+' leyo tu mensaje hace '+dias+' dias. Todavia es pronto, el momentum esta activo.',
+        msg:'Hola '+nombre+', te reenvio esto por si se perdio en el camino. Pense que podia hacer sentido mirarlo desde '+dolor+'. ¿Tienes 20 minutos esta semana?'
+      };
+    else
+      return {
+        ctx:nombre+' leyo tu mensaje hace '+dias+' dias. El momentum se esta enfriando, mensaje consultivo.',
+        msg:'Hola '+nombre+', queria retomar esto. Estuve pensando en lo que suele pasar en empresas como la tuya: '+dolor+'. Si eso resuena aunque sea un poco, probablemente vale conversar 20 minutos. ¿Te acomoda esta semana?'
+      };
+  }
+
+  if(c.status==='Contactado'&&dias>=7)
+    return {
+      ctx:'Llevas '+dias+' dias sin respuesta. Segundo toque consultivo, no repetir el primer mensaje.',
+      msg:'Hola '+nombre+', te escribo de nuevo porque me parece que hay algo relevante para lo que estan haciendo en '+c.emp+'. Muchas empresas en tu rubro llegan a un punto donde '+dolor+'. Si eso esta pasando, vale conversar. ¿Tienes 20 minutos?'
+    };
+
+  if(c.status==='Contactado'&&dias>=3)
+    return {
+      ctx:'Han pasado '+dias+' dias. Momento ideal para un segundo toque breve.',
+      msg:'Hola '+nombre+', te reenvio esto por si se perdio. ¿Tienes 20 minutos esta semana?'
+    };
+
+  if(c.status==='Reunión'){
+    if(dias>5)
+      return {
+        ctx:'Reunion hace '+dias+' dias sin propuesta. Urgente cerrar el siguiente paso.',
+        msg:'Hola '+nombre+', queria retomar lo que conversamos. Estuve pensando en como podriamos estructurar un primer paso concreto para '+c.emp+'. ¿Tienes 20 minutos esta semana para alinearnos?'
+      };
+    else
+      return {
+        ctx:'Reunion reciente con '+nombre+'. Cierra el siguiente paso antes de que se enfrie.',
+        msg:'Hola '+nombre+', gracias por la reunion. Quedo pensando en lo que conversamos y creo que hay un angulo concreto por donde podriamos partir. ¿Puedo enviarte una propuesta esta semana?'
+      };
+  }
+
+  if(c.status==='Por contactar'){
+    if(c.canal==='Referido')
+      return {
+        ctx:'Referido sin contactar. La confianza ya esta instalada, usala.',
+        msg:'Hola '+nombre+', me paso tu contacto alguien en quien confio mucho. Te escribo porque trabajo con Rave & Crutchik, una consultora de operaciones, y pense que podia hacer sentido conversar sobre '+dolor+'. ¿Tienes 20 minutos esta semana?'
+      };
+    else
+      return {
+        ctx:'Nunca contactado. Primer mensaje consultivo, no vendedor.',
+        msg:'Hola '+nombre+', mi nombre es Jael, de Rave & Crutchik. Te escribo porque trabajamos con empresas como '+c.emp+' en un momento especifico: cuando '+dolor+'. Si eso resuena, vale una conversacion de 20 minutos. ¿Te acomoda esta semana?'
+      };
+  }
+
+  if(c.status==='En proceso')
+    return {
+      ctx:'En proceso con '+nombre+'. Definir si hay dolor real antes de avanzar.',
+      msg:'Hola '+nombre+', queria retomar nuestra conversacion. Antes de avanzar me gustaria entender mejor como estan operando hoy en '+c.emp+'. ¿Tienes 20 minutos para contarme?'
+    };
+
+  return {
+    ctx:'Contacto en etapa '+c.status+'.',
+    msg:'Hola '+nombre+', queria retomar el contacto. ¿Tienes 20 minutos esta semana para conversar?'
+  };
 }
 
 let contacts=[
