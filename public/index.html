@@ -297,6 +297,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
     <div class="field"><label>Próxima acción</label><input id="f-accion" type="text" placeholder="ej: llamar jueves"></div>
     <div class="field"><label>Notas</label><textarea id="f-notas" placeholder="Contexto, historia, estado actual..."></textarea></div>
     <div class="field"><label>Contexto del contacto</label><textarea id="f-contexto" placeholder="Quién es esta persona realmente. Ej: armó la empresa solo, viene del terreno, muy directo, desconfía de consultores, le importa el equipo..."></textarea></div>
+    <div class="field">
+      <label style="display:flex;align-items:center;justify-content:space-between">
+        <span>Análisis de la empresa</span>
+        <button type="button" onclick="abrirInvestigar()" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--blue-m);background:var(--blue-l);color:var(--blue);cursor:pointer;font-weight:500">🔍 Investigar con Claude</button>
+      </label>
+      <textarea id="f-analisis" style="height:80px" placeholder="Pega aquí el análisis de la empresa: dolores específicos, quiénes son, qué encontraste. El Coach lo usará para personalizar el diagnóstico y el mensaje."></textarea>
+    </div>
     <div class="modal-btns">
       <button class="btn-del" id="btn-del" style="display:none" onclick="deleteContact()">Eliminar</button>
       <button class="btn-c" onclick="closeModal()">Cancelar</button>
@@ -460,29 +467,30 @@ function generarDiagReal(c){
   const canal=c.canal||'desconocido';
   const ultimoHist=(c.historial||[]).slice(-1)[0];
   const ultimoTexto=ultimoHist?ultimoHist.texto:'';
-  const contextoExtra=c.contexto&&c.contexto.length>0?` Contexto clave del contacto: "${c.contexto}".`:'';
+  const contextoExtra=c.contexto&&c.contexto.length>0?` Contexto clave: "${c.contexto}".`:'';
+  const analisisExtra=c.analisis&&c.analisis.length>0?`Análisis previo: ${c.analisis.slice(0,300)}${c.analisis.length>300?'...':''} `:'';
 
   if(c.status==='Respondió'){
     const via=canal==='Email'?'el email':canal==='WhatsApp'?'tu mensaje de WhatsApp':canal==='LinkedIn'?'tu mensaje de LinkedIn':`tu mensaje de ${canal}`;
-    return contextoExtra+`Leyó ${via} hace ${d} días pero no respondió. Hay interés (lo leyó), pero falta fricción suficiente para responder. No es rechazo  -  es silencio. El segundo toque tiene 40% más probabilidad de éxito.${ultimoTexto?' Contexto: '+ultimoTexto:''}`;
+    return analisisExtra+contextoExtra+`Leyó ${via} hace ${d} días pero no respondió. Hay interés (lo leyó), pero falta fricción suficiente para responder. No es rechazo  -  es silencio. El segundo toque tiene 40% más probabilidad de éxito.${ultimoTexto?' Contexto: '+ultimoTexto:''}`;
   }
   if(c.status==='Contactado'&&d>14)
-    return contextoExtra+`Lleva ${d} días sin respuesta por ${canal}. Probablemente nunca leyó el mensaje, o lo postergó y se olvidó. No es rechazo  -  es silencio. Falta un segundo toque.${ultimoTexto?' Último registro: '+ultimoTexto:''}`;
+    return analisisExtra+contextoExtra+`Lleva ${d} días sin respuesta por ${canal}. Probablemente nunca leyó el mensaje, o lo postergó y se olvidó. No es rechazo  -  es silencio. Falta un segundo toque.${ultimoTexto?' Último registro: '+ultimoTexto:''}`;
   if(c.status==='Contactado'&&d>7)
-    return contextoExtra+`${d} días desde el primer contacto por ${canal} sin respuesta. El momentum se está enfriando. Momento ideal para un seguimiento corto y directo.`;
+    return analisisExtra+contextoExtra+`${d} días desde el primer contacto por ${canal} sin respuesta. El momentum se está enfriando. Momento ideal para un seguimiento corto y directo.`;
   if(c.status==='Contactado')
-    return contextoExtra+`Recién contactado hace ${d} días por ${canal}. Demasiado pronto para insistir  -  el timing está bien. Solo hay que esperar.`;
+    return analisisExtra+contextoExtra+`Recién contactado hace ${d} días por ${canal}. Demasiado pronto para insistir  -  el timing está bien. Solo hay que esperar.`;
   if(c.status==='Reunión'&&d>7)
-    return contextoExtra+`Reunión hace ${d} días sin avance documentado. El riesgo es que pierda prioridad. ${c.notas?'Contexto: '+c.notas:''} Falta propuesta o confirmación de siguiente paso.`;
+    return analisisExtra+contextoExtra+`Reunión hace ${d} días sin avance documentado. El riesgo es que pierda prioridad. ${c.notas?'Contexto: '+c.notas:''} Falta propuesta o confirmación de siguiente paso.`;
   if(c.status==='Reunión')
-    return contextoExtra+`Reunión realizada hace ${d} días. El momentum está activo. ${c.notas?'Nota: '+c.notas+'. ':''} La propuesta debe llegar antes de 48 horas o la probabilidad de cierre baja.`;
+    return analisisExtra+contextoExtra+`Reunión realizada hace ${d} días. El momentum está activo. ${c.notas?'Nota: '+c.notas+'. ':''} La propuesta debe llegar antes de 48 horas o la probabilidad de cierre baja.`;
   if(c.status==='Por contactar')
-    return contextoExtra+`Nunca contactado. Canal planificado: ${canal||'sin definir'}. ${c.notas?'Contexto: '+c.notas+'. ':''}El único bloqueador eres tú  -  falta enviar el primer mensaje.`;
+    return analisisExtra+contextoExtra+`Nunca contactado. Canal planificado: ${canal||'sin definir'}. ${c.notas?'Contexto: '+c.notas+'. ':''}El único bloqueador eres tú  -  falta enviar el primer mensaje.`;
   if(c.status==='On hold')
-    return contextoExtra+`En pausa. ${c.notas||'Sin razón documentada'}. El riesgo es que "on hold" se convierta en descarte silencioso. Ponle una fecha límite.`;
+    return analisisExtra+contextoExtra+`En pausa. ${c.notas||'Sin razón documentada'}. El riesgo es que "on hold" se convierta en descarte silencioso. Ponle una fecha límite.`;
   if(c.status==='En proceso')
-    return contextoExtra+`En proceso por ${canal} pero sin avance claro en ${d} días. ${c.notas||''}. Hay que definir si hay dolor real o solo interés superficial.`;
-  return contextoExtra+`Estado: ${c.status}. ${d} días desde último contacto por ${canal}. Revisar si sigue siendo prioritario.`;
+    return analisisExtra+contextoExtra+`En proceso por ${canal} pero sin avance claro en ${d} días. ${c.notas||''}. Hay que definir si hay dolor real o solo interés superficial.`;
+  return analisisExtra+contextoExtra+`Estado: ${c.status}. ${d} días desde último contacto por ${canal}. Revisar si sigue siendo prioritario.`;
 }
 
 function generarDiagAccion(c){
@@ -500,12 +508,14 @@ function generarDiagAccion(c){
   var contextoNorte=esNorte?' Ademas, estamos con un proyecto activo en Antofagasta — estamos cerca y disponibles para ir a terreno.':'';
   var esTerreno=contexto.includes('terreno')||contexto.includes('maneja')||contexto.includes('armó')||contexto.includes('armo')||contexto.includes('fundó')||contexto.includes('fundo');
 
+  var analisisResumen=c.analisis&&c.analisis.length>0?'Basado en el analisis: '+c.analisis.slice(0,150)+(c.analisis.length>150?'...':'')+' ':'';
   // Construir accion que integra todo el contexto
   var intro='';
   if(nivel==='dueño'&&esTerreno) intro='Es dueño que viene del terreno — no quiere script de consultor, quiere alguien que entienda su realidad. ';
   else if(nivel==='dueño') intro='Es dueño — decide solo, va directo al dolor de negocio. ';
   else if(nivel==='gg') intro='Es GG — le importa el crecimiento y el control. ';
   else if(nivel==='gerente') intro='Es gerente — le importa que la operacion funcione sin depender de él. ';
+  intro=analisisResumen+intro;
 
   var rubroCtx=rubro!=='sin rubro detectado'?'Rubro '+rubro+'. ':'';
   var ciudadCtx=ciudad?'Empresa en '+ciudad+'.'+contextoNorte+' ':'';
@@ -1350,6 +1360,16 @@ function openNeg(id){
 
 function closeNeg(){document.getElementById('neg-overlay').classList.remove('open');}
 
+function abrirInvestigar(){
+  var emp=document.getElementById('f-emp').value.trim();
+  var cargo=document.getElementById('f-cargo').value.trim();
+  var rubro=document.getElementById('f-canal').value||'';
+  if(!emp){alert('Primero ingresa el nombre de la empresa');return;}
+  var prompt='Analiza la empresa "'+emp+'" para ayudarme a prepararme para una reunión de ventas. Soy consultor de operaciones y supply chain (Rave & Crutchik). Necesito saber:\n\n1. ¿Qué tipo de empresa es y cómo opera?\n2. ¿Cuáles son sus dolores operacionales más probables?\n3. ¿Qué señales de desorden o ineficiencia tienen?\n4. ¿Cuál es el mejor ángulo de entrada para ofrecer consultoría de operaciones?\n5. ¿Qué pregunta concreta le haría a '+(cargo||'el contacto')+' para abrir la conversación?\n\nSé específico y directo. No quiero generalidades, quiero lo que aplica para esta empresa en particular.';
+  var url='https://claude.ai/new?q='+encodeURIComponent(prompt);
+  window.open(url,'_blank');
+}
+
 async function syncInstantly(){
   const btn=document.getElementById('sync-btn');
   btn.textContent='⏳ Sync...';btn.disabled=true;
@@ -1440,9 +1460,10 @@ function openModal(id){
     document.getElementById('f-accion').value=c.accion||'';
     document.getElementById('f-notas').value=c.notas||'';
     document.getElementById('f-contexto').value=c.contexto||'';
+    document.getElementById('f-analisis').value=c.analisis||'';
   }else{
     document.getElementById('modal-title').textContent='Nuevo contacto';
-    ['f-emp','f-cont','f-cargo','f-uf','f-horas','f-accion','f-notas','f-email','f-ciudad','f-contexto'].forEach(f=>document.getElementById(f).value='');
+    ['f-emp','f-cont','f-cargo','f-uf','f-horas','f-accion','f-notas','f-email','f-ciudad','f-contexto','f-analisis'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('f-region').value='';
     document.getElementById('f-fecha').value='';
     document.getElementById('f-com').value=15;
@@ -1477,13 +1498,14 @@ function saveContact(){
     region:document.getElementById('f-region').value,
     accion:document.getElementById('f-accion').value.trim(),
     notas:document.getElementById('f-notas').value.trim(),
-    contexto:document.getElementById('f-contexto').value.trim()
+    contexto:document.getElementById('f-contexto').value.trim(),
+    analisis:document.getElementById('f-analisis').value.trim()
   };
   if(editingId){
     const i=contacts.findIndex(x=>x.id===editingId);
     if(i>=0) contacts[i]={...contacts[i],...data};
   } else {
-    contacts.push({id:nextId++,...data,historial:[],diagReal:'',diagAccion:'',diagDolor:'',diagValor:'',ciudad:'',region:'',contexto:''});
+    contacts.push({id:nextId++,...data,historial:[],diagReal:'',diagAccion:'',diagDolor:'',diagValor:'',ciudad:'',region:'',contexto:'',analisis:''});
   }
   closeModal();saveLS();showToast('✅ Guardado');renderAll();loadTips();
 }
@@ -1502,7 +1524,7 @@ try{
   if(saved){
     const d=JSON.parse(saved);
     // Merge: preserve saved data, add new fields if missing
-    contacts=d.map(c=>({diagReal:'',diagAccion:'',diagDolor:'',diagValor:'',ciudad:'',region:'',contexto:'',...c}));
+    contacts=d.map(c=>({diagReal:'',diagAccion:'',diagDolor:'',diagValor:'',ciudad:'',region:'',contexto:'',analisis:'',...c}));
     nextId=Math.max(...d.map(c=>c.id))+1;
   }
 }catch(e){}
