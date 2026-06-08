@@ -630,6 +630,20 @@ function getDolorCorto(c){
       'jefe':'los procesos administrativos consumen tiempo que deberia ir a atencion',
       'general':'en salud la ineficiencia operacional tiene un costo clinico ademas del economico'
     },
+    'Arquitectura/Construccion':{
+      'dueño':'¿Hay proyectos donde sientes que tuviste que estar más encima de lo que deberías para que saliera bien?',
+      'gg':'¿Cómo manejan hoy la coordinación entre el equipo de proyecto y los clientes cuando hay cambios de alcance?',
+      'gerente':'¿Qué parte del proceso de entrega genera más fricción con los clientes?',
+      'jefe':'¿Los procesos de obra están documentados o dependen de quién esté ese día?',
+      'general':'¿Cuándo un proyecto se complica, qué es lo primero que falla en la coordinación interna?'
+    },
+    'Arquitectura/Construccion':{
+      'dueño':'proyectos que te exigen estar encima de todo para que salgan bien, sin poder delegar',
+      'gg':'coordinacion entre proyectos y clientes que genera fricciones que se podrian evitar',
+      'gerente':'procesos de entrega que consumen mas tiempo del que deberian por falta de estandares',
+      'jefe':'cada proyecto se hace diferente segun quien lo lidere, sin un proceso comun',
+      'general':'estudios que crecen en proyectos pero no en estructura, y eso genera desorden visible para los clientes'
+    },
     'default':{
       'dueño':'cuanto tiempo de tu semana se va en cosas que deberian funcionar solas',
       'gg':'el negocio crece pero cada vez dependes mas de ti mismo para que las cosas salgan bien',
@@ -706,6 +720,20 @@ function getPreguntaDolor(c){
       'gerente':'¿Con qué frecuencia hay quiebres de insumos que afectan la atención?',
       'jefe':'¿Los procesos administrativos están estandarizados o dependen de quién los aprendió primero?',
       'general':'¿Qué es lo que más fricción genera en la operación día a día?'
+    },
+    'Arquitectura/Construccion':{
+      'dueño':'¿Hay proyectos donde sientes que tuviste que estar más encima de lo que deberías para que saliera bien?',
+      'gg':'¿Cómo manejan hoy la coordinación entre el equipo de proyecto y los clientes cuando hay cambios de alcance?',
+      'gerente':'¿Qué parte del proceso de entrega genera más fricción con los clientes?',
+      'jefe':'¿Los procesos de obra están documentados o dependen de quién esté ese día?',
+      'general':'¿Cuándo un proyecto se complica, qué es lo primero que falla en la coordinación interna?'
+    },
+    'Arquitectura/Construccion':{
+      'dueño':'proyectos que te exigen estar encima de todo para que salgan bien, sin poder delegar',
+      'gg':'coordinacion entre proyectos y clientes que genera fricciones que se podrian evitar',
+      'gerente':'procesos de entrega que consumen mas tiempo del que deberian por falta de estandares',
+      'jefe':'cada proyecto se hace diferente segun quien lo lidere, sin un proceso comun',
+      'general':'estudios que crecen en proyectos pero no en estructura, y eso genera desorden visible para los clientes'
     },
     'default':{
       'dueño': esTerreno?
@@ -1198,6 +1226,7 @@ function generarValorEstimado(c){
     '3PL/Operadores':'Ejercicio: cuantos clientes tienen x margen promedio por cliente. Si el margen real es 30% menor al estimado por ineficiencias, eso es lo que vale medir y resolver.',
     'Mineria/Industria':'Ejercicio: cuantas horas de parada no programada tuvieron el ultimo trimestre x costo hora de produccion parada. Ese numero suele ser 10x el costo de prevenirlo.',
     'Salud':'Ejercicio: cuantas horas clinicas se van en admin por semana x costo hora clinico. Mas el costo de quiebres de insumos que generan atencion de menor calidad.',
+    'Arquitectura/Construccion':'Ejercicio: cuantos proyectos tienen en paralelo x horas de coordinacion no planificada por semana x costo hora del equipo. Mas el costo de un cliente insatisfecho que no vuelve ni recomienda. Ese segundo numero suele ser el mas grande.',
     'default':'Ejercicio: cuanto tiempo pierde el equipo en el problema por semana x costo de ese tiempo. Mas el costo de las decisiones que se toman sin buena informacion. Si no puedes estimarlo, no tienes suficiente informacion para proponer todavia.'
   };
 
@@ -1247,7 +1276,7 @@ function saveDiag(){
   const realEdit=document.getElementById('diag-real-edit').value.trim();
   const accionEdit=document.getElementById('diag-accion-edit').value.trim();
   c.diagDolor=dolorEdit||document.getElementById('diag-dolor-gen').textContent.trim();
-  c.diagValor=document.getElementById('diag-valor-edit').value.trim()||document.getElementById('diag-valor-gen').textContent.trim();
+  c.diagValor=document.getElementById('diag-valor-edit').value.trim();
   c.diagReal=realEdit||document.getElementById('diag-real-gen').textContent.trim();
   c.diagAccion=accionEdit||document.getElementById('diag-accion-gen').textContent.trim();
   saveLS();renderAll();closeDiag();showToast('✅ Diagnóstico guardado');
@@ -1567,6 +1596,7 @@ function inferRubro(emp){
   if(emp.includes('coca')||emp.includes('miniso')||emp.includes('forus')||emp.includes('casa idea')) return 'Retail/Consumo';
   if(emp.includes('dhl')||emp.includes('id log')||emp.includes('rfp')) return '3PL/Operadores';
   if(emp.includes('arauco')||emp.includes('sqm')||emp.includes('neulin')) return 'Minería/Industria';
+  if(emp.includes('arquit')||emp.includes('construc')||emp.includes('inmobil')||emp.includes('obra')||emp.includes('diseño')||emp.includes('estudio')) return 'Arquitectura/Construccion';
   return null;
 }
 </script>
