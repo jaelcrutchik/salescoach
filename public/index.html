@@ -460,28 +460,29 @@ function generarDiagReal(c){
   const canal=c.canal||'desconocido';
   const ultimoHist=(c.historial||[]).slice(-1)[0];
   const ultimoTexto=ultimoHist?ultimoHist.texto:'';
+  const contextoExtra=c.contexto&&c.contexto.length>0?` Contexto clave del contacto: "${c.contexto}".`:'';
 
   if(c.status==='Respondió'){
     const via=canal==='Email'?'el email':canal==='WhatsApp'?'tu mensaje de WhatsApp':canal==='LinkedIn'?'tu mensaje de LinkedIn':`tu mensaje de ${canal}`;
-    return `Leyó ${via} hace ${d} días pero no respondió. Hay interés (lo leyó), pero falta fricción suficiente para responder. No es rechazo  -  es silencio. El segundo toque tiene 40% más probabilidad de éxito.${ultimoTexto?' Contexto: '+ultimoTexto:''}`;
+    return contextoExtra+`Leyó ${via} hace ${d} días pero no respondió. Hay interés (lo leyó), pero falta fricción suficiente para responder. No es rechazo  -  es silencio. El segundo toque tiene 40% más probabilidad de éxito.${ultimoTexto?' Contexto: '+ultimoTexto:''}`;
   }
   if(c.status==='Contactado'&&d>14)
-    return `Lleva ${d} días sin respuesta por ${canal}. Probablemente nunca leyó el mensaje, o lo postergó y se olvidó. No es rechazo  -  es silencio. Falta un segundo toque.${ultimoTexto?' Último registro: '+ultimoTexto:''}`;
+    return contextoExtra+`Lleva ${d} días sin respuesta por ${canal}. Probablemente nunca leyó el mensaje, o lo postergó y se olvidó. No es rechazo  -  es silencio. Falta un segundo toque.${ultimoTexto?' Último registro: '+ultimoTexto:''}`;
   if(c.status==='Contactado'&&d>7)
-    return `${d} días desde el primer contacto por ${canal} sin respuesta. El momentum se está enfriando. Momento ideal para un seguimiento corto y directo.`;
+    return contextoExtra+`${d} días desde el primer contacto por ${canal} sin respuesta. El momentum se está enfriando. Momento ideal para un seguimiento corto y directo.`;
   if(c.status==='Contactado')
-    return `Recién contactado hace ${d} días por ${canal}. Demasiado pronto para insistir  -  el timing está bien. Solo hay que esperar.`;
+    return contextoExtra+`Recién contactado hace ${d} días por ${canal}. Demasiado pronto para insistir  -  el timing está bien. Solo hay que esperar.`;
   if(c.status==='Reunión'&&d>7)
-    return `Reunión hace ${d} días sin avance documentado. El riesgo es que pierda prioridad. ${c.notas?'Contexto: '+c.notas:''} Falta propuesta o confirmación de siguiente paso.`;
+    return contextoExtra+`Reunión hace ${d} días sin avance documentado. El riesgo es que pierda prioridad. ${c.notas?'Contexto: '+c.notas:''} Falta propuesta o confirmación de siguiente paso.`;
   if(c.status==='Reunión')
-    return `Reunión realizada hace ${d} días. El momentum está activo. ${c.notas?'Nota: '+c.notas+'. ':''} La propuesta debe llegar antes de 48 horas o la probabilidad de cierre baja.`;
+    return contextoExtra+`Reunión realizada hace ${d} días. El momentum está activo. ${c.notas?'Nota: '+c.notas+'. ':''} La propuesta debe llegar antes de 48 horas o la probabilidad de cierre baja.`;
   if(c.status==='Por contactar')
-    return `Nunca contactado. Canal planificado: ${canal||'sin definir'}. ${c.notas?'Contexto: '+c.notas+'. ':''}El único bloqueador eres tú  -  falta enviar el primer mensaje.`;
+    return contextoExtra+`Nunca contactado. Canal planificado: ${canal||'sin definir'}. ${c.notas?'Contexto: '+c.notas+'. ':''}El único bloqueador eres tú  -  falta enviar el primer mensaje.`;
   if(c.status==='On hold')
-    return `En pausa. ${c.notas||'Sin razón documentada'}. El riesgo es que "on hold" se convierta en descarte silencioso. Ponle una fecha límite.`;
+    return contextoExtra+`En pausa. ${c.notas||'Sin razón documentada'}. El riesgo es que "on hold" se convierta en descarte silencioso. Ponle una fecha límite.`;
   if(c.status==='En proceso')
-    return `En proceso por ${canal} pero sin avance claro en ${d} días. ${c.notas||''}. Hay que definir si hay dolor real o solo interés superficial.`;
-  return `Estado: ${c.status}. ${d} días desde último contacto por ${canal}. Revisar si sigue siendo prioritario.`;
+    return contextoExtra+`En proceso por ${canal} pero sin avance claro en ${d} días. ${c.notas||''}. Hay que definir si hay dolor real o solo interés superficial.`;
+  return contextoExtra+`Estado: ${c.status}. ${d} días desde último contacto por ${canal}. Revisar si sigue siendo prioritario.`;
 }
 
 function generarDiagAccion(c){
