@@ -241,7 +241,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 <div class="overlay" id="overlay">
   <div class="modal">
     <h3 id="modal-title">Nuevo contacto</h3>
-    <div class="field"><label>Empresa *</label><input id="f-emp" type="text" placeholder="Nombre empresa"></div>
+    <div class="field"><label>Empresa *</label><input id="f-emp" type="text" placeholder="Nombre empresa" onblur="autoInvestigar()"></div>
     <div class="field-row">
       <div class="field"><label>Contacto</label><input id="f-cont" type="text" placeholder="Nombre persona"></div>
       <div class="field"><label>Cargo</label><input id="f-cargo" type="text" placeholder="Cargo"></div>
@@ -300,7 +300,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
     <div class="field">
       <label style="display:flex;align-items:center;justify-content:space-between">
         <span>Análisis de la empresa</span>
-        <button type="button" onclick="abrirInvestigar()" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--blue-m);background:var(--blue-l);color:var(--blue);cursor:pointer;font-weight:500">🔍 Investigar con Claude</button>
+        <span id="inv-status" style="font-size:11px;color:#94a3b8"></span>
       </label>
       <textarea id="f-analisis" style="height:80px" placeholder="Pega aquí el análisis de la empresa: dolores específicos, quiénes son, qué encontraste. El Coach lo usará para personalizar el diagnóstico y el mensaje."></textarea>
     </div>
@@ -1370,17 +1370,28 @@ function openNeg(id){
 
 function closeNeg(){document.getElementById('neg-overlay').classList.remove('open');}
 
+async function autoInvestigar(){
+  var emp=document.getElementById('f-emp').value.trim();
+  if(!emp) return;
+  // Only auto-investigate if fields are empty
+  var analisisVal=document.getElementById('f-analisis').value.trim();
+  if(analisisVal.length>10) return; // already has content, don't overwrite
+  await investigarEmpresa(emp);
+}
+
 async function abrirInvestigar(){
   var emp=document.getElementById('f-emp').value.trim();
-  var cargo=document.getElementById('f-cargo').value.trim();
-  var ciudad=document.getElementById('f-ciudad').value.trim();
   if(!emp){alert('Primero ingresa el nombre de la empresa');return;}
+  await investigarEmpresa(emp);
+}
 
-  var btn=document.querySelector('button[onclick="abrirInvestigar()"]');
-  btn.textContent='Analizando...';
-  btn.disabled=true;
+async function investigarEmpresa(emp){
+  var cargo=document.getElementById('f-cargo')?document.getElementById('f-cargo').value.trim():'';
+  var ciudad=document.getElementById('f-ciudad')?document.getElementById('f-ciudad').value.trim():'';
+  var status=document.getElementById('inv-status');
+  if(status) status.textContent='Analizando...';
 
-  var prompt='Analiza la empresa "'+emp+'" ubicada en '+(ciudad||'Chile')+' para ayudarme a prepararme para una venta consultiva. Soy Jael Crutchik de Rave & Crutchik, consultora de operaciones y supply chain. Mi contacto es '+( cargo||'un directivo')+'.\n\nResponde SOLO en JSON con esta estructura exacta, sin texto adicional ni backticks:\n{\n"analisis": "3-4 oraciones sobre que tipo de empresa es, como opera, que tan grande es y que desafios tipicos tiene",\n"dolores": "2-3 dolores operacionales especificos y probables para esta empresa y rubro",\n"angulo": "el mejor angulo de entrada para ofrecer consultoria de operaciones a esta empresa especifica",\n"incentivo": "que gana personalmente el '+( cargo||'contacto')+' si esto funciona - en terminos de estres, tiempo, reconocimiento o control",\n"stakeholders": "quienes mas probablemente tienen que aprobar esta decision internamente",\n"pregunta": "una pregunta concreta y humana para abrir la conversacion con '+(cargo||'el contacto')+'  - que no suene a script de vendedor"\n}';
+  var prompt='Analiza la empresa "'+emp+'" ubicada en '+(ciudad||'Chile')+' para ayudarme a prepararme para una venta consultiva. Soy Jael Crutchik de Rave & Crutchik, consultora de operaciones y supply chain. Mi contacto es '+(cargo||'un directivo')+'. Responde SOLO en JSON sin texto adicional ni backticks: {"analisis":"3-4 oraciones sobre que tipo de empresa es como opera y que desafios tipicos tiene","dolores":"2-3 dolores operacionales especificos y probables","angulo":"mejor angulo de entrada para ofrecer consultoria de operaciones","incentivo":"que gana personalmente el '+(cargo||'contacto')+' si esto funciona en terminos de estres tiempo reconocimiento o control","stakeholders":"quienes mas probablemente tienen que aprobar esta decision internamente","pregunta":"una pregunta concreta y humana para abrir la conversacion - que no suene a script de vendedor"}';
 
   try{
     var res=await fetch('https://api.anthropic.com/v1/messages',{
@@ -1397,20 +1408,19 @@ async function abrirInvestigar(){
     var clean=text.replace(/```json|```/g,'').trim();
     var parsed=JSON.parse(clean);
 
-    // Fill fields
-    var analisisText=(parsed.analisis||'')+' Dolores probables: '+(parsed.dolores||'')+' Angulo de entrada: '+(parsed.angulo||'')+' Pregunta sugerida: '+(parsed.pregunta||'');
+    var analisisText=(parsed.analisis||'')+(parsed.dolores?' Dolores probables: '+parsed.dolores:'')+(parsed.angulo?' Angulo de entrada: '+parsed.angulo:'')+(parsed.pregunta?' Pregunta sugerida: '+parsed.pregunta:'');
     document.getElementById('f-analisis').value=analisisText;
-    document.getElementById('f-incentivo').value=parsed.incentivo||'';
-    document.getElementById('f-stakeholders').value=parsed.stakeholders||'';
+    if(parsed.incentivo) document.getElementById('f-incentivo').value=parsed.incentivo;
+    if(parsed.stakeholders) document.getElementById('f-stakeholders').value=parsed.stakeholders;
 
-    showToast('✅ Análisis completado — revisa y ajusta lo que no aplique');
+    if(status) status.textContent='✅ Listo';
+    setTimeout(function(){if(status) status.textContent='';},3000);
+    showToast('✅ Análisis de '+emp+' completado');
   }catch(e){
-    showToast('⚠️ No se pudo analizar — intenta de nuevo');
+    if(status) status.textContent='';
+    showToast('No se pudo analizar — intenta de nuevo');
     console.error(e);
   }
-
-  btn.textContent='🔍 Investigar con Claude';
-  btn.disabled=false;
 }
 
 async function syncInstantly(){
