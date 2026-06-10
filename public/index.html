@@ -1258,44 +1258,48 @@ function generarValorEstimado(c){
 // --- MODAL DIAGNOSTICO ---
 function openDiag(id){
   diagId=id;
-  const c=contacts.find(x=>x.id===id);if(!c) return;
-  
-  const score = calcScore(c);
-  const temp = calcTemperatura(c);
-  const bloq = calcBloqueador(c);
-  
-  document.getElementById('diag-title').textContent='🔍 '+c.emp;
-  
-  // Score badge
-  const badge = document.getElementById('diag-score-badge');
-  const scoreColor = score >= 7 ? '#16a34a' : score >= 4 ? '#d97706' : '#94a3b8';
-  badge.style.background = scoreColor + '18';
-  badge.style.color = scoreColor;
-  badge.style.border = '1px solid ' + scoreColor + '40';
-  badge.textContent = score + '/10 probabilidad';
-  
-  document.getElementById('diag-temp-val').textContent = temp.label;
-  document.getElementById('diag-temp-val').style.color = temp.color;
-  document.getElementById('diag-score-val').textContent = score + ' / 10';
-  document.getElementById('diag-bloq-val').textContent = bloq;
-  
-  document.getElementById('diag-empresa-gen').textContent = generarEmpresaResumen(c);
-  document.getElementById('diag-dolor-gen').textContent = generarDolor(c);
-  var diagReal = c.diagReal && c.diagReal.length > 5 ? c.diagReal : generarDiagReal(c);
-  var diagAccion = c.diagAccion && c.diagAccion.length > 5 ? c.diagAccion : getMensaje(c).msg;
-  document.getElementById('diag-real-gen').textContent = diagReal;
-  document.getElementById('diag-accion-gen').textContent = diagAccion;
-  
-  var _s=function(id,val){var el=document.getElementById(id);if(el) el.value=val||'';};
-  _s('diag-dolor-edit',c.diagDolor);
-  _s('diag-valor-edit',c.diagValor);
-  _s('diag-real-edit',c.diagReal);
-  _s('diag-accion-edit',c.diagAccion);
-  _s('diag-contexto-edit',c.contexto);
-  _s('diag-analisis-edit',c.analisis);
-  _s('diag-incentivo-edit',c.incentivo);
-  _s('diag-stakeholders-edit',c.stakeholders);
-  
+  var c=contacts.find(function(x){return x.id===id;});if(!c) return;
+
+  var score=calcScore(c);
+  var temp=calcTemperatura(c);
+  var bloq=calcBloqueador(c);
+
+  var _st=function(eid,val){var e=document.getElementById(eid);if(e) e.textContent=val||'';};
+  var _sv=function(eid,val){var e=document.getElementById(eid);if(e) e.value=val||'';};
+
+  _st('diag-title','🔍 '+c.emp);
+
+  var badge=document.getElementById('diag-score-badge');
+  if(badge){
+    var scoreColor=score>=7?'#16a34a':score>=4?'#d97706':'#94a3b8';
+    badge.style.background=scoreColor+'18';
+    badge.style.color=scoreColor;
+    badge.style.border='1px solid '+scoreColor+'40';
+    badge.textContent=score+'/10 probabilidad';
+  }
+
+  _st('diag-temp-val',temp.label);
+  var tv=document.getElementById('diag-temp-val');if(tv) tv.style.color=temp.color;
+  _st('diag-score-val',score+' / 10');
+  _st('diag-bloq-val',bloq);
+
+  _st('diag-empresa-gen',generarEmpresaResumen(c));
+  _st('diag-dolor-gen',generarDolor(c));
+
+  var diagReal=c.diagReal&&c.diagReal.length>5?c.diagReal:generarDiagReal(c);
+  var diagAccion=c.diagAccion&&c.diagAccion.length>5?c.diagAccion:getMensaje(c).msg;
+  _st('diag-real-gen',diagReal);
+  _st('diag-accion-gen',diagAccion);
+
+  _sv('diag-dolor-edit',c.diagDolor);
+  _sv('diag-real-edit',c.diagReal);
+  _sv('diag-accion-edit',c.diagAccion);
+  _sv('diag-contexto-edit',c.contexto);
+  _sv('diag-analisis-edit',c.analisis);
+  _sv('diag-incentivo-edit',c.incentivo);
+  _sv('diag-stakeholders-edit',c.stakeholders);
+  _sv('diag-extra-edit','');
+
   document.getElementById('diag-overlay').classList.add('open');
 }
 
