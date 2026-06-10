@@ -296,16 +296,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
     </div>
     <div class="field"><label>Próxima acción</label><input id="f-accion" type="text" placeholder="ej: llamar jueves"></div>
     <div class="field"><label>Notas</label><textarea id="f-notas" placeholder="Contexto, historia, estado actual..."></textarea></div>
-    <div class="field"><label>Contexto del contacto</label><textarea id="f-contexto" placeholder="Quién es esta persona realmente. Ej: armó la empresa solo, viene del terreno, muy directo, desconfía de consultores, le importa el equipo..."></textarea></div>
-    <div class="field">
-      <label style="display:flex;align-items:center;justify-content:space-between">
-        <span>Análisis de la empresa</span>
-        <span id="inv-status" style="font-size:11px;color:#94a3b8"></span>
-      </label>
-      <textarea id="f-analisis" style="height:80px" placeholder="Pega aquí el análisis de la empresa: dolores específicos, quiénes son, qué encontraste. El Coach lo usará para personalizar el diagnóstico y el mensaje."></textarea>
-    </div>
-    <div class="field"><label>¿Qué gana él/ella personalmente si esto funciona?</label><textarea id="f-incentivo" style="height:52px" placeholder="Ej: reducir su estrés, quedar bien con sus socios, poder delegar sin que todo se caiga, tener más tiempo libre..."></textarea></div>
-    <div class="field"><label>¿Quién más tiene que comprar la idea?</label><input id="f-stakeholders" type="text" placeholder="Ej: socio fundador, directorio, gerente de finanzas..."></div>
+
     <div class="modal-btns">
       <button class="btn-del" id="btn-del" style="display:none" onclick="deleteContact()">Eliminar</button>
       <button class="btn-c" onclick="closeModal()">Cancelar</button>
@@ -343,7 +334,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
       <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:8px 11px;text-align:center">
-        <div style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px">Temperatura</div>
+        <div style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px">Prioridad</div>
         <div id="diag-temp-val" style="font-size:15px;font-weight:600"></div>
       </div>
       <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:8px 11px;text-align:center">
@@ -356,32 +347,46 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
       </div>
     </div>
 
+    <!-- 1. EMPRESA -->
     <div class="diag-section">
-      <div class="diag-section-title"><span>🎯</span> Dolor identificado</div>
+      <div class="diag-section-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>🏢 Quién es esta empresa</span>
+        <button onclick="investigarDesdeModal()" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--blue-m);background:var(--blue-l);color:var(--blue);cursor:pointer;font-weight:500" id="inv-btn">🔍 Investigar</button>
+      </div>
+      <span id="inv-status" style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px"></span>
+      <div class="diag-generated" id="diag-empresa-gen" style="min-height:40px"></div>
+    </div>
+
+    <!-- 2. DOLOR -->
+    <div class="diag-section">
+      <div class="diag-section-title"><span>🎯</span> Cuál es su dolor</div>
       <div class="diag-generated" id="diag-dolor-gen"></div>
-      <label class="diag-edit-label">Tu validación (editable):</label>
-      <textarea class="diag-edit" id="diag-dolor-edit" placeholder="¿Cuál es el dolor real de este prospecto? Edita o complementa..."></textarea>
+      <label class="diag-edit-label">Algo extra que sabes tú (opcional):</label>
+      <textarea class="diag-edit" id="diag-dolor-edit" placeholder="Ej: me dijeron que los clientes se quejan del desorden, el dueño quiere poder delegar..."></textarea>
     </div>
 
+    <!-- 3. QUÉ ESTÁ PASANDO -->
     <div class="diag-section">
-      <div class="diag-section-title"><span>💰</span> ¿Cuánto vale esto para ellos?</div>
-      <div class="diag-generated" id="diag-valor-gen"></div>
-      <label class="diag-edit-label">Tu estimación (editable):</label>
-      <textarea class="diag-edit" id="diag-valor-edit" placeholder="Estima cuánto les cuesta el problema hoy. Ej: si tienen 5 camiones con 2h muertas/día a $20k/h = $200k/mes. Eso es lo que vale resolverlo."></textarea>
-    </div>
-
-    <div class="diag-section">
-      <div class="diag-section-title"><span>🔍</span> Qué está pasando realmente</div>
+      <div class="diag-section-title"><span>🔍</span> Qué está pasando</div>
       <div class="diag-generated" id="diag-real-gen"></div>
-      <label class="diag-edit-label">Tu lectura (editable):</label>
-      <textarea class="diag-edit" id="diag-real-edit" placeholder="Completa o corrige el diagnóstico del Coach..."></textarea>
     </div>
 
+    <!-- 4. QUÉ HAGO AHORA -->
     <div class="diag-section">
-      <div class="diag-section-title"><span>⚡</span> Qué hago ahora</div>
+      <div class="diag-section-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>⚡ Qué hago ahora</span>
+        <span id="accion-loading" style="font-size:11px;color:#94a3b8;display:none">Recalculando...</span>
+      </div>
       <div class="diag-generated" id="diag-accion-gen"></div>
       <label class="diag-edit-label">Tu acción concreta (editable):</label>
-      <textarea class="diag-edit" id="diag-accion-edit" placeholder="Escribe la acción exacta y cuándo..."></textarea>
+      <textarea class="diag-edit" id="diag-accion-edit" placeholder="Se actualizará al guardar considerando todo el contexto..."></textarea>
+    </div>
+
+    <!-- hidden fields for compatibility -->
+    <div style="display:none">
+      <textarea id="diag-valor-edit"></textarea>
+      <textarea id="diag-incentivo-edit"></textarea>
+      <textarea id="diag-stakeholders-edit"></textarea>
     </div>
 
     <div class="modal-btns">
@@ -1227,6 +1232,26 @@ function calcBloqueador(c){
   return 'Sin bloqueo claro';
 }
 
+function generarEmpresaResumen(c){
+  var rubro=inferRubro(c.emp)||'sin rubro detectado';
+  var nivel=nivelCargo(c);
+  var ciudad=c.ciudad?'ubicada en '+c.ciudad+'.':'en Chile.';
+  var analisis=c.analisis&&c.analisis.length>10?c.analisis:'';
+  if(analisis) return analisis;
+  var rubDesc={
+    'Transporte/Logistica':'Empresa de transporte y logistica '+ciudad+' Con crecimiento suelen aparecer costos ocultos de flota, coordinacion manual y falta de visibilidad en tiempo real.',
+    'Puertos/Operaciones':'Operador portuario o de terminales '+ciudad+' La complejidad operacional con multiples actores (agentes, aduana, equipos) genera fricciones costosas.',
+    'Retail/Consumo':'Empresa de retail o consumo '+ciudad+' El crecimiento en puntos de venta trae desafios de stock, despacho y margen que se erosiona sin procesos claros.',
+    'Alimentos':'Empresa de alimentos '+ciudad+' La trazabilidad, merma y cumplimiento normativo son los dolores tipicos cuando escala el volumen.',
+    'Arquitectura/Construccion':'Estudio de arquitectura o constructora '+ciudad+' La gestion simultanea de multiples proyectos sin procesos claros genera desorden visible para los clientes.',
+    '3PL/Operadores':'Operador logistico '+ciudad+' Diferenciarse de la competencia y mantener margen por cliente son los desafios centrales.',
+    'Mineria/Industria':'Empresa minera o industrial '+ciudad+' Procesos criticos que dependen de personas clave y mantenimiento reactivo son los dolores tipicos.',
+    'Salud':'Empresa o clinica de salud '+ciudad+' Los flujos internos que consumen tiempo clinico y quiebres de insumos son los problemas mas frecuentes.',
+    'default':'Empresa en rubro '+rubro+' '+ciudad+' Usa el boton Investigar para obtener un analisis especifico de esta empresa.'
+  };
+  return rubDesc[rubro]||rubDesc['default'];
+}
+
 function generarValorEstimado(c){
   var nivel=nivelCargo(c);
   var rubro=inferRubro(c.emp)||'default';
@@ -1272,29 +1297,57 @@ function openDiag(id){
   document.getElementById('diag-score-val').textContent = score + ' / 10';
   document.getElementById('diag-bloq-val').textContent = bloq;
   
+  document.getElementById('diag-empresa-gen').textContent = generarEmpresaResumen(c);
   document.getElementById('diag-dolor-gen').textContent = generarDolor(c);
-  document.getElementById('diag-valor-gen').textContent = generarValorEstimado(c);
   document.getElementById('diag-real-gen').textContent = generarDiagReal(c);
   document.getElementById('diag-accion-gen').textContent = generarDiagAccion(c);
   
   document.getElementById('diag-dolor-edit').value = c.diagDolor||'';
-  document.getElementById('diag-valor-edit').value = c.diagValor||'';
+  if(document.getElementById('diag-valor-edit')) document.getElementById('diag-valor-edit').value = c.diagValor||'';
   document.getElementById('diag-real-edit').value = c.diagReal||'';
   document.getElementById('diag-accion-edit').value = c.diagAccion||'';
+  document.getElementById('diag-contexto-edit').value = c.contexto||'';
+  document.getElementById('diag-analisis-edit').value = c.analisis||'';
+  document.getElementById('diag-incentivo-edit').value = c.incentivo||'';
+  document.getElementById('diag-stakeholders-edit').value = c.stakeholders||'';
   
   document.getElementById('diag-overlay').classList.add('open');
 }
 
-function saveDiag(){
+async function saveDiag(){
   const c=contacts.find(x=>x.id===diagId);if(!c) return;
-  const dolorEdit=document.getElementById('diag-dolor-edit').value.trim();
-  const realEdit=document.getElementById('diag-real-edit').value.trim();
+  const dolorExtra=document.getElementById('diag-dolor-edit').value.trim();
   const accionEdit=document.getElementById('diag-accion-edit').value.trim();
-  c.diagDolor=dolorEdit||document.getElementById('diag-dolor-gen').textContent.trim();
-  c.diagValor=document.getElementById('diag-valor-edit').value.trim();
-  c.diagReal=realEdit||document.getElementById('diag-real-gen').textContent.trim();
-  c.diagAccion=accionEdit||document.getElementById('diag-accion-gen').textContent.trim();
-  saveLS();renderAll();closeDiag();showToast('✅ Diagnóstico guardado');
+
+  c.diagDolor=document.getElementById('diag-dolor-gen').textContent.trim()+(dolorExtra?' Contexto adicional: '+dolorExtra:'');
+  c.diagReal=document.getElementById('diag-real-gen').textContent.trim();
+  c.analisis=document.getElementById('diag-analisis-edit')?document.getElementById('diag-analisis-edit').value.trim():'';
+  c.contexto=document.getElementById('diag-contexto-edit')?document.getElementById('diag-contexto-edit').value.trim():'';
+
+  // If user wrote their own action, use it. Otherwise recalculate with full context
+  if(accionEdit.length>5){
+    c.diagAccion=accionEdit;
+    saveLS();renderAll();closeDiag();showToast('Diagnostico guardado');
+  } else {
+    // Recalculate accion with all context using Claude API
+    document.getElementById('accion-loading').style.display='inline';
+    var empresa=document.getElementById('diag-empresa-gen').textContent;
+    var dolor=c.diagDolor;
+    var real=c.diagReal;
+    var canal=c.canal||'Email';
+    var nivel=nivelCargo(c);
+    var dias=getDias(c);
+    var prompt='Eres un coach de ventas consultivas. Dado este contexto de un prospecto, dame UNA accion especifica y concreta para hoy. Sin intro, directo a la accion.\n\nEmpresa: '+c.emp+'\nContacto: '+c.cont+' ('+c.cargo+')\nCanal: '+canal+'\nDias sin contacto: '+dias+'\nEstado: '+c.status+'\nEmpresa: '+empresa+'\nDolor: '+dolor+'\nSituacion: '+real+'\n\nLa accion debe ser especifica (que mensaje, por que canal, que pregunta), humana (no script de vendedor), y considerar el nivel del contacto ('+nivel+'). Maximo 3 oraciones.';
+    try{
+      var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:prompt}]})});
+      var data=await res.json();
+      c.diagAccion=data.content.map(function(i){return i.text||'';}).join('').trim();
+    }catch(e){
+      c.diagAccion=generarDiagAccion(c);
+    }
+    document.getElementById('accion-loading').style.display='none';
+    saveLS();renderAll();closeDiag();showToast('Diagnostico guardado con accion actualizada');
+  }
 }
 
 function closeDiag(){document.getElementById('diag-overlay').classList.remove('open');}
@@ -1369,6 +1422,35 @@ function openNeg(id){
 }
 
 function closeNeg(){document.getElementById('neg-overlay').classList.remove('open');}
+
+async function investigarDesdeModal(){
+  var c=contacts.find(function(x){return x.id===diagId;});
+  if(!c){showToast('Guarda el contacto primero');return;}
+  var btn=document.getElementById('inv-btn');
+  var status=document.getElementById('inv-status');
+  btn.textContent='Analizando...';btn.disabled=true;
+  if(status) status.textContent='Claude esta investigando...';
+  var cargo=c.cargo||'directivo';
+  var ciudad=c.ciudad||'Chile';
+  var prompt='Analiza la empresa "'+c.emp+'" ubicada en '+ciudad+' para una venta consultiva. Soy Jael Crutchik de Rave & Crutchik, consultora de operaciones y supply chain. Mi contacto es '+cargo+'. Responde SOLO en JSON sin texto adicional ni backticks: {"analisis":"3-4 oraciones sobre que tipo de empresa es como opera y que desafios tipicos tiene","dolores":"2-3 dolores operacionales especificos y probables","angulo":"mejor angulo de entrada para consultoria de operaciones","incentivo":"que gana personalmente el '+cargo+' si esto funciona en terminos de estres tiempo reconocimiento o control","stakeholders":"quienes mas probablemente tienen que aprobar esta decision internamente","pregunta":"una pregunta concreta y humana para abrir la conversacion - que no suene a script de vendedor"}';
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    var data=await res.json();
+    var text=data.content.map(function(i){return i.text||'';}).join('');
+    var clean=text.replace(/```json|```/g,'').trim();
+    var parsed=JSON.parse(clean);
+    var analisisText=(parsed.analisis||'')+(parsed.dolores?' Dolores: '+parsed.dolores:'')+(parsed.angulo?' Angulo: '+parsed.angulo:'')+(parsed.pregunta?' Pregunta: '+parsed.pregunta:'');
+    document.getElementById('diag-analisis-edit').value=analisisText;
+    if(parsed.incentivo) document.getElementById('diag-incentivo-edit').value=parsed.incentivo;
+    if(parsed.stakeholders) document.getElementById('diag-stakeholders-edit').value=parsed.stakeholders;
+    if(status) status.textContent='Analisis listo - revisa y ajusta';
+    showToast('Analisis de '+c.emp+' completado');
+  }catch(e){
+    if(status) status.textContent='';
+    showToast('No se pudo analizar - intenta de nuevo');
+  }
+  btn.textContent='Investigar con Claude';btn.disabled=false;
+}
 
 async function autoInvestigar(){
   var emp=document.getElementById('f-emp').value.trim();
