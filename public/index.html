@@ -304,6 +304,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
       </label>
       <textarea id="f-analisis" style="height:80px" placeholder="Pega aquí el análisis de la empresa: dolores específicos, quiénes son, qué encontraste. El Coach lo usará para personalizar el diagnóstico y el mensaje."></textarea>
     </div>
+    <div class="field"><label>¿Qué gana él/ella personalmente si esto funciona?</label><textarea id="f-incentivo" style="height:52px" placeholder="Ej: reducir su estrés, quedar bien con sus socios, poder delegar sin que todo se caiga, tener más tiempo libre..."></textarea></div>
+    <div class="field"><label>¿Quién más tiene que comprar la idea?</label><input id="f-stakeholders" type="text" placeholder="Ej: socio fundador, directorio, gerente de finanzas..."></div>
     <div class="modal-btns">
       <button class="btn-del" id="btn-del" style="display:none" onclick="deleteContact()">Eliminar</button>
       <button class="btn-c" onclick="closeModal()">Cancelar</button>
@@ -469,23 +471,25 @@ function generarDiagReal(c){
   const ultimoTexto=ultimoHist?ultimoHist.texto:'';
   const contextoExtra=c.contexto&&c.contexto.length>0?` Contexto clave: "${c.contexto}".`:'';
   const analisisExtra=c.analisis&&c.analisis.length>0?`Análisis previo: ${c.analisis.slice(0,300)}${c.analisis.length>300?'...':''} `:'';
+  const incentivoExtra=c.incentivo&&c.incentivo.length>0?` Incentivo individual: ${c.incentivo}.`:'';
+  const stakeholderExtra=c.stakeholders&&c.stakeholders.length>0?` Otros que deben aprobar: ${c.stakeholders}.`:'';
 
   if(c.status==='Respondió'){
     const via=canal==='Email'?'el email':canal==='WhatsApp'?'tu mensaje de WhatsApp':canal==='LinkedIn'?'tu mensaje de LinkedIn':`tu mensaje de ${canal}`;
-    return analisisExtra+contextoExtra+`Leyó ${via} hace ${d} días pero no respondió. Hay interés (lo leyó), pero falta fricción suficiente para responder. No es rechazo  -  es silencio. El segundo toque tiene 40% más probabilidad de éxito.${ultimoTexto?' Contexto: '+ultimoTexto:''}`;
+    return analisisExtra+contextoExtra+incentivoExtra+stakeholderExtra+`Leyó ${via} hace ${d} días pero no respondió. Hay interés (lo leyó), pero falta fricción suficiente para responder. No es rechazo  -  es silencio. El segundo toque tiene 40% más probabilidad de éxito.${ultimoTexto?' Contexto: '+ultimoTexto:''}`;
   }
   if(c.status==='Contactado'&&d>14)
     return analisisExtra+contextoExtra+`Lleva ${d} días sin respuesta por ${canal}. Probablemente nunca leyó el mensaje, o lo postergó y se olvidó. No es rechazo  -  es silencio. Falta un segundo toque.${ultimoTexto?' Último registro: '+ultimoTexto:''}`;
   if(c.status==='Contactado'&&d>7)
     return analisisExtra+contextoExtra+`${d} días desde el primer contacto por ${canal} sin respuesta. El momentum se está enfriando. Momento ideal para un seguimiento corto y directo.`;
   if(c.status==='Contactado')
-    return analisisExtra+contextoExtra+`Recién contactado hace ${d} días por ${canal}. Demasiado pronto para insistir  -  el timing está bien. Solo hay que esperar.`;
+    return analisisExtra+contextoExtra+incentivoExtra+stakeholderExtra+`Recién contactado hace ${d} días por ${canal}. Demasiado pronto para insistir  -  el timing está bien. Solo hay que esperar.`;
   if(c.status==='Reunión'&&d>7)
     return analisisExtra+contextoExtra+`Reunión hace ${d} días sin avance documentado. El riesgo es que pierda prioridad. ${c.notas?'Contexto: '+c.notas:''} Falta propuesta o confirmación de siguiente paso.`;
   if(c.status==='Reunión')
     return analisisExtra+contextoExtra+`Reunión realizada hace ${d} días. El momentum está activo. ${c.notas?'Nota: '+c.notas+'. ':''} La propuesta debe llegar antes de 48 horas o la probabilidad de cierre baja.`;
   if(c.status==='Por contactar')
-    return analisisExtra+contextoExtra+`Nunca contactado. Canal planificado: ${canal||'sin definir'}. ${c.notas?'Contexto: '+c.notas+'. ':''}El único bloqueador eres tú  -  falta enviar el primer mensaje.`;
+    return analisisExtra+contextoExtra+incentivoExtra+stakeholderExtra+`Nunca contactado. Canal planificado: ${canal||'sin definir'}. ${c.notas?'Contexto: '+c.notas+'. ':''}El único bloqueador eres tú  -  falta enviar el primer mensaje.`;
   if(c.status==='On hold')
     return analisisExtra+contextoExtra+`En pausa. ${c.notas||'Sin razón documentada'}. El riesgo es que "on hold" se convierta en descarte silencioso. Ponle una fecha límite.`;
   if(c.status==='En proceso')
@@ -1302,6 +1306,12 @@ function openNeg(id){
   var pregunta=getPreguntaDolor(c);
   document.getElementById('neg-title').textContent='Propuesta - '+c.emp;
   var cards=[
+    {color:'#16a34a',titulo:'ANTES DE TODO: Incentivos individuales y domesticos',items:[
+      c.incentivo?'Incentivo personal de '+nombre+': '+c.incentivo:'No has registrado que gana el personalmente. Preguntate: que le pasa a el si esto funciona? Y si no funciona? Eso mueve la decision, no el ROI de la empresa.',
+      c.stakeholders?'Otros que deben aprobar: '+c.stakeholders+'. Necesitas que '+nombre+' sea tu champion interno — el que vende la idea adentro cuando tu no estas.':'No sabes quien mas tiene que comprar la idea. Preguntale: con quien mas tendrias que alinear esto antes de avanzar?',
+      'Negociar es identificar las necesidades del otro — individuales y domesticas — y generar una oferta que cubra las tuyas tambien. No es convencer, es intercambiar.',
+      'La empresa puede necesitar el servicio, pero la persona tiene que querer contratarte a ti. Son dos cosas distintas.'
+    ]},
     {color:'#7c3aed',titulo:'PASO 0: Ancla el valor antes del precio (Francisco)',items:[
       'El precio no lo defines desde tus horas. Lo defines desde lo que vale resolver el problema para ellos.',
       'Antes de decir el numero, haz que ellos pongan el numero: "cuanto te cuesta al mes este problema?" Si no lo saben, ayudalos a estimarlo.',
@@ -1360,14 +1370,47 @@ function openNeg(id){
 
 function closeNeg(){document.getElementById('neg-overlay').classList.remove('open');}
 
-function abrirInvestigar(){
+async function abrirInvestigar(){
   var emp=document.getElementById('f-emp').value.trim();
   var cargo=document.getElementById('f-cargo').value.trim();
-  var rubro=document.getElementById('f-canal').value||'';
+  var ciudad=document.getElementById('f-ciudad').value.trim();
   if(!emp){alert('Primero ingresa el nombre de la empresa');return;}
-  var prompt='Analiza la empresa "'+emp+'" para ayudarme a prepararme para una reunión de ventas. Soy consultor de operaciones y supply chain (Rave & Crutchik). Necesito saber:\n\n1. ¿Qué tipo de empresa es y cómo opera?\n2. ¿Cuáles son sus dolores operacionales más probables?\n3. ¿Qué señales de desorden o ineficiencia tienen?\n4. ¿Cuál es el mejor ángulo de entrada para ofrecer consultoría de operaciones?\n5. ¿Qué pregunta concreta le haría a '+(cargo||'el contacto')+' para abrir la conversación?\n\nSé específico y directo. No quiero generalidades, quiero lo que aplica para esta empresa en particular.';
-  var url='https://claude.ai/new?q='+encodeURIComponent(prompt);
-  window.open(url,'_blank');
+
+  var btn=document.querySelector('button[onclick="abrirInvestigar()"]');
+  btn.textContent='Analizando...';
+  btn.disabled=true;
+
+  var prompt='Analiza la empresa "'+emp+'" ubicada en '+(ciudad||'Chile')+' para ayudarme a prepararme para una venta consultiva. Soy Jael Crutchik de Rave & Crutchik, consultora de operaciones y supply chain. Mi contacto es '+( cargo||'un directivo')+'.\n\nResponde SOLO en JSON con esta estructura exacta, sin texto adicional ni backticks:\n{\n"analisis": "3-4 oraciones sobre que tipo de empresa es, como opera, que tan grande es y que desafios tipicos tiene",\n"dolores": "2-3 dolores operacionales especificos y probables para esta empresa y rubro",\n"angulo": "el mejor angulo de entrada para ofrecer consultoria de operaciones a esta empresa especifica",\n"incentivo": "que gana personalmente el '+( cargo||'contacto')+' si esto funciona - en terminos de estres, tiempo, reconocimiento o control",\n"stakeholders": "quienes mas probablemente tienen que aprobar esta decision internamente",\n"pregunta": "una pregunta concreta y humana para abrir la conversacion con '+(cargo||'el contacto')+'  - que no suene a script de vendedor"\n}';
+
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    var data=await res.json();
+    var text=data.content.map(function(i){return i.text||'';}).join('');
+    var clean=text.replace(/```json|```/g,'').trim();
+    var parsed=JSON.parse(clean);
+
+    // Fill fields
+    var analisisText=(parsed.analisis||'')+' Dolores probables: '+(parsed.dolores||'')+' Angulo de entrada: '+(parsed.angulo||'')+' Pregunta sugerida: '+(parsed.pregunta||'');
+    document.getElementById('f-analisis').value=analisisText;
+    document.getElementById('f-incentivo').value=parsed.incentivo||'';
+    document.getElementById('f-stakeholders').value=parsed.stakeholders||'';
+
+    showToast('✅ Análisis completado — revisa y ajusta lo que no aplique');
+  }catch(e){
+    showToast('⚠️ No se pudo analizar — intenta de nuevo');
+    console.error(e);
+  }
+
+  btn.textContent='🔍 Investigar con Claude';
+  btn.disabled=false;
 }
 
 async function syncInstantly(){
@@ -1461,9 +1504,11 @@ function openModal(id){
     document.getElementById('f-notas').value=c.notas||'';
     document.getElementById('f-contexto').value=c.contexto||'';
     document.getElementById('f-analisis').value=c.analisis||'';
+    document.getElementById('f-incentivo').value=c.incentivo||'';
+    document.getElementById('f-stakeholders').value=c.stakeholders||'';
   }else{
     document.getElementById('modal-title').textContent='Nuevo contacto';
-    ['f-emp','f-cont','f-cargo','f-uf','f-horas','f-accion','f-notas','f-email','f-ciudad','f-contexto','f-analisis'].forEach(f=>document.getElementById(f).value='');
+    ['f-emp','f-cont','f-cargo','f-uf','f-horas','f-accion','f-notas','f-email','f-ciudad','f-contexto','f-analisis','f-incentivo','f-stakeholders'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('f-region').value='';
     document.getElementById('f-fecha').value='';
     document.getElementById('f-com').value=15;
@@ -1499,13 +1544,15 @@ function saveContact(){
     accion:document.getElementById('f-accion').value.trim(),
     notas:document.getElementById('f-notas').value.trim(),
     contexto:document.getElementById('f-contexto').value.trim(),
-    analisis:document.getElementById('f-analisis').value.trim()
+    analisis:document.getElementById('f-analisis').value.trim(),
+    incentivo:document.getElementById('f-incentivo').value.trim(),
+    stakeholders:document.getElementById('f-stakeholders').value.trim()
   };
   if(editingId){
     const i=contacts.findIndex(x=>x.id===editingId);
     if(i>=0) contacts[i]={...contacts[i],...data};
   } else {
-    contacts.push({id:nextId++,...data,historial:[],diagReal:'',diagAccion:'',diagDolor:'',diagValor:'',ciudad:'',region:'',contexto:'',analisis:''});
+    contacts.push({id:nextId++,...data,historial:[],diagReal:'',diagAccion:'',diagDolor:'',diagValor:'',ciudad:'',region:'',contexto:'',analisis:'',incentivo:'',stakeholders:''});
   }
   closeModal();saveLS();showToast('✅ Guardado');renderAll();loadTips();
 }
@@ -1524,7 +1571,7 @@ try{
   if(saved){
     const d=JSON.parse(saved);
     // Merge: preserve saved data, add new fields if missing
-    contacts=d.map(c=>({diagReal:'',diagAccion:'',diagDolor:'',diagValor:'',ciudad:'',region:'',contexto:'',analisis:'',...c}));
+    contacts=d.map(c=>({diagReal:'',diagAccion:'',diagDolor:'',diagValor:'',ciudad:'',region:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',...c}));
     nextId=Math.max(...d.map(c=>c.id))+1;
   }
 }catch(e){}
