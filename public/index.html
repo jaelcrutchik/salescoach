@@ -1302,10 +1302,64 @@ function openDiag(id){
 
   document.getElementById('diag-overlay').classList.add('open');
 
-  // Auto-investigate if no saved analysis
-  if(!c.analisis||c.analisis.length<20){
-    autoInvestigarDiag(c);
+  // Always auto-generate recommendation + message on open
+  autoGenerarDiag(c);
+}
+
+async function autoGenerarDiag(c){
+  var elEmpresa=document.getElementById('diag-empresa-gen');
+  var elReal=document.getElementById('diag-real-gen');
+  var elAccion=document.getElementById('diag-accion-gen');
+  var btn=document.getElementById('inv-btn');
+  var status=document.getElementById('inv-status');
+  var loadingEl=document.getElementById('accion-loading');
+
+  var needsInvestiga=!c.analisis||c.analisis.length<20;
+  var empresa=needsInvestiga?'':c.analisis;
+
+  if(loadingEl) loadingEl.style.display='inline';
+  if(status) status.textContent='Analizando...';
+  if(btn) btn.disabled=true;
+
+  var canal=c.canal||'Email';
+  var dias=getDias(c);
+  var nombre=c.cont?c.cont.split(' ')[0]:'el contacto';
+  var ciudad=c.ciudad||'Chile';
+  var wa=canal==='WhatsApp';
+  var li=canal==='LinkedIn';
+  var tono=wa?'Tono WhatsApp: muy corto maximo 3 lineas sin formalismos como persona real.':li?'Tono LinkedIn: profesional pero cercano maximo 4 lineas.':'Tono email: habla al dolor especifico termina con una pregunta concreta. Sin firma.';
+
+  var parteEmpresa=needsInvestiga?'Investiga esta empresa y dame: que hace su tamano modelo de negocio y desafios tipicos. Luego genera los otros campos.':'Empresa ya analizada: '+empresa+'.';
+  var prompt='Eres Jael Crutchik de Rave & Crutchik consultora de operaciones y supply chain en Chile. '+parteEmpresa+' Empresa: '+c.emp+' ('+ciudad+'). Contacto: '+nombre+' - '+c.cargo+'. Estado: '+c.status+' '+dias+' dias sin contacto. Canal: '+canal+'. Dolor: '+c.diagDolor+'. Contexto: '+(c.contexto||'sin contexto')+'. Responde SOLO en JSON sin backticks: {"empresa":"2-3 oraciones sobre que hace la empresa su tamano y desafios tipicos","dolores":"2-3 dolores operacionales especificos y probables","recomendacion":"en 2 oraciones que hacer hoy y por que. Directo.","mensaje":"mensaje listo para enviar por '+canal+'. '+tono+' Usa el nombre '+nombre+'. Habla al dolor especifico de esta empresa no generico."}';
+
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:700,messages:[{role:'user',content:prompt}]})});
+    var data=await res.json();
+    var text=data.content.map(function(i){return i.text||'';}).join('');
+    var clean=text.replace(/```json|```/g,'').trim();
+    var parsed=JSON.parse(clean);
+
+    if(needsInvestiga&&parsed.empresa){
+      var analisisCompleto=(parsed.empresa||'')+(parsed.dolores?' Dolores: '+parsed.dolores:'');
+      c.analisis=analisisCompleto;
+      var analisisEl=document.getElementById('diag-analisis-edit');
+      if(analisisEl) analisisEl.value=analisisCompleto;
+    }
+    c.diagReal=parsed.recomendacion||generarDiagReal(c);
+    c.diagAccion=parsed.mensaje||getMensaje(c).msg;
+    saveLS();
+
+    if(elEmpresa) elEmpresa.textContent=c.analisis||generarEmpresaResumen(c);
+    if(elReal) elReal.textContent=c.diagReal;
+    if(elAccion) elAccion.textContent=c.diagAccion;
+  }catch(e){
+    if(elReal) elReal.textContent=generarDiagReal(c);
+    if(elAccion) elAccion.textContent=getMensaje(c).msg;
+    console.error(e);
   }
+  if(loadingEl) loadingEl.style.display='none';
+  if(status) status.textContent='';
+  if(btn) btn.disabled=false;
 }
 
 async function autoInvestigarDiag(c){
@@ -1347,27 +1401,23 @@ async function autoInvestigarDiag(c){
 }
 
 async function saveDiag(){
-  const c=contacts.find(x=>x.id===diagId);if(!c) return;
-  const dolorExtra=document.getElementById('diag-dolor-edit')?document.getElementById('diag-dolor-edit').value.trim():'';
+  var c=contacts.find(function(x){return x.id===diagId;});if(!c) return;
+  var dolorExtra=document.getElementById('diag-dolor-edit')?document.getElementById('diag-dolor-edit').value.trim():'';
+  var extra=document.getElementById('diag-extra-edit')?document.getElementById('diag-extra-edit').value.trim():'';
   c.diagDolor=document.getElementById('diag-dolor-gen').textContent.trim()+(dolorExtra?' Ademas: '+dolorExtra:'');
-  c.analisis=document.getElementById('diag-analisis-edit')?document.getElementById('diag-analisis-edit').value.trim():'';
-  c.contexto=document.getElementById('diag-contexto-edit')?document.getElementById('diag-contexto-edit').value.trim():'';
-
+  c.analisis=document.getElementById('diag-analisis-edit')?document.getElementById('diag-analisis-edit').value.trim():c.analisis||'';
+  c.contexto=document.getElementById('diag-contexto-edit')?document.getElementById('diag-contexto-edit').value.trim():c.contexto||'';
   var loadingEl=document.getElementById('accion-loading');
   if(loadingEl) loadingEl.style.display='inline';
-
   var empresa=document.getElementById('diag-empresa-gen')?document.getElementById('diag-empresa-gen').textContent:'';
-  var dolor=c.diagDolor;
   var canal=c.canal||'Email';
-  var nivel=nivelCargo(c);
   var dias=getDias(c);
   var nombre=c.cont?c.cont.split(' ')[0]:'el contacto';
   var ciudad=c.ciudad||'Chile';
-  var contexto=c.contexto||'';
-  var extra=document.getElementById('diag-extra-edit')?document.getElementById('diag-extra-edit').value.trim():'';
-
-  var prompt='Eres Jael Crutchik de Rave & Crutchik, consultora de operaciones y supply chain. Necesito dos cosas para este prospecto:\n\nEmpresa: '+c.emp+' ('+ciudad+')\nContacto: '+nombre+' - '+c.cargo+'\nEstado: '+c.status+' - '+dias+' dias sin contacto\nCanal: '+canal+'\nEmpresa info: '+empresa+'\nDolor: '+dolor+'\nContexto del contacto: '+(contexto||'no disponible')+'\n\nResponde SOLO en JSON sin backticks:\n{"recomendacion":"en 2 oraciones maximo: que debes hacer hoy y por que, considerando todo el contexto. Directo, sin intro.","mensaje":"el mensaje exacto listo para enviar por '+canal+'. Tono humano, no de vendedor. Que hable al dolor real de '+nombre+'. Maximo 4 oraciones. Sin saludos formales."}';
-
+  var wa=canal==='WhatsApp';
+  var li=canal==='LinkedIn';
+  var tono=wa?'Tono WhatsApp: muy corto, maximo 3 lineas, sin formalismos, como persona real.':li?'Tono LinkedIn: profesional pero cercano, maximo 4 lineas.':'Tono email: habla al dolor especifico, termina con una pregunta concreta. Sin firma.';
+  var prompt='Eres Jael Crutchik de Rave & Crutchik, consultora de operaciones y supply chain en Chile. Genera DOS cosas para este prospecto. Empresa: '+c.emp+' ('+ciudad+'). Contacto: '+nombre+' - '+c.cargo+'. Estado: '+c.status+' - '+dias+' dias sin contacto. Canal: '+canal+'. Analisis empresa: '+empresa+'. Dolor: '+c.diagDolor+'. Contexto contacto: '+(c.contexto||'no disponible')+'. Info adicional: '+(extra||'ninguna')+'. Responde SOLO en JSON sin backticks: {"recomendacion":"en 2 oraciones que hacer hoy y por que considerando todo el contexto. Directo.","mensaje":"mensaje listo para enviar por '+canal+'. '+tono+' Usa el nombre '+nombre+'. Habla al dolor especifico de esta empresa no generico."}';
   try{
     var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})});
     var data=await res.json();
@@ -1375,19 +1425,16 @@ async function saveDiag(){
     var clean=text.replace(/```json|```/g,'').trim();
     var parsed=JSON.parse(clean);
     c.diagReal=parsed.recomendacion||generarDiagReal(c);
-    c.diagAccion=parsed.mensaje||generarDiagAccion(c);
+    c.diagAccion=parsed.mensaje||getMensaje(c).msg;
   }catch(e){
     c.diagReal=generarDiagReal(c);
-    c.diagAccion=generarDiagAccion(c);
+    c.diagAccion=getMensaje(c).msg;
   }
-
-  // Update display immediately
   var realEl=document.getElementById('diag-real-gen');
   var accionEl=document.getElementById('diag-accion-gen');
   if(realEl) realEl.textContent=c.diagReal;
   if(accionEl) accionEl.textContent=c.diagAccion;
   if(loadingEl) loadingEl.style.display='none';
-
   saveLS();renderAll();showToast('Diagnostico guardado');
 }
 
@@ -1689,7 +1736,13 @@ function saveContact(){
   } else {
     contacts.push({id:nextId++,...data,historial:[],diagReal:'',diagAccion:'',diagDolor:'',diagValor:'',ciudad:'',region:'',contexto:'',analisis:'',incentivo:'',stakeholders:''});
   }
-  closeModal();saveLS();showToast('✅ Guardado');renderAll();loadTips();
+  // Reset cached message if key fields changed
+  var prev=contacts.find(function(x){return x.id===editingId;});
+  if(prev&&(prev.canal!==data.canal||prev.cargo!==data.cargo||prev.ciudad!==data.ciudad)){
+    var idx2=contacts.findIndex(function(x){return x.id===editingId;});
+    if(idx2>=0){contacts[idx2].diagAccion='';contacts[idx2].diagReal='';}
+  }
+  closeModal();saveLS();showToast('Guardado');renderAll();loadTips();
 }
 
 ['overlay','hist-overlay','consejo-overlay','diag-overlay','neg-overlay'].forEach(id=>{
