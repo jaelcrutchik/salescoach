@@ -643,6 +643,20 @@ function getDolorCorto(c){
       'jefe':'cada proyecto se hace diferente segun quien lo lidere, sin un proceso comun',
       'general':'estudios que crecen en proyectos pero no en estructura, y eso genera desorden visible para los clientes'
     },
+    'Manufactura/Packaging':{
+      'dueño':'produccion que depende de ti para que salga bien y eso no escala',
+      'gg':'crecimiento en pedidos que la operacion actual no puede absorber sin perder calidad',
+      'gerente':'reprocesos y merma que se comen el margen sin que nadie los este midiendo bien',
+      'jefe':'cada turno se hace diferente segun quien este porque los procesos no estan escritos',
+      'general':'capacidad productiva que no escala porque los procesos dependen de personas clave'
+    },
+    'Manufactura/Packaging':{
+      'dueño':'¿Cuánto tiempo de tu semana se va en resolver problemas de produccion que deberian funcionar solos?',
+      'gg':'¿El crecimiento en pedidos que tienen hoy, la operacion actual lo puede absorber sin que baje la calidad?',
+      'gerente':'¿Saben exactamente cuanto merma o reproceso tienen por linea o turno cada semana?',
+      'jefe':'¿Los procedimientos de produccion estan escritos o dependen de quien los aprendio primero?',
+      'general':'¿Si un operario clave no llega manana, que pasa con la produccion del dia?'
+    },
     'default':{
       'dueño':'cuanto tiempo de tu semana se va en cosas que deberian funcionar solas',
       'gg':'el negocio crece pero cada vez dependes mas de ti mismo para que las cosas salgan bien',
@@ -726,6 +740,20 @@ function getPreguntaDolor(c){
       'gerente':'procesos de entrega que consumen mas tiempo del que deberian por falta de estandares',
       'jefe':'cada proyecto se hace diferente segun quien lo lidere, sin un proceso comun',
       'general':'estudios que crecen en proyectos pero no en estructura, y eso genera desorden visible para los clientes'
+    },
+    'Manufactura/Packaging':{
+      'dueño':'produccion que depende de ti para que salga bien y eso no escala',
+      'gg':'crecimiento en pedidos que la operacion actual no puede absorber sin perder calidad',
+      'gerente':'reprocesos y merma que se comen el margen sin que nadie los este midiendo bien',
+      'jefe':'cada turno se hace diferente segun quien este porque los procesos no estan escritos',
+      'general':'capacidad productiva que no escala porque los procesos dependen de personas clave'
+    },
+    'Manufactura/Packaging':{
+      'dueño':'¿Cuánto tiempo de tu semana se va en resolver problemas de produccion que deberian funcionar solos?',
+      'gg':'¿El crecimiento en pedidos que tienen hoy, la operacion actual lo puede absorber sin que baje la calidad?',
+      'gerente':'¿Saben exactamente cuanto merma o reproceso tienen por linea o turno cada semana?',
+      'jefe':'¿Los procedimientos de produccion estan escritos o dependen de quien los aprendio primero?',
+      'general':'¿Si un operario clave no llega manana, que pasa con la produccion del dia?'
     },
     'default':{
       'dueño': esTerreno?
@@ -1851,6 +1879,7 @@ function inferRubro(emp){
   if(emp.includes('dhl')||emp.includes('id log')||emp.includes('rfp')) return '3PL/Operadores';
   if(emp.includes('arauco')||emp.includes('sqm')||emp.includes('neulin')) return 'Minería/Industria';
   if(emp.includes('arquit')||emp.includes('construc')||emp.includes('inmobil')||emp.includes('obra')||emp.includes('diseño')||emp.includes('estudio')) return 'Arquitectura/Construccion';
+  if(emp.includes('packag')||emp.includes('envase')||emp.includes('embalaj')||emp.includes('manufac')||emp.includes('industrial')||emp.includes('fabrica')) return 'Manufactura/Packaging';
   return null;
 }
 
