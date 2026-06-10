@@ -48,13 +48,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* APRENDIZAJES BOX */
-.learn-box{background:white;border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:0.85rem}
-.learn-title{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
-.learn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.learn-card{background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:9px 11px}
-.learn-card-label{font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px}
-.learn-card-val{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
-.learn-card-sub{font-size:10px;color:#64748b;line-height:1.4}
 
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:0.85rem}
 .stat{background:white;border:1px solid var(--border);border-radius:9px;padding:9px 11px}
@@ -184,14 +177,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
         <button class="tips-refresh" onclick="loadTips()">↻ Actualizar</button>
       </div>
       <div class="tips-grid" id="tips-grid"><div class="tips-loading"><div class="spinner"></div> Analizando tu pipeline...</div></div>
-    </div>
-
-    <div class="learn-box">
-      <div class="learn-title">
-        <span>📊 Qué estás aprendiendo</span>
-        <button class="tips-refresh" onclick="renderLearnings()">↻ Actualizar</button>
-      </div>
-      <div class="learn-grid" id="learn-grid"></div>
     </div>
 
     <div class="stats" id="stats"></div>
@@ -1080,7 +1065,7 @@ function toggleSort(col){
   renderContacts();
 }
 
-function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderLearnings();}
+function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();}
 
 // --- DOLORES POR RUBRO ---
 const DOLORES_RUBRO = {
@@ -1613,11 +1598,9 @@ function openModal(id){
     document.getElementById('f-horas').value=c.horas||'';
     document.getElementById('f-fecha').value=c.fechaContacto||'';
     document.getElementById('f-com').value=c.com||15;
-    document.getElementById('f-email').value=c.email||'';
-    document.getElementById('f-ciudad').value=c.ciudad||'';
-    document.getElementById('f-region').value=c.region||'';
-    document.getElementById('f-accion').value=c.accion||'';
-    document.getElementById('f-notas').value=c.notas||'';
+    var _sm=function(id,val){var el=document.getElementById(id);if(el) el.value=val||'';};
+    _sm('f-email',c.email);_sm('f-ciudad',c.ciudad);_sm('f-region',c.region||'');
+    _sm('f-accion',c.accion);_sm('f-notas',c.notas);
     document.getElementById('f-contexto').value=c.contexto||'';
     document.getElementById('f-analisis').value=c.analisis||'';
     document.getElementById('f-incentivo').value=c.incentivo||'';
