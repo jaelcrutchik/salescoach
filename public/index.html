@@ -133,7 +133,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 
 /* MODAL DIAGNÓSTICO */
 .diag-section{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:10px}
-.diag-section-title{font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.diag-section-title{font-size:12px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .diag-section-title span{font-size:14px}
 .diag-generated{font-size:12px;color:#475569;line-height:1.5;margin-bottom:6px;padding:7px 10px;background:white;border-radius:6px;border:1px solid var(--border)}
 .diag-edit{width:100%;font-size:12px;padding:7px 10px;border:1px solid var(--blue-m);border-radius:6px;outline:none;font-family:var(--sans);background:white;color:var(--ink);resize:none;height:52px}
@@ -317,24 +317,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
       <div id="diag-score-badge" style="font-size:13px;font-weight:600;padding:4px 14px;border-radius:99px"></div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
-      <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:8px 11px;text-align:center">
-        <div style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px">Prioridad</div>
-        <div id="diag-temp-val" style="font-size:15px;font-weight:600"></div>
-      </div>
-      <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:8px 11px;text-align:center">
-        <div style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px">Score cierre</div>
-        <div id="diag-score-val" style="font-size:15px;font-weight:600;color:var(--blue)"></div>
-      </div>
-      <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:8px 11px;text-align:center">
-        <div style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px">Bloqueador</div>
-        <div id="diag-bloq-val" style="font-size:12px;font-weight:600;color:var(--amber)"></div>
-      </div>
-    </div>
+
 
     <!-- 1. EMPRESA -->
     <div class="diag-section">
-      <div class="diag-section-title" style="display:flex;align-items:center;justify-content:space-between">
+      <div class="diag-section-title">
         <span>🏢 Quién es esta empresa</span>
         <button onclick="investigarDesdeModal()" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--blue-m);background:var(--blue-l);color:var(--blue);cursor:pointer;font-weight:500" id="inv-btn">🔍 Investigar</button>
       </div>
@@ -360,7 +347,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 
     <!-- 4. MENSAJE LISTO -->
     <div class="diag-section">
-      <div class="diag-section-title" style="display:flex;align-items:center;justify-content:space-between">
+      <div class="diag-section-title">
         <span>✉️ Mensaje listo para enviar</span>
         <button onclick="copiarMensajeDiag()" style="font-size:11px;padding:3px 10px;border-radius:6px;border:none;background:var(--blue);color:white;cursor:pointer;font-weight:500">📋 Copiar</button>
       </div>
@@ -458,39 +445,39 @@ function timing(c){
   return null;
 }
 
-// --- DIAGNÓSTICO AUTOMÁTICO ---
+// --- DIAGNOSTICO AUTOMATICO ---
 function generarDiagReal(c){
-  const d=getDias(c);
-  const nombre=c.cont?.split(' ')[0]||'el contacto';
-  const canal=c.canal||'desconocido';
-  const ultimoHist=(c.historial||[]).slice(-1)[0];
-  const ultimoTexto=ultimoHist?ultimoHist.texto:'';
-  const contextoExtra=c.contexto&&c.contexto.length>0?` Contexto clave: "${c.contexto}".`:'';
-  const analisisExtra=c.analisis&&c.analisis.length>0?`Análisis previo: ${c.analisis.slice(0,300)}${c.analisis.length>300?'...':''} `:'';
-  const incentivoExtra=c.incentivo&&c.incentivo.length>0?` Incentivo individual: ${c.incentivo}.`:'';
-  const stakeholderExtra=c.stakeholders&&c.stakeholders.length>0?` Otros que deben aprobar: ${c.stakeholders}.`:'';
+  var d=getDias(c);
+  var canal=c.canal||'desconocido';
+  var ultimoHist=(c.historial||[]).slice(-1)[0];
+  var ultimoTexto=ultimoHist?ultimoHist.texto:'';
+  var ctx='';
+  if(c.contexto&&c.contexto.length>0) ctx+=' Contexto: "'+c.contexto+'".';
+  if(c.analisis&&c.analisis.length>0) ctx+=' Analisis: '+c.analisis.slice(0,200)+(c.analisis.length>200?'...':'')+' ';
+  if(c.incentivo&&c.incentivo.length>0) ctx+=' Incentivo: '+c.incentivo+'.';
+  if(c.stakeholders&&c.stakeholders.length>0) ctx+=' Otros que aprueban: '+c.stakeholders+'.';
 
-  if(c.status==='Respondió'){
-    const via=canal==='Email'?'el email':canal==='WhatsApp'?'tu mensaje de WhatsApp':canal==='LinkedIn'?'tu mensaje de LinkedIn':`tu mensaje de ${canal}`;
-    return analisisExtra+contextoExtra+incentivoExtra+stakeholderExtra+`Leyó ${via} hace ${d} días pero no respondió. Hay interés (lo leyó), pero falta fricción suficiente para responder. No es rechazo  -  es silencio. El segundo toque tiene 40% más probabilidad de éxito.${ultimoTexto?' Contexto: '+ultimoTexto:''}`;
+  if(c.status==='Respondio'||c.status==='Respondió'){
+    var via=canal==='Email'?'el email':canal==='WhatsApp'?'tu mensaje de WhatsApp':canal==='LinkedIn'?'tu mensaje de LinkedIn':'tu mensaje de '+canal;
+    return ctx+'Leyo '+via+' hace '+d+' dias pero no respondio. Hay interes (lo leyo), pero falta friccion para responder. No es rechazo - es silencio. El segundo toque tiene 40% mas probabilidad de exito.'+(ultimoTexto?' Contexto: '+ultimoTexto:'');
   }
   if(c.status==='Contactado'&&d>14)
-    return analisisExtra+contextoExtra+`Lleva ${d} días sin respuesta por ${canal}. Probablemente nunca leyó el mensaje, o lo postergó y se olvidó. No es rechazo  -  es silencio. Falta un segundo toque.${ultimoTexto?' Último registro: '+ultimoTexto:''}`;
+    return ctx+'Lleva '+d+' dias sin respuesta por '+canal+'. Probablemente nunca leyo el mensaje, o lo postergo. No es rechazo - es silencio. Falta un segundo toque.'+(ultimoTexto?' Ultimo registro: '+ultimoTexto:'');
   if(c.status==='Contactado'&&d>7)
-    return analisisExtra+contextoExtra+`${d} días desde el primer contacto por ${canal} sin respuesta. El momentum se está enfriando. Momento ideal para un seguimiento corto y directo.`;
+    return ctx+d+' dias desde el primer contacto por '+canal+' sin respuesta. El momentum se esta enfriando. Momento ideal para un seguimiento corto.';
   if(c.status==='Contactado')
-    return analisisExtra+contextoExtra+incentivoExtra+stakeholderExtra+`Recién contactado hace ${d} días por ${canal}. Demasiado pronto para insistir  -  el timing está bien. Solo hay que esperar.`;
-  if(c.status==='Reunión'&&d>7)
-    return analisisExtra+contextoExtra+`Reunión hace ${d} días sin avance documentado. El riesgo es que pierda prioridad. ${c.notas?'Contexto: '+c.notas:''} Falta propuesta o confirmación de siguiente paso.`;
-  if(c.status==='Reunión')
-    return analisisExtra+contextoExtra+`Reunión realizada hace ${d} días. El momentum está activo. ${c.notas?'Nota: '+c.notas+'. ':''} La propuesta debe llegar antes de 48 horas o la probabilidad de cierre baja.`;
+    return ctx+'Recien contactado hace '+d+' dias por '+canal+'. Demasiado pronto para insistir - el timing esta bien. Solo hay que esperar.';
+  if(c.status==='Reunión'||c.status==='Reunion'){
+    if(d>7) return ctx+'Reunion hace '+d+' dias sin avance documentado. El riesgo es que pierda prioridad.'+(c.notas?' Contexto: '+c.notas:'')+' Falta propuesta o confirmacion de siguiente paso.';
+    return ctx+'Reunion realizada hace '+d+' dias. El momentum esta activo.'+(c.notas?' Nota: '+c.notas+'. ':'')+' La propuesta debe llegar antes de 48 horas.';
+  }
   if(c.status==='Por contactar')
-    return analisisExtra+contextoExtra+incentivoExtra+stakeholderExtra+`Nunca contactado. Canal planificado: ${canal||'sin definir'}. ${c.notas?'Contexto: '+c.notas+'. ':''}El único bloqueador eres tú  -  falta enviar el primer mensaje.`;
+    return ctx+'Nunca contactado. Canal planificado: '+(canal||'sin definir')+'. '+(c.notas?'Contexto: '+c.notas+'. ':'')+' El unico bloqueador eres tu - falta enviar el primer mensaje.';
   if(c.status==='On hold')
-    return analisisExtra+contextoExtra+`En pausa. ${c.notas||'Sin razón documentada'}. El riesgo es que "on hold" se convierta en descarte silencioso. Ponle una fecha límite.`;
+    return ctx+'En pausa. '+(c.notas||'Sin razon documentada')+'. El riesgo es que on hold se convierta en descarte silencioso.';
   if(c.status==='En proceso')
-    return analisisExtra+contextoExtra+`En proceso por ${canal} pero sin avance claro en ${d} días. ${c.notas||''}. Hay que definir si hay dolor real o solo interés superficial.`;
-  return analisisExtra+contextoExtra+`Estado: ${c.status}. ${d} días desde último contacto por ${canal}. Revisar si sigue siendo prioritario.`;
+    return ctx+'En proceso por '+canal+' pero sin avance claro en '+d+' dias. '+(c.notas||'')+'. Hay que definir si hay dolor real.';
+  return ctx+'Estado: '+c.status+'. '+d+' dias desde ultimo contacto por '+canal+'. Revisar si sigue siendo prioritario.';
 }
 
 function generarDiagAccion(c){
@@ -505,23 +492,23 @@ function generarDiagAccion(c){
   var contexto=(c.contexto||'').toLowerCase();
   var ciudad=c.ciudad||c.region||'';
   var esNorte=['Antofagasta','Iquique','Arica','Calama','Tocopilla','Tarapaca','Arica y Parinacota'].some(function(z){return ciudad.includes(z);});
-  var contextoNorte=esNorte?' Ademas, estamos con un proyecto activo en Antofagasta — estamos cerca y disponibles para ir a terreno.':'';
+  var contextoNorte=esNorte?' Ademas, estamos con un proyecto activo en Antofagasta  -  estamos cerca y disponibles para ir a terreno.':'';
   var esTerreno=contexto.includes('terreno')||contexto.includes('maneja')||contexto.includes('armó')||contexto.includes('armo')||contexto.includes('fundó')||contexto.includes('fundo');
 
   var analisisResumen=c.analisis&&c.analisis.length>0?'Basado en el analisis: '+c.analisis.slice(0,150)+(c.analisis.length>150?'...':'')+' ':'';
   // Construir accion que integra todo el contexto
   var intro='';
-  if(nivel==='dueño'&&esTerreno) intro='Es dueño que viene del terreno — no quiere script de consultor, quiere alguien que entienda su realidad. ';
-  else if(nivel==='dueño') intro='Es dueño — decide solo, va directo al dolor de negocio. ';
-  else if(nivel==='gg') intro='Es GG — le importa el crecimiento y el control. ';
-  else if(nivel==='gerente') intro='Es gerente — le importa que la operacion funcione sin depender de él. ';
+  if(nivel==='dueño'&&esTerreno) intro='Es dueño que viene del terreno  -  no quiere script de consultor, quiere alguien que entienda su realidad. ';
+  else if(nivel==='dueño') intro='Es dueño  -  decide solo, va directo al dolor de negocio. ';
+  else if(nivel==='gg') intro='Es GG  -  le importa el crecimiento y el control. ';
+  else if(nivel==='gerente') intro='Es gerente  -  le importa que la operacion funcione sin depender de él. ';
   intro=analisisResumen+intro;
 
   var rubroCtx=rubro!=='sin rubro detectado'?'Rubro '+rubro+'. ':'';
   var ciudadCtx=ciudad?'Empresa en '+ciudad+'.'+contextoNorte+' ':'';
 
   if(c.status==='Respondió'){
-    var timing=d<=3?'El momentum esta activo, no lo pierdas.':'Han pasado '+d+' dias, el momentum se esta enfriando — actua hoy.';
+    var timing=d<=3?'El momentum esta activo, no lo pierdas.':'Han pasado '+d+' dias, el momentum se esta enfriando  -  actua hoy.';
     return intro+rubroCtx+ciudadCtx+
       'Segundo toque por '+canal+'. No reenvies lo mismo. Pregunta genuina al dolor: "'+pregunta+'" '+
       'Una pregunta, sin explicar nada mas, sin vender. '+timing;
@@ -529,7 +516,7 @@ function generarDiagAccion(c){
 
   if(c.status==='Contactado'&&d>=14)
     return intro+rubroCtx+ciudadCtx+
-      'Ultimo intento. '+d+' dias sin respuesta. Mensaje directo: "'+nombre+', '+pregunta+' Si no es el momento, sin problema — aca vamos a estar." '+
+      'Ultimo intento. '+d+' dias sin respuesta. Mensaje directo: "'+nombre+', '+pregunta+' Si no es el momento, sin problema  -  aca vamos a estar." '+
       'Si no responde en 5 dias, cierra el loop. El silencio es del otro, no tuyo.';
 
   if(c.status==='Contactado'&&d>=5)
@@ -538,7 +525,7 @@ function generarDiagAccion(c){
       'Un mensaje, espera. No persigas.';
 
   if(c.status==='Contactado')
-    return intro+'Llevas '+d+' dias desde el primer contacto. Todavia es pronto para insistir — parece desesperado. '+
+    return intro+'Llevas '+d+' dias desde el primer contacto. Todavia es pronto para insistir  -  parece desesperado. '+
       'Proxima accion en dia '+(5-d<=0?'hoy':5-d)+'. Soporta la ansiedad de la incertidumbre.';
 
   if(c.status==='Reunión'){
@@ -549,13 +536,13 @@ function generarDiagAccion(c){
       'Enviar propuesta antes del fin de semana. Incluye: que resuelves, como se mide el exito, que incluye y que NO. '+
       'Precio anclado al costo del problema, no a tus horas.';
     return intro+rubroCtx+ciudadCtx+
-      'Momentum activo — enviar propuesta en 48 horas. '+
+      'Momentum activo  -  enviar propuesta en 48 horas. '+
       'Antes de que firmen: fija expectativas en voz alta. Que incluye, que no incluye, cuando termina.';
   }
 
   if(c.status==='Por contactar'){
     if(c.canal==='Referido') return intro+rubroCtx+ciudadCtx+
-      'Es referido — la confianza ya esta instalada. Primer mensaje esta semana. '+
+      'Es referido  -  la confianza ya esta instalada. Primer mensaje esta semana. '+
       'Directo al dolor: "'+nombre+', '+pregunta+'" Sin presentacion corporativa, sin pedir favor.';
     return intro+rubroCtx+ciudadCtx+
       'Primer contacto esta semana por '+canal+'. Arrancar con pregunta genuina: "'+pregunta+'" '+
@@ -566,7 +553,7 @@ function generarDiagAccion(c){
     var ctxVisto=notas.includes('visto')||notas.includes('reunion')?'Dejo en visto o no llego a la reunion. ':'';
     return intro+ctxVisto+rubroCtx+ciudadCtx+
       'Definir si hay dolor real antes de seguir invirtiendo tiempo. '+
-      'Pregunta directa: "'+pregunta+'" Si evade o no responde, probablemente no hay urgencia — libera esa energia.';
+      'Pregunta directa: "'+pregunta+'" Si evade o no responde, probablemente no hay urgencia  -  libera esa energia.';
   }
 
   if(c.status==='On hold')
@@ -585,6 +572,14 @@ function nivelCargo(c){
   if(cargo.includes('gerente')||cargo.includes('director')||cargo.includes('subgerente')) return 'gerente';
   if(cargo.includes('jefe')||cargo.includes('manager')||cargo.includes('mgr')||cargo.includes('coord')) return 'jefe';
   return 'general';
+}
+
+function getCanalTono(canal){
+  if(canal==='WhatsApp') return {tono:'muy corto y directo, maximo 3 lineas, sin formalismos', firma:'', largo:'cortisimo'};
+  if(canal==='LinkedIn') return {tono:'profesional pero cercano, maximo 4 lineas, sin adjuntos', firma:'', largo:'corto'};
+  if(canal==='Email') return {tono:'un poco mas desarrollado, con asunto atractivo de menos de 7 palabras', firma:'Jael Crutchik - Rave & Crutchik', largo:'medio'};
+  if(canal==='Llamada') return {tono:'script de apertura de llamada, 3 oraciones maximas antes de preguntar', firma:'', largo:'muy corto'};
+  return {tono:'directo y humano', firma:'', largo:'corto'};
 }
 
 function getDolorCorto(c){
@@ -640,13 +635,6 @@ function getDolorCorto(c){
       'gerente':'el abastecimiento de insumos tiene quiebres que generan problemas operacionales todos los meses',
       'jefe':'los procesos administrativos consumen tiempo que deberia ir a atencion',
       'general':'en salud la ineficiencia operacional tiene un costo clinico ademas del economico'
-    },
-    'Arquitectura/Construccion':{
-      'dueño':'¿Hay proyectos donde sientes que tuviste que estar más encima de lo que deberías para que saliera bien?',
-      'gg':'¿Cómo manejan hoy la coordinación entre el equipo de proyecto y los clientes cuando hay cambios de alcance?',
-      'gerente':'¿Qué parte del proceso de entrega genera más fricción con los clientes?',
-      'jefe':'¿Los procesos de obra están documentados o dependen de quién esté ese día?',
-      'general':'¿Cuándo un proyecto se complica, qué es lo primero que falla en la coordinación interna?'
     },
     'Arquitectura/Construccion':{
       'dueño':'proyectos que te exigen estar encima de todo para que salgan bien, sin poder delegar',
@@ -733,13 +721,6 @@ function getPreguntaDolor(c){
       'general':'¿Qué es lo que más fricción genera en la operación día a día?'
     },
     'Arquitectura/Construccion':{
-      'dueño':'¿Hay proyectos donde sientes que tuviste que estar más encima de lo que deberías para que saliera bien?',
-      'gg':'¿Cómo manejan hoy la coordinación entre el equipo de proyecto y los clientes cuando hay cambios de alcance?',
-      'gerente':'¿Qué parte del proceso de entrega genera más fricción con los clientes?',
-      'jefe':'¿Los procesos de obra están documentados o dependen de quién esté ese día?',
-      'general':'¿Cuándo un proyecto se complica, qué es lo primero que falla en la coordinación interna?'
-    },
-    'Arquitectura/Construccion':{
       'dueño':'proyectos que te exigen estar encima de todo para que salgan bien, sin poder delegar',
       'gg':'coordinacion entre proyectos y clientes que genera fricciones que se podrian evitar',
       'gerente':'procesos de entrega que consumen mas tiempo del que deberian por falta de estandares',
@@ -762,79 +743,89 @@ function getPreguntaDolor(c){
 }
 
 function getMensaje(c){
-  const nombre=c.cont?.split(' ')[0]||'[Nombre]';
-  const dias=getDias(c);
-  const dolor=getDolorCorto(c);
-  const pregunta=getPreguntaDolor(c);
-  const canal=c.canal||'Email';
-  const esNorte=['Antofagasta','Iquique','Arica','Calama','Tocopilla','Tarapaca','Arica y Parinacota'].some(z=>(c.ciudad||'').includes(z)||(c.region||'').includes(z));
-  const contextoNorte=esNorte?' Ademas, en este momento estamos con un proyecto activo en Antofagasta, asi que estamos cerca.':'';
+  var nombre=c.cont?c.cont.split(' ')[0]:'[Nombre]';
+  var dias=getDias(c);
+  var dolor=getDolorCorto(c);
+  var pregunta=getPreguntaDolor(c);
+  var canal=c.canal||'Email';
+  var esNorte=['Antofagasta','Iquique','Arica','Calama','Tocopilla','Tarapaca','Arica y Parinacota'].some(function(z){return (c.ciudad||'').includes(z)||(c.region||'').includes(z);});
+  var norte=esNorte?' Ademas, estamos con proyecto activo en Antofagasta, estamos cerca.':'';
+  var firma='Jael Crutchik - Rave & Crutchik';
+  var wa=canal==='WhatsApp';
+  var li=canal==='LinkedIn';
 
-  // RESPONDIO - leyo pero no respondio
   if(c.status==='Respondió'){
-    if(dias<=3)
-      return {
-        ctx:'Leyo tu mensaje hace '+dias+' dias. Tono directo, seguro, no perseguidor. Planta el dolor y pregunta.',
-        msg:'Hola '+nombre+', quede pensando en algo especifico de '+c.emp+'. '+pregunta+' Si la respuesta te genera algo de ruido, probablemente vale conversar 20 minutos. Sin compromiso.'
-      };
-    else
-      return {
-        ctx:'Han pasado '+dias+' dias. Segundo toque con angulo nuevo, no repetir el primero.',
-        msg:'Hola '+nombre+', te escribo de nuevo con un angulo distinto. Trabajamos con empresas donde '+dolor+'. Cuando eso pasa, el costo no siempre es visible hasta que alguien lo mide. Si quieres saber cuanto te esta costando hoy, eso lo podemos ver en 20 minutos. ¿Te acomoda esta semana?'
-      };
+    if(dias<=3) return {
+      ctx:'Leyo tu '+canal+' hace '+dias+' dias. Momentum activo.',
+      msg:wa?'Hola '+nombre+'! '+pregunta+' Si algo suena familiar, vale 20 min esta semana.':
+         li?'Hola '+nombre+', te escribo de nuevo: '+pregunta+' Si resuena, agendemos 20 minutos.':
+         'Hola '+nombre+', '+pregunta+' Si la respuesta genera algo de ruido, vale conversar. Tienes 20 minutos esta semana? '+firma
+    };
+    return {
+      ctx:''+dias+' dias. Segundo toque con angulo nuevo.',
+      msg:wa?'Hola '+nombre+'! '+dolor+'. Pasa algo de eso hoy? 20 min esta semana.':
+         li?'Hola '+nombre+', te escribo con un angulo distinto: '+dolor+'. Si resuena, vale 20 minutos. Esta semana?':
+         'Hola '+nombre+', estuve pensando en algo especifico: '+dolor+'. Cuando pasa, el costo no siempre es visible hasta que alguien lo mide. Tienes 20 minutos esta semana? '+firma
+    };
   }
 
-  // CONTACTADO - sin respuesta
-  if(c.status==='Contactado'&&dias>=7)
-    return {
-      ctx:''+dias+' dias sin respuesta. Ultimo intento con pregunta directa al dolor. Si no responde, cerrar loop.',
-      msg:'Hola '+nombre+', ultimo mensaje de mi parte. Una pregunta directa: '+pregunta+' Si la respuesta es "no lo se bien", eso es exactamente lo que resolvemos. Si no es el momento, sin problema, acá van a estar las puertas abiertas.'
-    };
+  if(c.status==='Contactado'&&dias>=14) return {
+    ctx:''+dias+' dias sin respuesta. Ultimo toque.',
+    msg:wa?'Hola '+nombre+', ultimo mensaje de mi parte: '+pregunta+' Si no es el momento, sin problema, aca vamos a estar.':
+       li?'Hola '+nombre+', ultima consulta: '+pregunta+' Si no es el momento, sin problema.':
+       'Hola '+nombre+', '+pregunta+' Si no es el momento, sin problema, aca vamos a estar. '+firma
+  };
 
-  if(c.status==='Contactado'&&dias>=3)
-    return {
-      ctx:''+dias+' dias desde el primer contacto. Segundo toque con angulo consultivo, no vender.',
-      msg:'Hola '+nombre+', quede pensando en algo que suele pasar en empresas como '+c.emp+': '+dolor+'. ¿Es algo que estan viendo hoy? Si resuena aunque sea un poco, vale 20 minutos.'
-    };
+  if(c.status==='Contactado'&&dias>=5) return {
+    ctx:''+dias+' dias. Segundo toque.',
+    msg:wa?'Hola '+nombre+'! '+dolor+'. Es algo que pasa en '+c.emp+'? 20 min esta semana.':
+       li?'Hola '+nombre+', retomo con algo concreto: '+dolor+'. Si resuena, vale 20 minutos.':
+       'Hola '+nombre+', '+dolor+'. Si eso resuena, vale una conversacion de 20 minutos. Esta semana? '+firma
+  };
 
-  // REUNION
+  if(c.status==='Contactado') return {
+    ctx:'Solo '+dias+' dias. Esperar hasta dia 5.',
+    msg:wa?'Hola '+nombre+'! Pudiste revisar mi mensaje? 20 min esta semana.':
+       'Hola '+nombre+', pudiste revisar mi mensaje? Vale 20 minutos esta semana? '+firma
+  };
+
   if(c.status==='Reunión'){
-    if(dias>5)
-      return {
-        ctx:'Reunion hace '+dias+' dias sin propuesta. Cierra el siguiente paso con confianza, no con disculpa.',
-        msg:'Hola '+nombre+', queria retomar lo que conversamos. Estuve estructurando como podria verse un primer paso concreto para '+c.emp+' y creo que hay algo que tiene sentido. ¿Tienes 20 minutos esta semana para revisarlo?'
-      };
-    else
-      return {
-        ctx:'Reunion reciente. Cierra propuesta rapidamente, el momentum esta activo.',
-        msg:'Hola '+nombre+', gracias por la reunion. Quedo claro el diagnostico. Esta semana te envio una propuesta concreta con un primer paso que no requiere compromiso de largo plazo. ¿Te parece?'
-      };
-  }
-
-  // POR CONTACTAR
-  if(c.status==='Por contactar'){
-    if(c.canal==='Referido')
-      return {
-        ctx:'Referido sin contactar. La confianza ya esta instalada, ir directo al dolor.',
-        msg:'Hola '+nombre+', me paso tu contacto alguien en quien confio. Te escribo porque trabajamos con empresas donde '+dolor+'.'+contextoNorte+' Si eso resuena, vale 20 minutos. ¿Te acomoda esta semana?'
-      };
-    else
-      return {
-        ctx:'Primer contacto. Ir directo al dolor, sin presentacion corporativa, sin pedir favor.',
-        msg:'Hola '+nombre+', mi nombre es Jael, de Rave & Crutchik. Una pregunta directa: '+pregunta+' Si no lo sabes con certeza, eso es exactamente lo que resolvemos.'+contextoNorte+' ¿Vale 20 minutos esta semana?'
-      };
-  }
-
-  // EN PROCESO
-  if(c.status==='En proceso')
-    return {
-      ctx:'En proceso pero sin avance. Definir si hay dolor real o solo interes superficial.',
-      msg:'Hola '+nombre+', queria ser directo contigo. '+pregunta+' Si eso es algo que les preocupa hoy, podemos avanzar. Si no es el momento, igual te lo digo yo primero.'
+    if(dias>5) return {
+      ctx:dias+' dias desde reunion. Propuesta urgente.',
+      msg:wa?'Hola '+nombre+'! Queria retomar lo que conversamos. Puedo enviarte una propuesta esta semana?':
+         'Hola '+nombre+', quedo pensando en lo que conversamos. Puedo enviarte una propuesta concreta esta semana con un primer paso sin compromiso largo. Te parece? '+firma
     };
+    return {
+      ctx:'Reunion reciente. Cierra propuesta.',
+      msg:wa?'Hola '+nombre+'! Gracias por la reunion. Esta semana te mando la propuesta. Va?':
+         'Hola '+nombre+', gracias por la reunion. Esta semana te envio una propuesta concreta. Te parece? '+firma
+    };
+  }
+
+  if(c.status==='Por contactar'){
+    if(c.canal==='Referido') return {
+      ctx:'Referido. Usar el nexo de confianza.',
+      msg:wa?'Hola '+nombre+'! Me paso tu contacto alguien en quien confio. '+pregunta+' Vale 20 min?':
+         'Hola '+nombre+', me paso tu contacto alguien en quien confio mucho. Te escribo porque '+dolor+'.'+norte+' Tienes 20 minutos esta semana? '+firma
+    };
+    return {
+      ctx:'Primer contacto. Directo al dolor.',
+      msg:wa?'Hola '+nombre+'! Soy Jael de Rave & Crutchik. '+pregunta+' Si algo resuena, vale 20 min.':
+         li?'Hola '+nombre+', soy Jael de Rave & Crutchik. '+pregunta+' Si resuena, agendemos 20 minutos.':
+         'Hola '+nombre+', mi nombre es Jael de Rave & Crutchik. '+dolor+'.'+norte+' '+pregunta+' Si resuena, vale 20 minutos. Esta semana? '+firma
+    };
+  }
+
+  if(c.status==='En proceso') return {
+    ctx:'En proceso. Definir si hay dolor real.',
+    msg:wa?'Hola '+nombre+'! '+pregunta+' Tienes 20 min para contarme?':
+       'Hola '+nombre+', '+pregunta+' Tienes 20 minutos para contarme? '+firma
+  };
 
   return {
-    ctx:'Contacto en etapa '+c.status+'. Retomar con pregunta directa al dolor.',
-    msg:'Hola '+nombre+', queria retomar el contacto con una pregunta directa: '+pregunta+' ¿Tienes 20 minutos esta semana?'
+    ctx:'Retomar contacto.',
+    msg:wa?'Hola '+nombre+'! Tienes 20 min esta semana?':
+       'Hola '+nombre+', tienes 20 minutos esta semana para conversar? '+firma
   };
 }
 
@@ -929,12 +920,12 @@ function renderLearnings(){
   // Score promedio del pipeline
   const scorePromedio=activos.length>0?Math.round(activos.reduce((s,c)=>s+calcScore(c),0)/activos.length):0;
   
-  // Calientes vs tibios vs fríos
+  // Calientes vs tibios vs fr-os
   const calientes=activos.filter(c=>calcTemperatura(c).label.includes('Caliente')).length;
   const tibios=activos.filter(c=>calcTemperatura(c).label.includes('Tibio')).length;
   const frios=activos.filter(c=>calcTemperatura(c).label.includes('Frío')).length;
 
-  // Rubro que más responde (tiene estado Respondió o Reunión)
+  // Rubro que m-s responde (tiene estado Respondi- o Reuni-n)
   const rubrosCalientes={};
   activos.filter(c=>['Respondió','Reunión','Propuesta'].includes(c.status)).forEach(c=>{
     const r=inferRubro(c.emp);if(r) rubrosCalientes[r]=(rubrosCalientes[r]||0)+1;
@@ -1040,8 +1031,8 @@ function renderContacts(){
         <div class="td-cont">${c.cont&&c.cont!=='-'?c.cont:' - '}</div>
 
       </td>
-      <td class="col-cargo"><span style="font-size:11px;color:#475569">${c.cargo&&c.cargo!=='-'?c.cargo:'—'}</span></td>
-      <td class="col-city"><span style="font-size:11px;color:#64748b">${c.ciudad||'—'}</span></td>
+      <td class="col-cargo"><span style="font-size:11px;color:#475569">${c.cargo&&c.cargo!=='-'?c.cargo:' - '}</span></td>
+      <td class="col-city"><span style="font-size:11px;color:#64748b">${c.ciudad||' - '}</span></td>
       <td class="col-status" style="text-align:center"><span class="badge ${bc(c.status)}">${c.status}</span></td>
       <td class="col-score" style="text-align:center"><span style="font-size:15px;font-weight:700;color:${scoreColor}">${score}</span><span style="font-size:10px;color:#94a3b8">/10</span></td>
       <td class="col-timing">${timingHtml}</td>
@@ -1151,7 +1142,7 @@ function calcScore(c){
   const emp = (c.emp||'').toLowerCase();
   const notas = (c.notas||'').toLowerCase();
 
-  // 1. SEÑALES DE INTERES REALES (peso mas alto)
+  // 1. SE-ALES DE INTERES REALES (peso mas alto)
   if(c.status === 'Respondió') score += 30;  // abrio o respondio = señal concreta
   if(c.status === 'Reunión') score += 28;
   if(c.status === 'Propuesta') score += 32;
@@ -1264,7 +1255,7 @@ function generarValorEstimado(c){
   return intro+(guias[rubro]||guias['default'])+' Recuerda: el precio correcto no lo defines desde tus horas. Lo defines desde lo que vale para ellos.';
 }
 
-// --- MODAL DIAGNÓSTICO ---
+// --- MODAL DIAGNOSTICO ---
 function openDiag(id){
   diagId=id;
   const c=contacts.find(x=>x.id===id);if(!c) return;
@@ -1290,8 +1281,10 @@ function openDiag(id){
   
   document.getElementById('diag-empresa-gen').textContent = generarEmpresaResumen(c);
   document.getElementById('diag-dolor-gen').textContent = generarDolor(c);
-  document.getElementById('diag-real-gen').textContent = generarDiagReal(c);
-  document.getElementById('diag-accion-gen').textContent = generarDiagAccion(c);
+  var diagReal = c.diagReal && c.diagReal.length > 5 ? c.diagReal : generarDiagReal(c);
+  var diagAccion = c.diagAccion && c.diagAccion.length > 5 ? c.diagAccion : getMensaje(c).msg;
+  document.getElementById('diag-real-gen').textContent = diagReal;
+  document.getElementById('diag-accion-gen').textContent = diagAccion;
   
   var _s=function(id,val){var el=document.getElementById(id);if(el) el.value=val||'';};
   _s('diag-dolor-edit',c.diagDolor);
@@ -1370,8 +1363,8 @@ function openNeg(id){
   var cards=[
     {color:'#16a34a',titulo:'ANTES DE TODO: Incentivos individuales y domesticos',items:[
       c.incentivo?'Incentivo personal de '+nombre+': '+c.incentivo:'No has registrado que gana el personalmente. Preguntate: que le pasa a el si esto funciona? Y si no funciona? Eso mueve la decision, no el ROI de la empresa.',
-      c.stakeholders?'Otros que deben aprobar: '+c.stakeholders+'. Necesitas que '+nombre+' sea tu champion interno — el que vende la idea adentro cuando tu no estas.':'No sabes quien mas tiene que comprar la idea. Preguntale: con quien mas tendrias que alinear esto antes de avanzar?',
-      'Negociar es identificar las necesidades del otro — individuales y domesticas — y generar una oferta que cubra las tuyas tambien. No es convencer, es intercambiar.',
+      c.stakeholders?'Otros que deben aprobar: '+c.stakeholders+'. Necesitas que '+nombre+' sea tu champion interno  -  el que vende la idea adentro cuando tu no estas.':'No sabes quien mas tiene que comprar la idea. Preguntale: con quien mas tendrias que alinear esto antes de avanzar?',
+      'Negociar es identificar las necesidades del otro  -  individuales y domesticas  -  y generar una oferta que cubra las tuyas tambien. No es convencer, es intercambiar.',
       'La empresa puede necesitar el servicio, pero la persona tiene que querer contratarte a ti. Son dos cosas distintas.'
     ]},
     {color:'#7c3aed',titulo:'PASO 0: Ancla el valor antes del precio (Francisco)',items:[
@@ -1509,7 +1502,7 @@ async function investigarEmpresa(emp){
     showToast('✅ Análisis de '+emp+' completado');
   }catch(e){
     if(status) status.textContent='';
-    showToast('No se pudo analizar — intenta de nuevo');
+    showToast('No se pudo analizar  -  intenta de nuevo');
     console.error(e);
   }
 }
@@ -1586,33 +1579,29 @@ function closeConsejo(){document.getElementById('consejo-overlay').classList.rem
 function openModal(id){
   editingId=id||null;
   document.getElementById('btn-del').style.display=id?'block':'none';
+  var sf=function(fid,val){var e=document.getElementById(fid);if(e) e.value=(val||'');};
+  var sr=function(fid,val){var e=document.getElementById(fid);if(e) e.value=(val||'');};
   if(id){
     const c=contacts.find(x=>x.id===id);if(!c) return;
     document.getElementById('modal-title').textContent='Editar  -  '+c.emp;
-    document.getElementById('f-emp').value=c.emp;
-    document.getElementById('f-cont').value=c.cont||'';
-    document.getElementById('f-cargo').value=c.cargo||'';
-    document.getElementById('f-status').value=c.status;
-    document.getElementById('f-canal').value=c.canal||'';
-    document.getElementById('f-uf').value=c.uf||'';
-    document.getElementById('f-horas').value=c.horas||'';
-    document.getElementById('f-fecha').value=c.fechaContacto||'';
-    document.getElementById('f-com').value=c.com||15;
-    var _sm=function(id,val){var el=document.getElementById(id);if(el) el.value=val||'';};
-    _sm('f-email',c.email);_sm('f-ciudad',c.ciudad);_sm('f-region',c.region||'');
-    _sm('f-accion',c.accion);_sm('f-notas',c.notas);
-    document.getElementById('f-contexto').value=c.contexto||'';
-    document.getElementById('f-analisis').value=c.analisis||'';
-    document.getElementById('f-incentivo').value=c.incentivo||'';
-    document.getElementById('f-stakeholders').value=c.stakeholders||'';
+    sf('f-emp',c.emp);sf('f-cont',c.cont);sf('f-cargo',c.cargo);
+    sf('f-accion',c.accion);sf('f-notas',c.notas);
+    sf('f-email',c.email);sf('f-ciudad',c.ciudad);
+    sf('f-uf',c.uf||'');sf('f-horas',c.horas||'');
+    sf('f-com',c.com||15);sf('f-fecha',c.fechaContacto);
+    var fstatus=document.getElementById('f-status');if(fstatus) fstatus.value=c.status||'Por contactar';
+    var fcanal=document.getElementById('f-canal');if(fcanal) fcanal.value=c.canal||'';
+    var freg=document.getElementById('f-region');if(freg) freg.value=c.region||'';
   }else{
     document.getElementById('modal-title').textContent='Nuevo contacto';
-    ['f-emp','f-cont','f-cargo','f-uf','f-horas','f-accion','f-notas','f-email','f-ciudad','f-contexto','f-analisis','f-incentivo','f-stakeholders'].forEach(f=>document.getElementById(f).value='');
-    document.getElementById('f-region').value='';
-    document.getElementById('f-fecha').value='';
-    document.getElementById('f-com').value=15;
-    document.getElementById('f-status').value='Por contactar';
-    document.getElementById('f-canal').value='';
+    ['f-emp','f-cont','f-cargo','f-uf','f-horas','f-accion','f-notas','f-email','f-ciudad'].forEach(function(fid){
+      var e=document.getElementById(fid);if(e) e.value='';
+    });
+    var fstatus2=document.getElementById('f-status');if(fstatus2) fstatus2.value='Por contactar';
+    var fcanal2=document.getElementById('f-canal');if(fcanal2) fcanal2.value='';
+    var freg2=document.getElementById('f-region');if(freg2) freg2.value='';
+    var fcom=document.getElementById('f-com');if(fcom) fcom.value=15;
+    var ffecha=document.getElementById('f-fecha');if(ffecha) ffecha.value='';
   }
   document.getElementById('overlay').classList.add('open');
 }
@@ -1681,18 +1670,13 @@ syncInstantly();
 loadTips();
 
 function loadTips(){
-  const box=document.getElementById('tips-grid');
+  var box=document.getElementById('tips-grid');
   box.innerHTML='<div class="tips-loading"><div class="spinner"></div> Analizando tu pipeline...</div>';
-  setTimeout(()=>{
-    const tips=generarInsights();
-    box.innerHTML=tips.map(t=>`
-      <div class="tip-item">
-        <div class="tip-ico">${t.icono}</div>
-        <div>
-          <div class="tip-label">${t.label}</div>
-          <div class="tip-text">${t.texto}</div>
-        </div>
-      </div>`).join('');
+  setTimeout(function(){
+    var tips=generarInsights();
+    box.innerHTML=tips.map(function(t){
+      return '<div class="tip-item"><div class="tip-ico">'+t.icono+'</div><div><div class="tip-label">'+t.label+'</div><div class="tip-text">'+t.texto+'</div></div></div>';
+    }).join('');
   },400);
 }
 
@@ -1768,6 +1752,7 @@ function inferRubro(emp){
   if(emp.includes('arquit')||emp.includes('construc')||emp.includes('inmobil')||emp.includes('obra')||emp.includes('diseño')||emp.includes('estudio')) return 'Arquitectura/Construccion';
   return null;
 }
+
 </script>
 </body>
 </html>
