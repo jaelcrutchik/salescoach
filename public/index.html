@@ -1552,7 +1552,8 @@ async function autoInvestigar(){
   var emp=document.getElementById('f-emp').value.trim();
   if(!emp) return;
   // Only auto-investigate if fields are empty
-  var analisisVal=document.getElementById('f-analisis').value.trim();
+  var analisisEl=document.getElementById('f-analisis');
+  var analisisVal=analisisEl?analisisEl.value.trim():'';
   if(analisisVal.length>10) return; // already has content, don't overwrite
   await investigarEmpresa(emp);
 }
@@ -1587,9 +1588,9 @@ async function investigarEmpresa(emp){
     var parsed=JSON.parse(clean);
 
     var analisisText=(parsed.analisis||'')+(parsed.dolores?' Dolores probables: '+parsed.dolores:'')+(parsed.angulo?' Angulo de entrada: '+parsed.angulo:'')+(parsed.pregunta?' Pregunta sugerida: '+parsed.pregunta:'');
-    document.getElementById('f-analisis').value=analisisText;
-    if(parsed.incentivo) document.getElementById('f-incentivo').value=parsed.incentivo;
-    if(parsed.stakeholders) document.getElementById('f-stakeholders').value=parsed.stakeholders;
+    var _fa=document.getElementById('f-analisis');if(_fa) _fa.value=analisisText;
+    var _fi=document.getElementById('f-incentivo');if(_fi&&parsed.incentivo) _fi.value=parsed.incentivo;
+    var _fst=document.getElementById('f-stakeholders');if(_fst&&parsed.stakeholders) _fst.value=parsed.stakeholders;
 
     if(status) status.textContent='✅ Listo';
     setTimeout(function(){if(status) status.textContent='';},3000);
@@ -1711,24 +1712,24 @@ function deleteContact(){
 function saveContact(){
   const emp=document.getElementById('f-emp').value.trim();
   if(!emp){alert('Ingresa el nombre de la empresa');return;}
+  var _gv=function(fid){var e=document.getElementById(fid);return e?e.value.trim():'';};
+  var _gn=function(fid,def){var e=document.getElementById(fid);return e?(parseFloat(e.value)||def):def;};
+  var _gs=function(fid){var e=document.getElementById(fid);return e?e.value:'';};
   const data={
-    emp,cont:document.getElementById('f-cont').value.trim(),
-    cargo:document.getElementById('f-cargo').value.trim(),
-    status:document.getElementById('f-status').value,
-    canal:document.getElementById('f-canal').value,
-    uf:parseFloat(document.getElementById('f-uf').value)||0,
-    horas:parseInt(document.getElementById('f-horas').value)||0,
-    fechaContacto:document.getElementById('f-fecha').value,
-    com:parseFloat(document.getElementById('f-com').value)||15,
-    email:document.getElementById('f-email').value.trim(),
-    ciudad:document.getElementById('f-ciudad').value.trim(),
-    region:document.getElementById('f-region').value,
-    accion:document.getElementById('f-accion').value.trim(),
-    notas:document.getElementById('f-notas').value.trim(),
-    contexto:document.getElementById('f-contexto').value.trim(),
-    analisis:document.getElementById('f-analisis').value.trim(),
-    incentivo:document.getElementById('f-incentivo').value.trim(),
-    stakeholders:document.getElementById('f-stakeholders').value.trim()
+    emp,
+    cont:_gv('f-cont'),
+    cargo:_gv('f-cargo'),
+    status:_gs('f-status')||'Por contactar',
+    canal:_gs('f-canal'),
+    uf:_gn('f-uf',0),
+    horas:parseInt((document.getElementById('f-horas')||{value:'0'}).value)||0,
+    fechaContacto:_gv('f-fecha'),
+    com:_gn('f-com',15),
+    email:_gv('f-email'),
+    ciudad:_gv('f-ciudad'),
+    region:_gs('f-region'),
+    accion:_gv('f-accion'),
+    notas:_gv('f-notas')
   };
   if(editingId){
     const i=contacts.findIndex(x=>x.id===editingId);
