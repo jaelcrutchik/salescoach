@@ -140,7 +140,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
 
 /* MODAL DIAGNÓSTICO */
 .diag-section{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:10px}
-.diag-section-title{font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.diag-section-title{font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .diag-section-title span{font-size:14px}
 .diag-generated{font-size:12px;color:#475569;line-height:1.5;margin-bottom:6px;padding:7px 10px;background:white;border-radius:6px;border:1px solid var(--border)}
 .diag-edit{width:100%;font-size:12px;padding:7px 10px;border:1px solid var(--blue-m);border-radius:6px;outline:none;font-family:var(--sans);background:white;color:var(--ink);resize:none;height:52px}
@@ -361,25 +361,26 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
     <div class="diag-section">
       <div class="diag-section-title"><span>🎯</span> Cuál es su dolor</div>
       <div class="diag-generated" id="diag-dolor-gen"></div>
-      <label class="diag-edit-label">Algo extra que sabes tú (opcional):</label>
-      <textarea class="diag-edit" id="diag-dolor-edit" placeholder="Ej: me dijeron que los clientes se quejan del desorden, el dueño quiere poder delegar..."></textarea>
+      <textarea class="diag-edit" id="diag-dolor-edit" style="display:none"></textarea>
     </div>
 
-    <!-- 3. QUÉ ESTÁ PASANDO -->
+    <!-- 3. TE RECOMIENDO -->
     <div class="diag-section">
-      <div class="diag-section-title"><span>🔍</span> Qué está pasando</div>
+      <div class="diag-section-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>💡 Te recomiendo</span>
+        <span id="accion-loading" style="font-size:11px;color:#94a3b8;display:none">Analizando...</span>
+      </div>
       <div class="diag-generated" id="diag-real-gen"></div>
     </div>
 
-    <!-- 4. QUÉ HAGO AHORA -->
+    <!-- 4. MENSAJE LISTO -->
     <div class="diag-section">
       <div class="diag-section-title" style="display:flex;align-items:center;justify-content:space-between">
-        <span>⚡ Qué hago ahora</span>
-        <span id="accion-loading" style="font-size:11px;color:#94a3b8;display:none">Recalculando...</span>
+        <span>✉️ Mensaje listo para enviar</span>
+        <button onclick="copiarMensajeDiag()" style="font-size:11px;padding:3px 10px;border-radius:6px;border:none;background:var(--blue);color:white;cursor:pointer;font-weight:500">📋 Copiar</button>
       </div>
-      <div class="diag-generated" id="diag-accion-gen"></div>
-      <label class="diag-edit-label">Tu acción concreta (editable):</label>
-      <textarea class="diag-edit" id="diag-accion-edit" placeholder="Se actualizará al guardar considerando todo el contexto..."></textarea>
+      <div class="diag-generated" id="diag-accion-gen" style="background:#eff6ff;border-color:var(--blue-m);color:#1e40af;font-style:normal"></div>
+      <textarea class="diag-edit" id="diag-accion-edit" placeholder="El mensaje se genera al guardar..." style="display:none"></textarea>
     </div>
 
     <!-- hidden fields for compatibility -->
@@ -387,6 +388,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;
       <textarea id="diag-valor-edit"></textarea>
       <textarea id="diag-incentivo-edit"></textarea>
       <textarea id="diag-stakeholders-edit"></textarea>
+    </div>
+
+    <div class="diag-section">
+      <div class="diag-section-title"><span>📝</span> Algo que quieras agregar</div>
+      <textarea class="diag-edit" id="diag-extra-edit" placeholder="Contexto adicional que Claude debería considerar: lo que sabes del contacto, algo que te dijeron, intuiciones..."></textarea>
     </div>
 
     <div class="modal-btns">
@@ -1317,41 +1323,58 @@ function openDiag(id){
 
 async function saveDiag(){
   const c=contacts.find(x=>x.id===diagId);if(!c) return;
-  const dolorExtra=document.getElementById('diag-dolor-edit').value.trim();
-  const accionEdit=document.getElementById('diag-accion-edit').value.trim();
-
-  c.diagDolor=document.getElementById('diag-dolor-gen').textContent.trim()+(dolorExtra?' Contexto adicional: '+dolorExtra:'');
-  c.diagReal=document.getElementById('diag-real-gen').textContent.trim();
+  const dolorExtra=document.getElementById('diag-dolor-edit')?document.getElementById('diag-dolor-edit').value.trim():'';
+  c.diagDolor=document.getElementById('diag-dolor-gen').textContent.trim()+(dolorExtra?' Ademas: '+dolorExtra:'');
   c.analisis=document.getElementById('diag-analisis-edit')?document.getElementById('diag-analisis-edit').value.trim():'';
   c.contexto=document.getElementById('diag-contexto-edit')?document.getElementById('diag-contexto-edit').value.trim():'';
 
-  // If user wrote their own action, use it. Otherwise recalculate with full context
-  if(accionEdit.length>5){
-    c.diagAccion=accionEdit;
-    saveLS();renderAll();closeDiag();showToast('Diagnostico guardado');
-  } else {
-    // Recalculate accion with all context using Claude API
-    document.getElementById('accion-loading').style.display='inline';
-    var empresa=document.getElementById('diag-empresa-gen').textContent;
-    var dolor=c.diagDolor;
-    var real=c.diagReal;
-    var canal=c.canal||'Email';
-    var nivel=nivelCargo(c);
-    var dias=getDias(c);
-    var prompt='Eres un coach de ventas consultivas. Dado este contexto de un prospecto, dame UNA accion especifica y concreta para hoy. Sin intro, directo a la accion.\n\nEmpresa: '+c.emp+'\nContacto: '+c.cont+' ('+c.cargo+')\nCanal: '+canal+'\nDias sin contacto: '+dias+'\nEstado: '+c.status+'\nEmpresa: '+empresa+'\nDolor: '+dolor+'\nSituacion: '+real+'\n\nLa accion debe ser especifica (que mensaje, por que canal, que pregunta), humana (no script de vendedor), y considerar el nivel del contacto ('+nivel+'). Maximo 3 oraciones.';
-    try{
-      var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:prompt}]})});
-      var data=await res.json();
-      c.diagAccion=data.content.map(function(i){return i.text||'';}).join('').trim();
-    }catch(e){
-      c.diagAccion=generarDiagAccion(c);
-    }
-    document.getElementById('accion-loading').style.display='none';
-    saveLS();renderAll();closeDiag();showToast('Diagnostico guardado con accion actualizada');
+  var loadingEl=document.getElementById('accion-loading');
+  if(loadingEl) loadingEl.style.display='inline';
+
+  var empresa=document.getElementById('diag-empresa-gen')?document.getElementById('diag-empresa-gen').textContent:'';
+  var dolor=c.diagDolor;
+  var canal=c.canal||'Email';
+  var nivel=nivelCargo(c);
+  var dias=getDias(c);
+  var nombre=c.cont?c.cont.split(' ')[0]:'el contacto';
+  var ciudad=c.ciudad||'Chile';
+  var contexto=c.contexto||'';
+  var extra=document.getElementById('diag-extra-edit')?document.getElementById('diag-extra-edit').value.trim():'';
+
+  var prompt='Eres Jael Crutchik de Rave & Crutchik, consultora de operaciones y supply chain. Necesito dos cosas para este prospecto:\n\nEmpresa: '+c.emp+' ('+ciudad+')\nContacto: '+nombre+' - '+c.cargo+'\nEstado: '+c.status+' - '+dias+' dias sin contacto\nCanal: '+canal+'\nEmpresa info: '+empresa+'\nDolor: '+dolor+'\nContexto del contacto: '+(contexto||'no disponible')+'\n\nResponde SOLO en JSON sin backticks:\n{"recomendacion":"en 2 oraciones maximo: que debes hacer hoy y por que, considerando todo el contexto. Directo, sin intro.","mensaje":"el mensaje exacto listo para enviar por '+canal+'. Tono humano, no de vendedor. Que hable al dolor real de '+nombre+'. Maximo 4 oraciones. Sin saludos formales."}';
+
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})});
+    var data=await res.json();
+    var text=data.content.map(function(i){return i.text||'';}).join('');
+    var clean=text.replace(/```json|```/g,'').trim();
+    var parsed=JSON.parse(clean);
+    c.diagReal=parsed.recomendacion||generarDiagReal(c);
+    c.diagAccion=parsed.mensaje||generarDiagAccion(c);
+  }catch(e){
+    c.diagReal=generarDiagReal(c);
+    c.diagAccion=generarDiagAccion(c);
   }
+
+  // Update display immediately
+  var realEl=document.getElementById('diag-real-gen');
+  var accionEl=document.getElementById('diag-accion-gen');
+  if(realEl) realEl.textContent=c.diagReal;
+  if(accionEl) accionEl.textContent=c.diagAccion;
+  if(loadingEl) loadingEl.style.display='none';
+
+  saveLS();renderAll();showToast('Diagnostico guardado');
 }
 
 function closeDiag(){document.getElementById('diag-overlay').classList.remove('open');}
+
+function copiarMensajeDiag(){
+  var el=document.getElementById('diag-accion-gen');
+  if(!el) return;
+  var txt=el.textContent.trim();
+  if(!txt){showToast('Guarda primero para generar el mensaje');return;}
+  navigator.clipboard.writeText(txt).then(function(){showToast('Mensaje copiado');}).catch(function(){showToast('Copia manualmente');});
+}
 
 function openNeg(id){
   var c=contacts.find(function(x){return x.id===id;});if(!c) return;
