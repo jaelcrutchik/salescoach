@@ -1283,11 +1283,11 @@ function openDiag(id){
   _st('diag-score-val',score+' / 10');
   _st('diag-bloq-val',bloq);
 
-  _st('diag-empresa-gen',generarEmpresaResumen(c));
-  _st('diag-dolor-gen',generarDolor(c));
+  _st('diag-empresa-gen', c.analisis && c.analisis.length > 20 ? c.analisis : generarEmpresaResumen(c));
+  _st('diag-dolor-gen', generarDolor(c));
 
   var diagReal=c.diagReal&&c.diagReal.length>5?c.diagReal:generarDiagReal(c);
-  var diagAccion=c.diagAccion&&c.diagAccion.length>5?c.diagAccion:getMensaje(c).msg;
+  var diagAccion=getMensaje(c).msg;
   _st('diag-real-gen',diagReal);
   _st('diag-accion-gen',diagAccion);
 
@@ -1301,6 +1301,49 @@ function openDiag(id){
   _sv('diag-extra-edit','');
 
   document.getElementById('diag-overlay').classList.add('open');
+
+  // Auto-investigate if no saved analysis
+  if(!c.analisis||c.analisis.length<20){
+    autoInvestigarDiag(c);
+  }
+}
+
+async function autoInvestigarDiag(c){
+  var el=document.getElementById('diag-empresa-gen');
+  var btn=document.getElementById('inv-btn');
+  var status=document.getElementById('inv-status');
+  if(status) status.textContent='Investigando...';
+  if(btn) btn.disabled=true;
+
+  var cargo=c.cargo||'directivo';
+  var ciudad=c.ciudad||'Chile';
+  var prompt='Analiza la empresa "'+c.emp+'" ubicada en '+ciudad+' para una venta consultiva de operaciones y supply chain. Mi contacto es '+cargo+'. Dame informacion especifica y concreta. Responde SOLO en JSON sin backticks: {"empresa":"2-3 oraciones sobre que hace esta empresa, su tamano aproximado, su modelo de negocio y posicion en el mercado","dolores":"2-3 dolores operacionales especificos y probables para este tipo de empresa y rubro","angulo":"el mejor angulo de entrada para ofrecer mejora de procesos a esta empresa","incentivo":"que gana personalmente el '+cargo+' si esto funciona","stakeholders":"quienes mas probablemente aprueban esta decision"}';
+
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:prompt}]})
+    });
+    var data=await res.json();
+    var text=data.content.map(function(i){return i.text||'';}).join('');
+    var clean=text.replace(/```json|```/g,'').trim();
+    var parsed=JSON.parse(clean);
+
+    var analisisCompleto=(parsed.empresa||'')+(parsed.dolores?' Dolores probables: '+parsed.dolores:'')+(parsed.angulo?' Angulo: '+parsed.angulo:'');
+    c.analisis=analisisCompleto;
+    if(parsed.incentivo&&!c.incentivo) c.incentivo=parsed.incentivo;
+    if(parsed.stakeholders&&!c.stakeholders) c.stakeholders=parsed.stakeholders;
+    saveLS();
+
+    if(el) el.textContent=analisisCompleto;
+    if(status) status.textContent='';
+    if(btn) btn.disabled=false;
+  }catch(e){
+    if(status) status.textContent='';
+    if(btn) btn.disabled=false;
+    console.error(e);
+  }
 }
 
 async function saveDiag(){
