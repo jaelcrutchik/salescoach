@@ -1302,14 +1302,15 @@ function openDiag(id){
   document.getElementById('diag-real-gen').textContent = generarDiagReal(c);
   document.getElementById('diag-accion-gen').textContent = generarDiagAccion(c);
   
-  document.getElementById('diag-dolor-edit').value = c.diagDolor||'';
-  if(document.getElementById('diag-valor-edit')) document.getElementById('diag-valor-edit').value = c.diagValor||'';
-  document.getElementById('diag-real-edit').value = c.diagReal||'';
-  document.getElementById('diag-accion-edit').value = c.diagAccion||'';
-  document.getElementById('diag-contexto-edit').value = c.contexto||'';
-  document.getElementById('diag-analisis-edit').value = c.analisis||'';
-  document.getElementById('diag-incentivo-edit').value = c.incentivo||'';
-  document.getElementById('diag-stakeholders-edit').value = c.stakeholders||'';
+  var _s=function(id,val){var el=document.getElementById(id);if(el) el.value=val||'';};
+  _s('diag-dolor-edit',c.diagDolor);
+  _s('diag-valor-edit',c.diagValor);
+  _s('diag-real-edit',c.diagReal);
+  _s('diag-accion-edit',c.diagAccion);
+  _s('diag-contexto-edit',c.contexto);
+  _s('diag-analisis-edit',c.analisis);
+  _s('diag-incentivo-edit',c.incentivo);
+  _s('diag-stakeholders-edit',c.stakeholders);
   
   document.getElementById('diag-overlay').classList.add('open');
 }
