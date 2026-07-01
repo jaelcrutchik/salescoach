@@ -138,6 +138,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
   <div class="logo">Rave <em>&</em> Crutchik <span style="font-size:11px;color:#94a3b8;font-family:var(--sans);font-weight:400;margin-left:5px">Sales Coach v2</span></div>
   <div style="display:flex;align-items:center;gap:8px">
     <span class="day-pill" id="day-pill"></span>
+    <button class="hbtn" onclick="refreshShared(true)" title="Traer los últimos cambios del pipeline compartido">↻ Sincronizar</button>
     <button class="hbtn" onclick="exportData()">⬇ Exportar</button>
     <button class="hbtn" onclick="openImport()">⬆ Importar</button>
   </div>
@@ -286,19 +287,35 @@ function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contact
 
 let contacts=[],nextId=60,activeFilter='todos',ownerFilter='todos',detailId=null,sortCol='default',sortDesc=true,loaded=false;
 
-// ---------- PERSISTENCIA (storage del artifact) ----------
+// ---------- PERSISTENCIA (almacenamiento COMPARTIDO: Jael y Rafa ven el mismo pipeline) ----------
 async function persist(){
-  try{await window.storage.set('sales-coach-v2',JSON.stringify({contacts,nextId}));}
+  try{await window.storage.set('sales-coach-v2',JSON.stringify({contacts,nextId,updatedAt:new Date().toISOString()}),true);}
   catch(e){console.error('storage error',e);}
 }
 async function loadData(){
+  // 1) datos compartidos
   try{
-    const r=await window.storage.get('sales-coach-v2');
+    const r=await window.storage.get('sales-coach-v2',true);
     if(r&&r.value){const d=JSON.parse(r.value);contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;loaded=true;return;}
-  }catch(e){/* key no existe aún */}
+  }catch(e){/* aún no existe */}
+  // 2) migración desde datos personales (versión anterior)
+  try{
+    const p=await window.storage.get('sales-coach-v2');
+    if(p&&p.value){const d=JSON.parse(p.value);contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;loaded=true;await persist();showToast('Pipeline migrado a modo compartido');return;}
+  }catch(e){/* no hay datos personales */}
+  // 3) seed inicial
   contacts=SEED.map(normalize);nextId=60;loaded=true;
   persist();
 }
+function anyModalOpen(){return ['add-overlay','detail-overlay','import-overlay'].some(id=>document.getElementById(id).classList.contains('open'));}
+async function refreshShared(manual){
+  if(anyModalOpen()){if(manual)showToast('Cierra la ficha abierta antes de sincronizar');return;}
+  try{
+    const r=await window.storage.get('sales-coach-v2',true);
+    if(r&&r.value){const d=JSON.parse(r.value);contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||nextId;renderAll();if(manual)showToast('✅ Pipeline sincronizado');}
+  }catch(e){if(manual)showToast('No se pudo sincronizar');}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&loaded)refreshShared(false);});
 
 // ---------- LÓGICA BASE ----------
 function getDias(c){
@@ -543,24 +560,21 @@ function renderContacts(){
   if(q)list=contacts.filter(c=>(c.emp||'').toLowerCase().includes(q)||(c.cont||'').toLowerCase().includes(q));
   if(ownerFilter!=='todos')list=list.filter(c=>c.owner===ownerFilter);
   const sorted=[...list].sort((a,b)=>{
-    if(sortCol==='score')return sortDesc?calcScore(b)-calcScore(a):calcScore(a)-calcScore(b);
     if(sortCol==='emp')return sortDesc?a.emp.localeCompare(b.emp):b.emp.localeCompare(a.emp);
     if(sortCol==='dias')return sortDesc?getDias(b)-getDias(a):getDias(a)-getDias(b);
     return (ORD[a.status]||9)-(ORD[b.status]||9)||getDias(b)-getDias(a);
   });
-  const thead='<thead><tr><th onclick="toggleSort(\'emp\')">Empresa ↕</th><th>Status</th><th onclick="toggleSort(\'score\')" style="text-align:center">Prioridad ↕</th><th>Timing</th><th onclick="toggleSort(\'dias\')" style="text-align:center">Días ↕</th><th>Próxima acción</th></tr></thead>';
+  const thead='<thead><tr><th onclick="toggleSort(\'emp\')">Empresa ↕</th><th>Status</th><th>Timing</th><th onclick="toggleSort(\'dias\')" style="text-align:center">Días ↕</th><th>Próxima acción</th></tr></thead>';
   const rows=sorted.map(c=>{
-    const u=urg(c),d=getDias(c),t=timing(c),score=calcScore(c);
-    const scoreColor=score>=7?'#16a34a':score>=4?'#d97706':'#94a3b8';
+    const u=urg(c),d=getDias(c),t=timing(c);
     return '<tr onclick="openDetail('+c.id+')">'+
       '<td><div class="td-emp">'+esc(c.emp)+(c.owner?' <span style="font-size:9px;font-weight:600;color:#94a3b8;background:#f1f5f9;border-radius:4px;padding:1px 5px;vertical-align:1px">'+c.owner[0]+'</span>':'')+'</div><div class="td-cont">'+esc(c.cont&&c.cont!=='-'?c.cont+(c.cargo&&c.cargo!=='-'?' · '+c.cargo:''):'')+'</div></td>'+
       '<td><span class="badge '+bc(c.status)+'">'+c.status+'</span></td>'+
-      '<td style="text-align:center"><span style="font-size:14px;font-weight:700;color:'+scoreColor+'">'+score+'</span><span style="font-size:10px;color:#94a3b8">/10</span></td>'+
       '<td>'+(t?'<span class="timing-txt" style="color:'+t.color+'">'+t.txt+'</span>':'<span style="color:#e2e8f0;font-size:10px">—</span>')+'</td>'+
       '<td style="text-align:center"><span class="td-dias'+(u==='h'?' hot':'')+'">'+(d===0?'hoy':d+'d')+'</span></td>'+
       '<td><span style="font-size:11px;color:#64748b">'+esc(c.accion||'—')+'</span></td></tr>';
   }).join('');
-  document.getElementById('clist').innerHTML=thead+'<tbody>'+(rows||'<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:1.5rem">Sin contactos en este filtro. Agrega uno con + Nuevo contacto.</td></tr>')+'</tbody>';
+  document.getElementById('clist').innerHTML=thead+'<tbody>'+(rows||'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem">Sin contactos en este filtro. Agrega uno con + Nuevo contacto.</td></tr>')+'</tbody>';
 }
 
 // ---------- INSIGHTS ----------
@@ -604,9 +618,6 @@ function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts
 function openDetail(id){
   detailId=id;
   const c=contacts.find(x=>x.id===id);if(!c)return;
-  const score=calcScore(c);
-  const scoreColor=score>=7?'#16a34a':score>=4?'#d97706':'#94a3b8';
-  const showFrancisco=['Reunión','Propuesta'].includes(c.status);
   const m=document.getElementById('detail-modal');
   m.innerHTML=
     '<h3>'+esc(c.emp)+'</h3>'+
@@ -615,7 +626,6 @@ function openDetail(id){
       '<select id="d-status" onchange="changeStatus()">'+['Por contactar','Contactado','Respondió','Reunión','Propuesta','Ganado','En proceso','On hold','No'].map(s=>'<option'+(c.status===s?' selected':'')+'>'+s+'</option>').join('')+'</select>'+
       '<input type="date" id="d-fecha-top" value="'+esc(c.fechaContacto)+'" onchange="changeFecha()" title="Fecha del último contacto">'+
       '<span style="font-size:11px;color:#94a3b8" id="d-dias-txt">'+getDias(c)+' días · '+(c.canal||'sin canal')+'</span>'+
-      '<span class="score-pill" style="background:'+scoreColor+'18;color:'+scoreColor+';border:1px solid '+scoreColor+'40">'+score+'/10</span>'+
     '</div>'+
     '<div class="coach-block">'+
       '<div class="coach-hdr"><span class="t">🎯 Coach</span><button class="mini-btn" onclick="regenCoach()">↻ Regenerar</button></div>'+
@@ -624,7 +634,7 @@ function openDetail(id){
       '<div class="coach-msg" id="coach-msg"></div>'+
       '<div class="coach-actions"><button class="mini-btn primary" onclick="copyMsg()">📋 Copiar mensaje</button></div>'+
     '</div>'+
-    '<div class="dsec'+(showFrancisco?' open':'')+'" id="sec-fr"><div class="dsec-hdr" onclick="toggleSec(\'sec-fr\')"><span class="t">⚖️ Francisco mode — negociación</span><span>▾</span></div><div class="dsec-body" id="fr-body"></div></div>'+
+    '<div class="dsec" id="sec-fr"><div class="dsec-hdr" onclick="toggleSec(\'sec-fr\')"><span class="t">⚖️ Francisco mode — negociación</span><span>▾</span></div><div class="dsec-body" id="fr-body"></div></div>'+
     '<div class="dsec" id="sec-hist"><div class="dsec-hdr" onclick="toggleSec(\'sec-hist\')"><span class="t">📋 Historial ('+(c.historial||[]).length+')</span><span>▾</span></div><div class="dsec-body">'+
       '<div id="hist-entries"></div>'+
       '<div class="hist-add"><select class="hist-sel" id="hist-type"><option>Email</option><option>LinkedIn</option><option>WhatsApp</option><option>Llamada</option><option>Reunión</option><option>Nota</option></select><input class="hist-input" id="hist-input" placeholder="¿Qué pasó?" onkeydown="if(event.key===\'Enter\')addHist()"><button class="mini-btn primary" onclick="addHist()">+</button></div>'+
