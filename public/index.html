@@ -126,7 +126,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .fr-card .ft{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
 .fr-card .fi{font-size:12px;color:#475569;line-height:1.55;margin-bottom:3px}
 .detail-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-.detail-top select{font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:7px;background:var(--cream);outline:none;font-family:var(--sans)}
+.detail-top select,.detail-top input[type=date]{font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:7px;background:var(--cream);outline:none;font-family:var(--sans)}
 .score-pill{font-size:12px;font-weight:600;padding:3px 12px;border-radius:99px;margin-left:auto}
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:8px 16px;border-radius:8px;font-size:12px;opacity:0;transition:opacity 0.3s;z-index:300;pointer-events:none}
 .toast.show{opacity:1}
@@ -193,6 +193,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
         <div class="field"><label>Ciudad</label><input id="a-ciudad" type="text"></div>
         <div class="field"><label>Email</label><input id="a-email" type="email"></div>
       </div>
+      <div class="field"><label>Cliente de</label><select id="a-owner"><option value="">Sin asignar</option><option>Jael</option><option>Rafa</option></select></div>
       <div class="field"><label>Notas</label><textarea id="a-notas" placeholder="Contexto..."></textarea></div>
     </div>
     <div class="modal-btns">
@@ -281,9 +282,9 @@ const SEED=[
 {id:49,emp:'Alemán Experto',cont:'(vía Sofi)',cargo:'Dueño',status:'Por contactar',canal:'Referido',accion:'Contactar por Sofi/Berna',notas:'Sofi es esposa del dueño'},
 {id:50,emp:'Ferreterías Lonza',cont:'Simón Lonza',cargo:'Ejecutivo',status:'Contactado',canal:'Email',accion:'Seguimiento en 5 días',notas:'Referido de Luzma. Perfil emprendedor, ecoturismo.',fechaContacto:'2026-06-06',historial:[{fecha:'2026-06-06',tipo:'Email',texto:'Correo personalizado enviado vía Luzma.'}]}
 ];
-function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,accion:'',notas:'',com:15,email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:''},c);}
+function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,accion:'',notas:'',com:15,email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:''},c);}
 
-let contacts=[],nextId=60,activeFilter='todos',detailId=null,sortCol='default',sortDesc=true,loaded=false;
+let contacts=[],nextId=60,activeFilter='todos',ownerFilter='todos',detailId=null,sortCol='default',sortDesc=true,loaded=false;
 
 // ---------- PERSISTENCIA (storage del artifact) ----------
 async function persist(){
@@ -405,13 +406,29 @@ function getMensajeLocal(c){
   if(c.status==='Contactado'&&d>=5)return 'Hola '+nombre+', retomo con algo concreto: '+pregunta+' Si resuena, vale una conversación de 20 minutos.'+(wa?'':firma);
   if(c.status==='Contactado')return 'Hola '+nombre+', ¿pudiste revisar mi mensaje? ¿Vale 20 minutos esta semana?'+(wa?'':firma);
   if(c.status==='Reunión')return 'Hola '+nombre+', quedé pensando en lo que conversamos. Esta semana te envío una propuesta concreta con un primer paso sin compromiso largo. ¿Te parece?'+(wa?'':firma);
+  if(c.status==='Propuesta'&&d>=7)return 'Hola '+nombre+', ¿qué necesitarías ver para tomar la decisión sobre la propuesta? Si hay algo que no quedó claro o que valga la pena ajustar, lo conversamos.'+(wa?'':firma);
+  if(c.status==='Propuesta')return 'Hola '+nombre+', ¿pudiste revisar la propuesta? ¿Hay algo que genere dudas o que valga la pena conversar?'+(wa?'':firma);
+  if(c.status==='En proceso')return 'Hola '+nombre+', '+pregunta+' Si no es prioridad ahora, dime sin problema y lo retomamos cuando tenga sentido.'+(wa?'':firma);
+  if(c.status==='On hold')return 'Hola '+nombre+', sé que esto quedó en pausa. ¿Sigue teniendo sentido retomarlo, o prefieres que lo veamos más adelante?'+(wa?'':firma);
   if(c.status==='Por contactar'&&c.canal==='Referido')return 'Hola '+nombre+', me pasó tu contacto alguien en quien confío mucho. '+pregunta+' Si resuena, vale 20 minutos.'+(wa?'':firma);
   if(c.status==='Por contactar')return 'Hola '+nombre+', soy Jael de Rave & Crutchik. '+pregunta+' Si algo resuena, vale 20 minutos esta semana.'+(wa?'':firma);
   return 'Hola '+nombre+', '+pregunta+' ¿Tienes 20 minutos esta semana?'+(wa?'':firma);
 }
 function getRecoLocal(c){
-  const d=getDias(c);const bloq=calcBloqueador(c);
-  return bloq+'. '+(urg(c)==='h'?'Prioridad alta: actúa hoy.':'Timing razonable — sigue el plan de la próxima acción.');
+  const d=getDias(c);
+  if(c.status==='Propuesta'&&d>=7)return 'Propuesta enviada hace '+d+' días sin decisión. El "lo estamos pensando" suele ser una objeción disfrazada: pregunta directamente qué falta para decidir.';
+  if(c.status==='Propuesta')return 'Propuesta enviada hace '+d+' día(s). Seguimiento suave: confirma que la revisaron y abre espacio para dudas, sin presionar.';
+  if(c.status==='Reunión'&&d>5)return d+' días desde la reunión sin propuesta enviada. Cada día baja la probabilidad de cierre — envíala hoy con el valor anclado al costo del problema.';
+  if(c.status==='Reunión')return 'Reunión reciente, momentum activo. La propuesta debe llegar antes de 48 horas.';
+  if(c.status==='Respondió')return 'Mostró interés (leyó/respondió) hace '+d+' días. Segundo toque con pregunta genuina al dolor — corto, sin volver a vender.';
+  if(c.status==='Contactado'&&d>=14)return d+' días sin respuesta. Último toque: mensaje directo y cierre del loop con dignidad si no responde.';
+  if(c.status==='Contactado'&&d>=5)return d+' días desde el primer contacto. Momento ideal para el segundo toque con un ángulo nuevo.';
+  if(c.status==='Contactado')return 'Contactado hace '+d+' día(s). Todavía es pronto para insistir — soporta la ansiedad de la incertidumbre.';
+  if(c.status==='Por contactar')return 'El único bloqueador eres tú: falta enviar el primer mensaje. '+(c.canal==='Referido'?'Es referido — la confianza ya está instalada, escríbele esta semana.':'Arranca con pregunta genuina, sin vender en el primer mensaje.');
+  if(c.status==='En proceso')return 'Sin avance claro en '+d+' días. Define si hay dolor real antes de seguir invirtiendo energía.';
+  if(c.status==='On hold')return 'En pausa. Ponle fecha límite de revisión — que el on hold no se convierta en descarte silencioso.';
+  const bloq=calcBloqueador(c);
+  return (bloq?bloq+'. ':'')+(urg(c)==='h'?'Prioridad alta: actúa hoy.':'Timing razonable — sigue el plan de la próxima acción.');
 }
 
 // ---------- COACH CON CLAUDE ----------
@@ -431,7 +448,7 @@ async function generarCoach(c,force){
   const nombre=c.cont&&c.cont!=='-'?c.cont.split(' ')[0]:'el contacto';
   const hist=(c.historial||[]).slice(-3).map(h=>h.fecha+' ('+h.tipo+'): '+h.texto).join(' | ')||'sin historial';
   const tono=canal==='WhatsApp'?'Tono WhatsApp: muy corto, máximo 3 líneas, sin formalismos, como persona real, sin firma.':canal==='LinkedIn'?'Tono LinkedIn: profesional pero cercano, máximo 4 líneas, sin firma.':'Tono email: habla al dolor específico, termina con una pregunta concreta, firma "Jael Crutchik — Rave & Crutchik".';
-  const prompt='Eres el sales coach de Jael Crutchik, cofundadora de Rave & Crutchik, consultora de operaciones y supply chain en Chile (Lean, excelencia operacional, 3 UF/hora). Su estilo de venta sigue los principios de Francisco Pereira (NEGOCIAR O PERDER): hablar al dolor del otro, nunca sonar desesperada, preguntas genuinas sin script de vendedor, el poder lo dan las alternativas del otro, toda concesión con condición.\n\nProspecto:\n- Empresa: '+c.emp+' ('+(c.ciudad||'Chile')+')'+(c.analisis?'\n- Análisis previo: '+c.analisis:'')+'\n- Contacto: '+nombre+' — '+(c.cargo||'sin cargo')+'\n- Estado: '+c.status+' — '+dias+' días desde el último contacto\n- Canal: '+canal+'\n- Notas: '+(c.notas||'sin notas')+(c.contexto?'\n- Contexto del contacto: '+c.contexto:'')+(c.diagDolor?'\n- Dolor documentado: '+c.diagDolor:'')+'\n- Historial reciente: '+hist+'\n\nResponde SOLO con JSON válido, sin backticks ni texto adicional: {"empresa":"si no hay análisis previo: 2 oraciones sobre qué hace esta empresa y sus desafíos operacionales típicos; si ya hay análisis, string vacío","recomendacion":"en 2 oraciones máximo: qué hacer HOY con este contacto y por qué. Directo, sin relleno.","mensaje":"mensaje listo para enviar por '+canal+'. '+tono+' Usa el nombre '+nombre+'. Habla al dolor específico y probable de ESTA empresa, no genérico. Pregunta concreta al final. Nunca desesperado."}';
+  const prompt='Eres el sales coach de Jael Crutchik, cofundadora de Rave & Crutchik, consultora de operaciones y supply chain en Chile (Lean, excelencia operacional, 3 UF/hora). Su estilo de venta sigue los principios de Francisco Pereira (NEGOCIAR O PERDER): hablar al dolor del otro, nunca sonar desesperada, preguntas genuinas sin script de vendedor, el poder lo dan las alternativas del otro, toda concesión con condición.\n\nREGLA CRÍTICA: el mensaje DEBE corresponder exactamente a la etapa del prospecto. Guía por etapa:\n- Por contactar: primer contacto, pregunta genuina al dolor, sin vender.\n- Contactado: seguimiento sin repetir el pitch; si lleva 14+ días, último toque con cierre digno del loop.\n- Respondió: segundo toque, ángulo nuevo, corto.\n- Reunión: retomar lo conversado y encaminar la propuesta o el siguiente paso concreto.\n- Propuesta: seguimiento de la propuesta YA ENVIADA — preguntar si la revisaron, qué dudas hay, qué falta para decidir. JAMÁS preguntas de dolor de primer contacto ni presentarse de nuevo.\n- En proceso: definir si hay dolor real, dar salida digna.\n- On hold: check-in ligero, sin presión.\n- Ganado: relación y siguiente oportunidad, no venta.\n\nProspecto:\n- Empresa: '+c.emp+' ('+(c.ciudad||'Chile')+')'+(c.analisis?'\n- Análisis previo: '+c.analisis:'')+'\n- Contacto: '+nombre+' — '+(c.cargo||'sin cargo')+'\n- ETAPA ACTUAL: '+c.status+' — '+dias+' días desde el último contacto\n- Canal: '+canal+'\n- Notas: '+(c.notas||'sin notas')+(c.contexto?'\n- Contexto del contacto: '+c.contexto:'')+(c.diagDolor?'\n- Dolor documentado: '+c.diagDolor:'')+'\n- Historial reciente: '+hist+'\n\nResponde SOLO con JSON válido, sin backticks ni texto adicional: {"empresa":"si no hay análisis previo: 2 oraciones sobre qué hace esta empresa y sus desafíos operacionales típicos; si ya hay análisis, string vacío","recomendacion":"en 2 oraciones máximo: qué hacer HOY con este contacto dada su etapa ('+c.status+') y los días transcurridos, y por qué. Directo, sin relleno.","mensaje":"mensaje listo para enviar por '+canal+', coherente con la etapa '+c.status+' según la guía. '+tono+' Usa el nombre '+nombre+'. Específico a ESTA empresa, no genérico. Nunca desesperado."}';
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     const data=await res.json();
@@ -512,14 +529,19 @@ function renderFunnel(){
 }
 function renderFilters(){
   const ss=['todos',...new Set(contacts.map(c=>c.status))];
-  document.getElementById('filter-btns').innerHTML=ss.map(s=>'<button class="fb'+(s===activeFilter?' on':'')+'" onclick="setF(\''+s+'\')">'+(s==='todos'?'Todos':s)+'</button>').join('');
+  let html=ss.map(s=>'<button class="fb'+(s===activeFilter?' on':'')+'" onclick="setF(\''+s+'\')">'+(s==='todos'?'Todos':s)+'</button>').join('');
+  html+='<span style="width:1px;height:16px;background:var(--border);margin:0 3px;align-self:center"></span>';
+  html+=['Jael','Rafa'].map(o=>'<button class="fb'+(ownerFilter===o?' on':'')+'" style="'+(ownerFilter===o?'background:var(--purple);border-color:var(--purple)':'')+'" onclick="setOwner(\''+o+'\')">👤 '+o+'</button>').join('');
+  document.getElementById('filter-btns').innerHTML=html;
 }
 function setF(f){activeFilter=f;renderFilters();renderFunnel();renderContacts();}
+function setOwner(o){ownerFilter=ownerFilter===o?'todos':o;renderFilters();renderContacts();}
 function toggleSort(col){if(sortCol===col){sortDesc=!sortDesc;}else{sortCol=col;sortDesc=true;}renderContacts();}
 function renderContacts(){
   const q=(document.getElementById('search-input').value||'').toLowerCase().trim();
   let list=activeFilter==='todos'?contacts.filter(c=>c.status!=='No'):contacts.filter(c=>c.status===activeFilter);
   if(q)list=contacts.filter(c=>(c.emp||'').toLowerCase().includes(q)||(c.cont||'').toLowerCase().includes(q));
+  if(ownerFilter!=='todos')list=list.filter(c=>c.owner===ownerFilter);
   const sorted=[...list].sort((a,b)=>{
     if(sortCol==='score')return sortDesc?calcScore(b)-calcScore(a):calcScore(a)-calcScore(b);
     if(sortCol==='emp')return sortDesc?a.emp.localeCompare(b.emp):b.emp.localeCompare(a.emp);
@@ -531,7 +553,7 @@ function renderContacts(){
     const u=urg(c),d=getDias(c),t=timing(c),score=calcScore(c);
     const scoreColor=score>=7?'#16a34a':score>=4?'#d97706':'#94a3b8';
     return '<tr onclick="openDetail('+c.id+')">'+
-      '<td><div class="td-emp">'+esc(c.emp)+'</div><div class="td-cont">'+esc(c.cont&&c.cont!=='-'?c.cont+(c.cargo&&c.cargo!=='-'?' · '+c.cargo:''):'')+'</div></td>'+
+      '<td><div class="td-emp">'+esc(c.emp)+(c.owner?' <span style="font-size:9px;font-weight:600;color:#94a3b8;background:#f1f5f9;border-radius:4px;padding:1px 5px;vertical-align:1px">'+c.owner[0]+'</span>':'')+'</div><div class="td-cont">'+esc(c.cont&&c.cont!=='-'?c.cont+(c.cargo&&c.cargo!=='-'?' · '+c.cargo:''):'')+'</div></td>'+
       '<td><span class="badge '+bc(c.status)+'">'+c.status+'</span></td>'+
       '<td style="text-align:center"><span style="font-size:14px;font-weight:700;color:'+scoreColor+'">'+score+'</span><span style="font-size:10px;color:#94a3b8">/10</span></td>'+
       '<td>'+(t?'<span class="timing-txt" style="color:'+t.color+'">'+t.txt+'</span>':'<span style="color:#e2e8f0;font-size:10px">—</span>')+'</td>'+
@@ -591,7 +613,8 @@ function openDetail(id){
     '<div style="font-size:12px;color:#64748b;margin-bottom:10px">'+esc(c.cont&&c.cont!=='-'?c.cont:'Sin contacto')+(c.cargo&&c.cargo!=='-'?' · '+esc(c.cargo):'')+(c.ciudad?' · '+esc(c.ciudad):'')+'</div>'+
     '<div class="detail-top">'+
       '<select id="d-status" onchange="changeStatus()">'+['Por contactar','Contactado','Respondió','Reunión','Propuesta','Ganado','En proceso','On hold','No'].map(s=>'<option'+(c.status===s?' selected':'')+'>'+s+'</option>').join('')+'</select>'+
-      '<span style="font-size:11px;color:#94a3b8">'+getDias(c)+' días · '+(c.canal||'sin canal')+'</span>'+
+      '<input type="date" id="d-fecha-top" value="'+esc(c.fechaContacto)+'" onchange="changeFecha()" title="Fecha del último contacto">'+
+      '<span style="font-size:11px;color:#94a3b8" id="d-dias-txt">'+getDias(c)+' días · '+(c.canal||'sin canal')+'</span>'+
       '<span class="score-pill" style="background:'+scoreColor+'18;color:'+scoreColor+';border:1px solid '+scoreColor+'40">'+score+'/10</span>'+
     '</div>'+
     '<div class="coach-block">'+
@@ -608,7 +631,8 @@ function openDetail(id){
     '</div></div>'+
     '<div class="dsec" id="sec-datos"><div class="dsec-hdr" onclick="toggleSec(\'sec-datos\')"><span class="t">✏️ Datos del contacto</span><span>▾</span></div><div class="dsec-body">'+
       '<div class="field-row"><div class="field"><label>Contacto</label><input id="d-cont" value="'+esc(c.cont)+'"></div><div class="field"><label>Cargo</label><input id="d-cargo" value="'+esc(c.cargo)+'"></div></div>'+
-      '<div class="field-row3"><div class="field"><label>Canal</label><select id="d-canal">'+['','Email','LinkedIn','WhatsApp','Llamada','Referido','Reunión'].map(x=>'<option value="'+x+'"'+(c.canal===x?' selected':'')+'>'+(x||'-')+'</option>').join('')+'</select></div><div class="field"><label>Ciudad</label><input id="d-ciudad" value="'+esc(c.ciudad)+'"></div><div class="field"><label>Último contacto</label><input id="d-fecha" type="date" value="'+esc(c.fechaContacto)+'"></div></div>'+
+      '<div class="field-row"><div class="field"><label>Canal</label><select id="d-canal">'+['','Email','LinkedIn','WhatsApp','Llamada','Referido','Reunión'].map(x=>'<option value="'+x+'"'+(c.canal===x?' selected':'')+'>'+(x||'-')+'</option>').join('')+'</select></div><div class="field"><label>Ciudad</label><input id="d-ciudad" value="'+esc(c.ciudad)+'"></div></div>'+
+      '<div class="field"><label>Cliente de</label><select id="d-owner">'+['','Jael','Rafa'].map(x=>'<option value="'+x+'"'+(c.owner===x?' selected':'')+'>'+(x||'Sin asignar')+'</option>').join('')+'</select></div>'+
       '<div class="field-row"><div class="field"><label>UF/hora</label><input id="d-uf" type="number" step="0.1" value="'+(c.uf||'')+'"></div><div class="field"><label>Horas est.</label><input id="d-horas" type="number" value="'+(c.horas||'')+'"></div></div>'+
       '<div class="field"><label>Email</label><input id="d-email" value="'+esc(c.email)+'"></div>'+
       '<div class="field"><label>Próxima acción</label><input id="d-accion" value="'+esc(c.accion)+'"></div>'+
@@ -644,6 +668,18 @@ function changeStatus(){
     generarCoach(c,true);
   }
 }
+function changeFecha(){
+  const c=contacts.find(x=>x.id===detailId);if(!c)return;
+  const nueva=document.getElementById('d-fecha-top').value;
+  if(nueva===c.fechaContacto)return;
+  c.fechaContacto=nueva;
+  c.diagReal='';c.diagAccion='';
+  const txt=document.getElementById('d-dias-txt');
+  if(txt)txt.textContent=getDias(c)+' días · '+(c.canal||'sin canal');
+  persist();
+  showToast('Fecha actualizada');
+  generarCoach(c,true);
+}
 function renderHistEntries(c){
   const entries=(c.historial||[]).slice().reverse();
   document.getElementById('hist-entries').innerHTML=entries.length?entries.map(e=>'<div class="hist-entry"><span class="hist-type">'+e.tipo+'</span><span class="hist-date">'+e.fecha+'</span><div class="hist-text">'+esc(e.texto)+'</div></div>').join(''):'<div style="font-size:12px;color:#94a3b8;padding:4px 0">Sin historial todavía.</div>';
@@ -662,7 +698,7 @@ function saveDetail(){
   const gv=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
   const prevCanal=c.canal,prevCargo=c.cargo;
   c.cont=gv('d-cont');c.cargo=gv('d-cargo');c.canal=document.getElementById('d-canal').value;
-  c.ciudad=gv('d-ciudad');c.fechaContacto=gv('d-fecha');
+  c.ciudad=gv('d-ciudad');c.owner=document.getElementById('d-owner').value;
   c.uf=parseFloat(gv('d-uf'))||0;c.horas=parseInt(gv('d-horas'))||0;
   c.email=gv('d-email');c.accion=gv('d-accion');c.notas=gv('d-notas');
   c.contexto=gv('d-contexto');c.diagDolor=gv('d-dolor');
@@ -680,6 +716,7 @@ function openAdd(){
   ['a-emp','a-accion','a-cont','a-cargo','a-ciudad','a-email','a-notas'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('a-status').value='Por contactar';
   document.getElementById('a-canal').value='';
+  document.getElementById('a-owner').value='';
   document.getElementById('add-more').style.display='none';
   document.getElementById('add-more-link').textContent='+ Más campos (contacto, cargo, ciudad...)';
   document.getElementById('add-overlay').classList.add('open');
@@ -696,7 +733,7 @@ function saveAdd(){
   const emp=document.getElementById('a-emp').value.trim();
   if(!emp){showToast('Ingresa el nombre de la empresa');return;}
   const gv=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
-  const c=normalize({id:nextId++,emp,status:document.getElementById('a-status').value,canal:document.getElementById('a-canal').value,accion:gv('a-accion'),cont:gv('a-cont'),cargo:gv('a-cargo'),ciudad:gv('a-ciudad'),email:gv('a-email'),notas:gv('a-notas'),fechaContacto:document.getElementById('a-status').value!=='Por contactar'?new Date().toISOString().split('T')[0]:''});
+  const c=normalize({id:nextId++,emp,status:document.getElementById('a-status').value,canal:document.getElementById('a-canal').value,accion:gv('a-accion'),cont:gv('a-cont'),cargo:gv('a-cargo'),ciudad:gv('a-ciudad'),email:gv('a-email'),notas:gv('a-notas'),owner:document.getElementById('a-owner').value,fechaContacto:document.getElementById('a-status').value!=='Por contactar'?new Date().toISOString().split('T')[0]:''});
   contacts.push(c);
   persist();closeAdd();renderAll();showToast('✅ '+emp+' agregado');
   openDetail(c.id);
