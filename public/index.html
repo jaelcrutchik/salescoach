@@ -213,8 +213,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 <div class="overlay" id="import-overlay">
   <div class="modal" style="width:480px">
     <h3>Importar datos</h3>
-    <p style="font-size:12px;color:#64748b;margin-bottom:10px;line-height:1.5">Pega aquí un JSON exportado antes. Esto <strong>reemplaza</strong> el pipeline actual.</p>
-    <div class="field"><textarea id="import-text" style="height:140px" placeholder='{"contacts":[...],"nextId":60}'></textarea></div>
+    <p style="font-size:12px;color:#64748b;margin-bottom:10px;line-height:1.5">Pega aquí un JSON con contactos.</p>
+    <div class="field"><textarea id="import-text" style="height:140px" placeholder='{"contacts":[...]}'></textarea></div>
+    <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:#475569;cursor:pointer;margin-bottom:4px"><input type="checkbox" id="import-merge" checked style="width:auto"> <span><strong>Agregar</strong> al pipeline actual (desmarcar para reemplazar todo)</span></label>
     <div class="modal-btns">
       <button class="btn-c" onclick="closeImport()">Cancelar</button>
       <button class="btn-s" onclick="doImport()">Importar</button>
@@ -288,23 +289,35 @@ function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contact
 let contacts=[],nextId=60,activeFilter='todos',ownerFilter='todos',detailId=null,sortCol='default',sortDesc=true,loaded=false;
 
 // ---------- PERSISTENCIA (almacenamiento COMPARTIDO: Jael y Rafa ven el mismo pipeline) ----------
+let ownersInit=false;
 async function persist(){
-  try{await window.storage.set('sales-coach-v2',JSON.stringify({contacts,nextId,updatedAt:new Date().toISOString()}),true);}
+  try{await window.storage.set('sales-coach-v2',JSON.stringify({contacts,nextId,ownersInit,updatedAt:new Date().toISOString()}),true);}
   catch(e){console.error('storage error',e);}
+}
+function initOwners(){
+  if(ownersInit)return false;
+  contacts.forEach(c=>{if(!c.owner)c.owner='Jael';});
+  ownersInit=true;
+  return true;
 }
 async function loadData(){
   // 1) datos compartidos
   try{
     const r=await window.storage.get('sales-coach-v2',true);
-    if(r&&r.value){const d=JSON.parse(r.value);contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;loaded=true;return;}
+    if(r&&r.value){
+      const d=JSON.parse(r.value);contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;ownersInit=!!d.ownersInit;loaded=true;
+      if(initOwners()){await persist();showToast('Contactos existentes asignados a Jael');}
+      return;
+    }
   }catch(e){/* aún no existe */}
   // 2) migración desde datos personales (versión anterior)
   try{
     const p=await window.storage.get('sales-coach-v2');
-    if(p&&p.value){const d=JSON.parse(p.value);contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;loaded=true;await persist();showToast('Pipeline migrado a modo compartido');return;}
+    if(p&&p.value){const d=JSON.parse(p.value);contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;loaded=true;initOwners();await persist();showToast('Pipeline migrado a modo compartido');return;}
   }catch(e){/* no hay datos personales */}
   // 3) seed inicial
   contacts=SEED.map(normalize);nextId=60;loaded=true;
+  initOwners();
   persist();
 }
 function anyModalOpen(){return ['add-overlay','detail-overlay','import-overlay'].some(id=>document.getElementById(id).classList.contains('open'));}
@@ -561,10 +574,14 @@ function renderContacts(){
   if(ownerFilter!=='todos')list=list.filter(c=>c.owner===ownerFilter);
   const sorted=[...list].sort((a,b)=>{
     if(sortCol==='emp')return sortDesc?a.emp.localeCompare(b.emp):b.emp.localeCompare(a.emp);
+    if(sortCol==='status')return sortDesc?(ORD[a.status]??9)-(ORD[b.status]??9):(ORD[b.status]??9)-(ORD[a.status]??9);
+    if(sortCol==='timing'){const r=x=>{const t=timing(x);if(!t)return 3;return t.color==='#ef4444'?0:t.color==='#f59e0b'?1:2;};return sortDesc?r(a)-r(b):r(b)-r(a);}
     if(sortCol==='dias')return sortDesc?getDias(b)-getDias(a):getDias(a)-getDias(b);
-    return (ORD[a.status]||9)-(ORD[b.status]||9)||getDias(b)-getDias(a);
+    if(sortCol==='accion'){const va=(a.accion||'').toLowerCase(),vb=(b.accion||'').toLowerCase();if(!va&&!vb)return 0;if(!va)return 1;if(!vb)return -1;return sortDesc?va.localeCompare(vb):vb.localeCompare(va);}
+    return (ORD[a.status]??9)-(ORD[b.status]??9)||getDias(b)-getDias(a);
   });
-  const thead='<thead><tr><th onclick="toggleSort(\'emp\')">Empresa ↕</th><th>Status</th><th>Timing</th><th onclick="toggleSort(\'dias\')" style="text-align:center">Días ↕</th><th>Próxima acción</th></tr></thead>';
+  const arrow=col=>sortCol===col?(sortDesc?' ↓':' ↑'):' ↕';
+  const thead='<thead><tr><th onclick="toggleSort(\'emp\')">Empresa'+arrow('emp')+'</th><th onclick="toggleSort(\'status\')">Status'+arrow('status')+'</th><th onclick="toggleSort(\'timing\')">Timing'+arrow('timing')+'</th><th onclick="toggleSort(\'dias\')" style="text-align:center">Días'+arrow('dias')+'</th><th onclick="toggleSort(\'accion\')">Próxima acción'+arrow('accion')+'</th></tr></thead>';
   const rows=sorted.map(c=>{
     const u=urg(c),d=getDias(c),t=timing(c);
     return '<tr onclick="openDetail('+c.id+')">'+
@@ -751,7 +768,7 @@ function saveAdd(){
 
 // ---------- EXPORT / IMPORT ----------
 function exportData(){
-  const json=JSON.stringify({contacts,nextId},null,1);
+  const json=JSON.stringify({contacts,nextId,ownersInit},null,1);
   navigator.clipboard.writeText(json).then(()=>showToast('✅ Pipeline copiado al portapapeles (JSON)')).catch(()=>{
     const blob=new Blob([json],{type:'application/json'});
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sales-coach-backup.json';a.click();
@@ -763,8 +780,16 @@ function doImport(){
   try{
     const d=JSON.parse(document.getElementById('import-text').value);
     if(!d.contacts||!Array.isArray(d.contacts))throw new Error('formato');
-    contacts=d.contacts.map(normalize);nextId=d.nextId||Math.max(...contacts.map(c=>c.id))+1;
-    persist();closeImport();renderAll();showToast('✅ '+contacts.length+' contactos importados');
+    const merge=document.getElementById('import-merge').checked;
+    if(merge){
+      const nuevos=d.contacts.map(c=>{const n=normalize(c);n.id=nextId++;return n;});
+      contacts=contacts.concat(nuevos);
+      persist();closeImport();renderAll();showToast('✅ '+nuevos.length+' contactos agregados');
+    }else{
+      contacts=d.contacts.map(normalize);nextId=d.nextId||Math.max(...contacts.map(c=>c.id))+1;
+      if(typeof d.ownersInit!=='undefined')ownersInit=!!d.ownersInit;
+      persist();closeImport();renderAll();showToast('✅ Pipeline reemplazado: '+contacts.length+' contactos');
+    }
   }catch(e){showToast('JSON inválido — revisa el formato');}
 }
 
