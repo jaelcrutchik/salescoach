@@ -496,12 +496,12 @@ function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replac
 function renderStats(){
   const act=contacts.filter(c=>c.status!=='No');
   const urg_n=contacts.filter(c=>urg(c)==='h').length;
-  const comEst=act.reduce((s,c)=>s+(c.uf&&c.horas?Math.round(c.uf*c.horas*UF*(c.com||15)/100):0),0);
+  const cierre=contacts.filter(c=>['Reunión','Propuesta'].includes(c.status)).length;
   document.getElementById('stats').innerHTML=
     '<div class="stat"><div class="stat-label">Pipeline</div><div class="stat-val">'+act.length+'</div><div class="stat-sub">'+contacts.filter(c=>c.status==='No').length+' descartados</div></div>'+
     '<div class="stat"><div class="stat-label">Para escribir hoy</div><div class="stat-val" style="color:'+(urg_n?'var(--red)':'var(--green)')+'">'+urg_n+'</div><div class="stat-sub">según timing</div></div>'+
     '<div class="stat"><div class="stat-label">Leads calientes</div><div class="stat-val" style="color:var(--amber)">'+contacts.filter(c=>c.status==='Respondió').length+'</div><div class="stat-sub">respondieron / abrieron</div></div>'+
-    '<div class="stat"><div class="stat-label">Comisión est.</div><div class="stat-val" style="color:var(--blue)">'+(comEst?'$'+Math.round(comEst/1000)+'k':'—')+'</div><div class="stat-sub">CLP · sobre valorizado</div></div>';
+    '<div class="stat"><div class="stat-label">Cerca del cierre</div><div class="stat-val" style="color:var(--purple)">'+cierre+'</div><div class="stat-sub">en reunión o propuesta</div></div>';
 }
 function renderFunnel(){
   const act=contacts.filter(c=>c.status!=='No'),tot=act.length||1;
@@ -609,7 +609,7 @@ function openDetail(id){
     '<div class="dsec" id="sec-datos"><div class="dsec-hdr" onclick="toggleSec(\'sec-datos\')"><span class="t">✏️ Datos del contacto</span><span>▾</span></div><div class="dsec-body">'+
       '<div class="field-row"><div class="field"><label>Contacto</label><input id="d-cont" value="'+esc(c.cont)+'"></div><div class="field"><label>Cargo</label><input id="d-cargo" value="'+esc(c.cargo)+'"></div></div>'+
       '<div class="field-row3"><div class="field"><label>Canal</label><select id="d-canal">'+['','Email','LinkedIn','WhatsApp','Llamada','Referido','Reunión'].map(x=>'<option value="'+x+'"'+(c.canal===x?' selected':'')+'>'+(x||'-')+'</option>').join('')+'</select></div><div class="field"><label>Ciudad</label><input id="d-ciudad" value="'+esc(c.ciudad)+'"></div><div class="field"><label>Último contacto</label><input id="d-fecha" type="date" value="'+esc(c.fechaContacto)+'"></div></div>'+
-      '<div class="field-row3"><div class="field"><label>UF/hora</label><input id="d-uf" type="number" step="0.1" value="'+(c.uf||'')+'"></div><div class="field"><label>Horas est.</label><input id="d-horas" type="number" value="'+(c.horas||'')+'"></div><div class="field"><label>Comisión %</label><input id="d-com" type="number" value="'+(c.com||15)+'"></div></div>'+
+      '<div class="field-row"><div class="field"><label>UF/hora</label><input id="d-uf" type="number" step="0.1" value="'+(c.uf||'')+'"></div><div class="field"><label>Horas est.</label><input id="d-horas" type="number" value="'+(c.horas||'')+'"></div></div>'+
       '<div class="field"><label>Email</label><input id="d-email" value="'+esc(c.email)+'"></div>'+
       '<div class="field"><label>Próxima acción</label><input id="d-accion" value="'+esc(c.accion)+'"></div>'+
       '<div class="field"><label>Notas</label><textarea id="d-notas">'+esc(c.notas)+'</textarea></div>'+
@@ -663,7 +663,7 @@ function saveDetail(){
   const prevCanal=c.canal,prevCargo=c.cargo;
   c.cont=gv('d-cont');c.cargo=gv('d-cargo');c.canal=document.getElementById('d-canal').value;
   c.ciudad=gv('d-ciudad');c.fechaContacto=gv('d-fecha');
-  c.uf=parseFloat(gv('d-uf'))||0;c.horas=parseInt(gv('d-horas'))||0;c.com=parseFloat(gv('d-com'))||15;
+  c.uf=parseFloat(gv('d-uf'))||0;c.horas=parseInt(gv('d-horas'))||0;
   c.email=gv('d-email');c.accion=gv('d-accion');c.notas=gv('d-notas');
   c.contexto=gv('d-contexto');c.diagDolor=gv('d-dolor');
   if(prevCanal!==c.canal||prevCargo!==c.cargo){c.diagReal='';c.diagAccion='';}
