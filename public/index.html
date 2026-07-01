@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sales Coach — Rave & Crutchik</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Sales Coach v2 — Rave & Crutchik</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -15,1874 +15,724 @@
   --border:#e2e8f0;--shadow:0 1px 12px rgba(0,0,0,0.06);
   --serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',sans-serif;
 }
-body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.header{background:white;border-bottom:1px solid var(--border);padding:0.7rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:var(--shadow)}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:100vh}
+.header{background:white;border-bottom:1px solid var(--border);padding:0.7rem 1.25rem;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);position:sticky;top:0;z-index:50}
 .logo{font-family:var(--serif);font-size:17px}.logo em{color:var(--blue);font-style:italic}
 .day-pill{font-size:11px;background:var(--blue-l);color:var(--blue);padding:3px 10px;border-radius:99px;font-weight:500}
-.sync-btn{font-size:12px;padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer}
-.sync-btn:hover{background:var(--blue-l);color:var(--blue)}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;flex:1;min-height:0;overflow:hidden}
-.main{overflow-y:auto;overflow-x:hidden;padding:1rem;min-width:0}
-.panel{display:flex;flex-direction:column;background:white;border-left:1px solid var(--border);overflow-y:auto}
-.panel-hdr{padding:0.85rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--cream);flex-shrink:0}
-.coach-av{width:28px;height:28px;background:linear-gradient(135deg,#2563eb,#7c3aed);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.panel-body{padding:1rem;display:flex;flex-direction:column;gap:10px;flex:1}
-.panel-desc{font-size:12px;color:#64748b;line-height:1.6}
-.coach-link{display:block;text-align:center;padding:10px;background:var(--blue);color:white;border-radius:8px;font-size:13px;font-weight:500;text-decoration:none}
-.coach-link:hover{background:#1d4ed8}
-.faq-title{font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
-.faq-item{font-size:11px;padding:7px 10px;background:var(--cream);border:1px solid var(--border);border-radius:6px;color:#475569;cursor:pointer}
-.faq-item:hover{background:var(--blue-l);color:var(--blue);border-color:var(--blue-m)}
+.hbtn{font-size:11px;padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer}
+.hbtn:hover{background:var(--blue-l);color:var(--blue)}
+.main{max-width:1080px;margin:0 auto;padding:1rem}
 
-.tips-box{background:white;border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:0.85rem}
-.tips-title{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.tips-box{background:white;border:1px solid var(--border);border-radius:12px;padding:0.9rem 1rem;margin-bottom:0.85rem}
+.tips-title{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between}
 .tips-refresh{font-size:11px;padding:3px 9px;border-radius:6px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0}
 .tips-refresh:hover{background:var(--blue-l);color:var(--blue)}
-.tips-grid{display:flex;flex-direction:column;gap:7px}
-.tip-item{display:flex;align-items:flex-start;gap:10px;padding:9px 11px;border-radius:8px;border:1px solid #e0e7ff;background:#f8f7ff}
-.tip-item .tip-ico{font-size:16px;flex-shrink:0;margin-top:1px}
-.tip-item .tip-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#5b21b6;margin-bottom:2px}
-.tip-item .tip-text{font-size:12px;color:#475569;line-height:1.5}
-.tips-loading{font-size:12px;color:#94a3b8;padding:8px 0;display:flex;align-items:center;gap:8px}
-.spinner{width:14px;height:14px;border:2px solid #e2e8f0;border-top-color:var(--blue);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* APRENDIZAJES BOX */
+.tips-grid{display:flex;flex-direction:column;gap:6px}
+.tip-item{display:flex;align-items:flex-start;gap:10px;padding:8px 11px;border-radius:8px;border:1px solid #e0e7ff;background:#f8f7ff;cursor:default}
+.tip-item.clickable{cursor:pointer}
+.tip-item.clickable:hover{border-color:var(--blue-m)}
+.tip-ico{font-size:15px;flex-shrink:0;margin-top:1px}
+.tip-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#5b21b6;margin-bottom:2px}
+.tip-text{font-size:12px;color:#475569;line-height:1.5}
 
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:0.85rem}
 .stat{background:white;border:1px solid var(--border);border-radius:9px;padding:9px 11px}
 .stat-label{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px;font-weight:500;margin-bottom:2px}
 .stat-val{font-size:19px;font-weight:700;color:var(--ink)}
 .stat-sub{font-size:10px;color:#94a3b8;margin-top:1px}
-.funnel{background:white;border:1px solid var(--border);border-radius:12px;padding:0.9rem;margin-bottom:0.85rem}
-.funnel-title{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px}
+
+.funnel{background:white;border:1px solid var(--border);border-radius:12px;padding:0.85rem;margin-bottom:0.85rem}
 .funnel-stages{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
-.stage{border-radius:8px;padding:9px 5px;text-align:center;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s}
+.stage{border-radius:8px;padding:8px 5px;text-align:center;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s}
 .stage:hover{border-color:#cbd5e1}
 .stage.active{border-color:var(--blue);background:var(--blue-l)}
-.s-icon{font-size:15px;margin-bottom:3px}
 .s-name{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;color:#64748b;margin-bottom:3px}
 .s-num{font-size:18px;font-weight:700;color:var(--ink);line-height:1}
 .s-pct{font-size:10px;color:#94a3b8;margin-top:1px}
-.s-bar{height:3px;border-radius:2px;margin-top:5px;background:#e2e8f0}
-.s-bar-fill{height:3px;border-radius:2px}
-.funnel-totals{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:#94a3b8}
-.funnel-totals span{color:var(--ink);font-weight:600}
-.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+
+.section-hdr{display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap}
 .section-title{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px}
-.add-btn{font-size:12px;padding:4px 11px;border-radius:6px;border:1px solid var(--border);background:white;color:var(--blue);cursor:pointer;font-weight:500}
-.add-btn:hover{background:var(--blue);color:white}
-.filter-btns{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:7px}
+.add-btn{font-size:12px;padding:5px 12px;border-radius:7px;border:none;background:var(--blue);color:white;cursor:pointer;font-weight:500;margin-left:auto}
+.add-btn:hover{background:#1d4ed8}
+.search-wrap{position:relative}
+.search-wrap span{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;color:#94a3b8}
+#search-input{font-size:12px;padding:5px 10px 5px 26px;border:1px solid var(--border);border-radius:99px;outline:none;background:white;width:200px;font-family:var(--sans)}
+.filter-btns{display:flex;gap:4px;flex-wrap:wrap}
 .fb{font-size:11px;padding:3px 9px;border-radius:99px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer}
 .fb.on{background:var(--blue);color:white;border-color:var(--blue)}
 
-.table-wrap{background:white;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1rem;width:100%}
-.ctable{width:100%;border-collapse:collapse;table-layout:fixed}
-.ctable th{font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;padding:8px 10px;background:#f8f9fc;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
-.ctable td{font-size:12px;padding:6px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.table-wrap{background:white;border:1px solid var(--border);border-radius:12px;overflow-x:auto;margin-bottom:1.5rem}
+.ctable{width:100%;border-collapse:collapse;min-width:640px}
+.ctable th{font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;padding:8px 10px;background:#f8f9fc;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;cursor:pointer;user-select:none}
+.ctable td{font-size:12px;padding:8px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
 .ctable tr:last-child td{border-bottom:none}
-.ctable tr:hover td{background:#fafbfd}
-.col-emp{width:150px}
-.col-cont{width:110px}
-.col-cargo{width:100px}
-.col-city{width:75px}
-.col-status{width:85px;text-align:center}
-.col-score{width:70px;text-align:center}
-.col-timing{width:140px}
-.col-dias{width:40px;text-align:center}
-.col-acc{width:90px;text-align:center}
+.ctable tbody tr{cursor:pointer}
+.ctable tbody tr:hover td{background:#fafbfd}
 .td-emp{font-weight:600;font-size:12px}
-.td-cont{font-size:11px;color:#475569}
-.td-cargo{font-size:10px;color:#94a3b8}
-.td-dias{font-size:11px;color:#cbd5e1;display:block;text-align:center}
+.td-cont{font-size:11px;color:#64748b;margin-top:1px}
+.td-dias{font-size:11px;color:#94a3b8}
 .td-dias.hot{color:var(--red);font-weight:600}
-.badge{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:500;white-space:nowrap}
-.b-pc{background:#f1f5f9;color:#475569}
-.b-co{background:#dbeafe;color:#1e40af}
-.b-re{background:#fef9c3;color:#854d0e}
-.b-ru{background:#f5f3ff;color:#6d28d9}
-.b-pr{background:#fff7ed;color:#c2410c}
-.b-ga{background:#dcfce7;color:#166534}
-.b-oh{background:#f3f4f6;color:#374151}
-.b-no{background:#fee2e2;color:#991b1b}
+.badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500;white-space:nowrap}
+.b-pc{background:#f1f5f9;color:#475569}.b-co{background:#dbeafe;color:#1e40af}
+.b-re{background:#fef9c3;color:#854d0e}.b-ru{background:#f5f3ff;color:#6d28d9}
+.b-pr{background:#fff7ed;color:#c2410c}.b-ga{background:#dcfce7;color:#166534}
+.b-oh{background:#f3f4f6;color:#374151}.b-no{background:#fee2e2;color:#991b1b}
 .b-ep{background:#dbeafe;color:#1e40af}
 .timing-txt{font-size:10px;white-space:nowrap}
-.diag-cell{font-size:10px;color:#475569;line-height:1.4;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.diag-cell.blocker{color:var(--red);font-weight:500}
-.row-btns{display:flex;gap:3px;align-items:center}
-.rb{font-size:13px;padding:3px 4px;border-radius:4px;border:none;background:transparent;cursor:pointer;color:#94a3b8;line-height:1}
-.rb:hover{background:var(--blue-l)}
-.rb.ask:hover{background:var(--purple-l)}
-.rb.hist:hover{background:#f0fdf4}
-.rb.diag:hover{background:#fef9c3}
 
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:center;justify-content:center}
+.overlay{display:none;position:fixed;inset:0;background:rgba(26,26,46,0.45);z-index:100;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto}
 .overlay.open{display:flex}
-.modal{background:white;border-radius:14px;padding:1.5rem;width:460px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.15)}
-.modal h3{font-family:var(--serif);font-size:19px;margin-bottom:1.1rem}
+.modal{background:white;border-radius:14px;padding:1.4rem;width:560px;max-width:96vw;box-shadow:0 20px 60px rgba(0,0,0,0.18);margin-bottom:2rem}
+.modal h3{font-family:var(--serif);font-size:20px;margin-bottom:0.4rem}
 .field{margin-bottom:10px}
-.field label{font-size:11px;color:#64748b;display:block;margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px}
+.field label{font-size:10px;color:#64748b;display:block;margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px}
 .field input,.field select,.field textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:7px;outline:none;font-family:var(--sans);background:var(--cream)}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);background:white}
-.field textarea{height:58px;resize:none}
+.field textarea{height:56px;resize:vertical}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.field-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
 .modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem}
 .btn-c{font-size:13px;padding:7px 15px;border-radius:7px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer}
 .btn-s{font-size:13px;padding:7px 15px;border-radius:7px;border:none;background:var(--blue);color:white;cursor:pointer;font-weight:500}
-.btn-del{font-size:13px;padding:7px 15px;border-radius:7px;border:none;background:var(--red-l);color:var(--red);cursor:pointer;font-weight:500;margin-right:auto}
+.btn-del{font-size:12px;padding:7px 13px;border-radius:7px;border:none;background:var(--red-l);color:var(--red);cursor:pointer;font-weight:500;margin-right:auto}
+.toggle-link{font-size:12px;color:var(--blue);cursor:pointer;background:none;border:none;font-family:var(--sans);padding:2px 0}
 
-/* MODAL DIAGNÓSTICO */
-.diag-section{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:10px}
-.diag-section-title{font-size:12px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.diag-section-title span{font-size:14px}
-.diag-generated{font-size:12px;color:#475569;line-height:1.5;margin-bottom:6px;padding:7px 10px;background:white;border-radius:6px;border:1px solid var(--border)}
-.diag-edit{width:100%;font-size:12px;padding:7px 10px;border:1px solid var(--blue-m);border-radius:6px;outline:none;font-family:var(--sans);background:white;color:var(--ink);resize:none;height:52px}
-.diag-edit:focus{border-color:var(--blue)}
-.diag-edit-label{font-size:10px;color:var(--blue);margin-bottom:3px;display:block}
-.loading-diag{font-size:12px;color:#94a3b8;display:flex;align-items:center;gap:6px;padding:4px 0}
-
-.hist-entries{display:flex;flex-direction:column;gap:7px;margin-top:0.75rem;max-height:280px;overflow-y:auto}
-.hist-entry{padding:8px 11px;background:var(--cream);border-radius:8px;border:1px solid var(--border)}
-.hist-type{font-size:10px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:0.4px}
-.hist-date{font-size:10px;color:#94a3b8;margin-bottom:3px}
-.hist-text{font-size:12px;color:var(--ink);line-height:1.4}
-.hist-add{display:flex;gap:6px;margin-top:10px}
-.hist-input{flex:1;font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:7px;outline:none;font-family:var(--sans);background:white}
-.hist-input:focus{border-color:var(--blue)}
-.hist-sel{font-size:12px;padding:7px 8px;border:1px solid var(--border);border-radius:7px;outline:none;background:white}
-.hist-add-btn{font-size:12px;padding:7px 12px;border:none;background:var(--blue);color:white;border-radius:7px;cursor:pointer;white-space:nowrap}
-.consejo-ctx{font-size:12px;color:#64748b;margin-bottom:10px;line-height:1.5}
-.consejo-msg{background:#eff6ff;border:1px solid var(--blue-m);border-radius:8px;padding:12px 14px;font-size:13px;color:#1e40af;line-height:1.6;margin-bottom:10px}
-.copy-btn{font-size:12px;padding:6px 14px;border:none;background:var(--blue);color:white;border-radius:6px;cursor:pointer}
-.copy-btn:hover{background:#1d4ed8}
-.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:8px 16px;border-radius:8px;font-size:12px;opacity:0;transition:opacity 0.3s;z-index:200;pointer-events:none}
+.dsec{border:1px solid var(--border);border-radius:10px;margin-bottom:9px;overflow:hidden}
+.dsec-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--cream);cursor:pointer;user-select:none}
+.dsec-hdr .t{font-size:11px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.4px}
+.dsec-body{padding:11px 12px;display:none}
+.dsec.open .dsec-body{display:block}
+.coach-block{background:#f8f7ff;border:1px solid #e0e7ff;border-radius:10px;padding:12px;margin-bottom:9px}
+.coach-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.coach-hdr .t{font-size:11px;font-weight:600;color:#5b21b6;text-transform:uppercase;letter-spacing:0.5px}
+.coach-reco{font-size:12px;color:#475569;line-height:1.55;margin-bottom:9px}
+.coach-msg{background:#eff6ff;border:1px solid var(--blue-m);border-radius:8px;padding:11px 13px;font-size:13px;color:#1e40af;line-height:1.6;white-space:pre-wrap}
+.coach-actions{display:flex;gap:6px;margin-top:8px}
+.mini-btn{font-size:11px;padding:5px 11px;border-radius:6px;border:1px solid var(--border);background:white;color:#475569;cursor:pointer;font-weight:500}
+.mini-btn:hover{background:var(--blue-l);color:var(--blue)}
+.mini-btn.primary{background:var(--blue);color:white;border-color:var(--blue)}
+.mini-btn.primary:hover{background:#1d4ed8}
+.spinner{width:13px;height:13px;border:2px solid #e2e8f0;border-top-color:var(--purple);border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:-2px;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-line{font-size:12px;color:#94a3b8;padding:4px 0}
+.hist-entry{padding:7px 10px;background:var(--cream);border-radius:8px;border:1px solid var(--border);margin-bottom:6px}
+.hist-type{font-size:10px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:0.4px;display:inline}
+.hist-date{font-size:10px;color:#94a3b8;display:inline;margin-left:6px}
+.hist-text{font-size:12px;color:var(--ink);line-height:1.4;margin-top:2px}
+.hist-add{display:flex;gap:6px;margin-top:8px}
+.hist-sel{font-size:12px;padding:6px 7px;border:1px solid var(--border);border-radius:7px;outline:none;background:white}
+.hist-input{flex:1;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:7px;outline:none;font-family:var(--sans);background:white}
+.fr-card{background:var(--cream);border-left:3px solid var(--purple);border-radius:8px;padding:9px 13px;margin-bottom:6px}
+.fr-card .ft{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.fr-card .fi{font-size:12px;color:#475569;line-height:1.55;margin-bottom:3px}
+.detail-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.detail-top select{font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:7px;background:var(--cream);outline:none;font-family:var(--sans)}
+.score-pill{font-size:12px;font-weight:600;padding:3px 12px;border-radius:99px;margin-left:auto}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:8px 16px;border-radius:8px;font-size:12px;opacity:0;transition:opacity 0.3s;z-index:300;pointer-events:none}
 .toast.show{opacity:1}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.funnel-stages{grid-template-columns:repeat(3,1fr);row-gap:6px}#search-input{width:140px}}
 </style>
 </head>
 <body>
 <div class="header">
-  <div class="logo">Rave <em>&</em> Crutchik <span style="font-size:11px;color:#94a3b8;font-family:var(--sans);font-weight:400;margin-left:5px">Sales Coach</span></div>
+  <div class="logo">Rave <em>&</em> Crutchik <span style="font-size:11px;color:#94a3b8;font-family:var(--sans);font-weight:400;margin-left:5px">Sales Coach v2</span></div>
   <div style="display:flex;align-items:center;gap:8px">
     <span class="day-pill" id="day-pill"></span>
-    <button class="sync-btn" id="sync-btn" onclick="syncInstantly()">⚡ Sync Instantly</button>
+    <button class="hbtn" onclick="exportData()">⬇ Exportar</button>
+    <button class="hbtn" onclick="openImport()">⬆ Importar</button>
   </div>
 </div>
 
-<div class="layout">
-  <div class="main">
-
-    <div class="tips-box">
-      <div class="tips-title">
-        <span>💡 Insights del coach</span>
-        <button class="tips-refresh" onclick="loadTips()">↻ Actualizar</button>
-      </div>
-      <div class="tips-grid" id="tips-grid"><div class="tips-loading"><div class="spinner"></div> Analizando tu pipeline...</div></div>
+<div class="main">
+  <div class="tips-box">
+    <div class="tips-title">
+      <span>💡 Insights del coach</span>
+      <button class="tips-refresh" onclick="renderTips()">↻ Actualizar</button>
     </div>
-
-    <div class="stats" id="stats"></div>
-    <div class="funnel">
-      <div class="funnel-title">Embudo de ventas</div>
-      <div class="funnel-stages" id="funnel-stages"></div>
-      <div class="funnel-totals" id="funnel-totals"></div>
-    </div>
-    <div class="section-hdr">
-      <div class="section-title">Pipeline</div>
-      <button class="add-btn" onclick="openModal()">+ Nuevo contacto</button>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
-      <div style="position:relative;flex:0 0 auto">
-        <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;color:#94a3b8">🔍</span>
-        <input id="search-input" type="text" placeholder="Buscar empresa o contacto..." oninput="renderContacts()" style="font-size:12px;padding:4px 10px 4px 26px;border:1px solid var(--border);border-radius:99px;outline:none;background:white;width:220px;font-family:var(--sans)">
-      </div>
-      <div class="filter-btns" id="filter-btns" style="margin-bottom:0;flex:1"></div>
-    </div>
-    <div class="table-wrap">
-      <table class="ctable" id="clist"></table>
-    </div>
+    <div class="tips-grid" id="tips-grid"></div>
   </div>
 
-  <div class="panel">
-    <div class="panel-hdr">
-      <div class="coach-av">🎯</div>
-      <div>
-        <div style="font-size:13px;font-weight:600">Sales Coach</div>
-        <div style="font-size:11px;color:var(--green)">● Disponible en Claude.ai</div>
-      </div>
-    </div>
-    <div class="panel-body">
-      <p class="panel-desc">Haz clic en <strong>🎯 Consejo</strong> en cualquier contacto para ver el mensaje sugerido, o abre Claude directamente.</p>
-      <a href="https://claude.ai" target="_blank" class="coach-link">🎯 Abrir Sales Coach</a>
-      <div class="faq-title" style="margin-top:8px">Preguntas frecuentes</div>
-      <div class="faq-item" onclick="window.open('https://claude.ai','_blank')">¿A quién contacto hoy?</div>
-      <div class="faq-item" onclick="window.open('https://claude.ai','_blank')">¿Cómo cierro a Tagler?</div>
-      <div class="faq-item" onclick="window.open('https://claude.ai','_blank')">Seguimiento a Dmerco</div>
-      <div class="faq-item" onclick="window.open('https://claude.ai','_blank')">Me dejaron en visto</div>
-      <div class="faq-item" onclick="window.open('https://claude.ai','_blank')">¿Cuánta comisión tengo?</div>
-    </div>
+  <div class="stats" id="stats"></div>
+
+  <div class="funnel">
+    <div class="funnel-stages" id="funnel-stages"></div>
   </div>
+
+  <div class="section-hdr">
+    <div class="section-title">Pipeline</div>
+    <div class="search-wrap"><span>🔍</span><input id="search-input" type="text" placeholder="Buscar..." oninput="renderContacts()"></div>
+    <div class="filter-btns" id="filter-btns"></div>
+    <button class="add-btn" onclick="openAdd()">+ Nuevo contacto</button>
+  </div>
+
+  <div class="table-wrap"><table class="ctable" id="clist"></table></div>
 </div>
 
-<!-- MODAL EDITAR -->
-<div class="overlay" id="overlay">
-  <div class="modal">
-    <h3 id="modal-title">Nuevo contacto</h3>
-    <div class="field"><label>Empresa *</label><input id="f-emp" type="text" placeholder="Nombre empresa" onblur="autoInvestigar()"></div>
-    <div class="field-row">
-      <div class="field"><label>Contacto</label><input id="f-cont" type="text" placeholder="Nombre persona"></div>
-      <div class="field"><label>Cargo</label><input id="f-cargo" type="text" placeholder="Cargo"></div>
-    </div>
+<!-- MODAL NUEVO CONTACTO (quick add) -->
+<div class="overlay" id="add-overlay">
+  <div class="modal" style="width:440px">
+    <h3>Nuevo contacto</h3>
+    <p style="font-size:12px;color:#94a3b8;margin-bottom:12px">Solo lo esencial. El resto lo completas después si hace falta.</p>
+    <div class="field"><label>Empresa *</label><input id="a-emp" type="text" placeholder="Nombre empresa"></div>
     <div class="field-row">
       <div class="field"><label>Etapa</label>
-        <select id="f-status">
-          <option>Por contactar</option><option>Contactado</option><option>Respondió</option>
-          <option>Reunión</option><option>Propuesta</option><option>Ganado</option>
-          <option>On hold</option><option>No</option>
-        </select>
+        <select id="a-status"><option>Por contactar</option><option>Contactado</option><option>Respondió</option><option>Reunión</option><option>Propuesta</option><option>Ganado</option><option>On hold</option><option>No</option></select>
       </div>
       <div class="field"><label>Canal</label>
-        <select id="f-canal">
-          <option value="">-</option><option>Email</option><option>LinkedIn</option>
-          <option>WhatsApp</option><option>Llamada</option><option>Referido</option><option>Reunión</option>
-        </select>
+        <select id="a-canal"><option value="">-</option><option>Email</option><option>LinkedIn</option><option>WhatsApp</option><option>Llamada</option><option>Referido</option><option>Reunión</option></select>
       </div>
     </div>
-    <div class="field-row">
-      <div class="field"><label>UF/hora</label><input id="f-uf" type="number" placeholder="ej: 3.0" step="0.1" min="0"></div>
-      <div class="field"><label>Horas estimadas</label><input id="f-horas" type="number" placeholder="ej: 20" min="0"></div>
-    </div>
-    <div class="field-row">
-      <div class="field"><label>Fecha último contacto</label><input id="f-fecha" type="date"></div>
-      <div class="field"><label>Comisión %</label><input id="f-com" type="number" placeholder="15" min="0" max="100"></div>
-    </div>
-    <div class="field"><label>Email</label><input id="f-email" type="email" placeholder="email@empresa.cl"></div>
-    <div class="field-row">
-      <div class="field"><label>Ciudad</label><input id="f-ciudad" type="text" placeholder="ej: Antofagasta"></div>
-      <div class="field"><label>Región</label>
-        <select id="f-region">
-          <option value="">-</option>
-          <option>Arica y Parinacota</option>
-          <option>Tarapacá</option>
-          <option>Antofagasta</option>
-          <option>Atacama</option>
-          <option>Coquimbo</option>
-          <option>Valparaíso</option>
-          <option>Metropolitana</option>
-          <option>O'Higgins</option>
-          <option>Maule</option>
-          <option>Ñuble</option>
-          <option>Biobío</option>
-          <option>La Araucanía</option>
-          <option>Los Ríos</option>
-          <option>Los Lagos</option>
-          <option>Aysén</option>
-          <option>Magallanes</option>
-        </select>
+    <div class="field"><label>Próxima acción</label><input id="a-accion" type="text" placeholder="ej: escribir el jueves"></div>
+    <button class="toggle-link" onclick="toggleAddMore()" id="add-more-link">+ Más campos (contacto, cargo, ciudad...)</button>
+    <div id="add-more" style="display:none;margin-top:8px">
+      <div class="field-row">
+        <div class="field"><label>Contacto</label><input id="a-cont" type="text" placeholder="Nombre persona"></div>
+        <div class="field"><label>Cargo</label><input id="a-cargo" type="text" placeholder="Cargo"></div>
       </div>
+      <div class="field-row">
+        <div class="field"><label>Ciudad</label><input id="a-ciudad" type="text"></div>
+        <div class="field"><label>Email</label><input id="a-email" type="email"></div>
+      </div>
+      <div class="field"><label>Notas</label><textarea id="a-notas" placeholder="Contexto..."></textarea></div>
     </div>
-    <div class="field"><label>Próxima acción</label><input id="f-accion" type="text" placeholder="ej: llamar jueves"></div>
-    <div class="field"><label>Notas</label><textarea id="f-notas" placeholder="Contexto, historia, estado actual..."></textarea></div>
-
     <div class="modal-btns">
-      <button class="btn-del" id="btn-del" style="display:none" onclick="deleteContact()">Eliminar</button>
-      <button class="btn-c" onclick="closeModal()">Cancelar</button>
-      <button class="btn-s" onclick="saveContact()">Guardar</button>
+      <button class="btn-c" onclick="closeAdd()">Cancelar</button>
+      <button class="btn-s" onclick="saveAdd()">Guardar</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL HISTORIAL -->
-<div class="overlay" id="hist-overlay">
-  <div class="modal" style="width:500px">
-    <h3 id="hist-title">Historial</h3>
-    <div class="hist-entries" id="hist-entries"></div>
-    <div class="hist-add">
-      <select class="hist-sel" id="hist-type">
-        <option>Email</option><option>LinkedIn</option><option>WhatsApp</option>
-        <option>Llamada</option><option>Reunión</option><option>Nota</option>
-      </select>
-      <input class="hist-input" id="hist-input" type="text" placeholder="¿Qué pasó? ej: Respondió positivo, agenda reunión...">
-      <button class="hist-add-btn" onclick="addHist()">+ Agregar</button>
-    </div>
-    <div class="modal-btns" style="margin-top:1rem">
-      <button class="btn-s" onclick="closeHist()">Cerrar</button>
-    </div>
-  </div>
+<!-- MODAL DETALLE (todo en uno) -->
+<div class="overlay" id="detail-overlay">
+  <div class="modal" id="detail-modal"></div>
 </div>
 
-<!-- MODAL DIAGNÓSTICO -->
-<div class="overlay" id="diag-overlay">
-  <div class="modal" style="width:580px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem">
-      <h3 id="diag-title" style="margin-bottom:0">Diagnóstico</h3>
-      <div id="diag-score-badge" style="font-size:13px;font-weight:600;padding:4px 14px;border-radius:99px"></div>
-    </div>
-
-
-
-    <!-- 1. EMPRESA -->
-    <div class="diag-section">
-      <div class="diag-section-title">
-        <span>🏢 Quién es esta empresa</span>
-        <button onclick="investigarDesdeModal()" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--blue-m);background:var(--blue-l);color:var(--blue);cursor:pointer;font-weight:500" id="inv-btn">🔍 Investigar</button>
-      </div>
-      <span id="inv-status" style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px"></span>
-      <div class="diag-generated" id="diag-empresa-gen" style="min-height:40px"></div>
-    </div>
-
-    <!-- 2. DOLOR -->
-    <div class="diag-section">
-      <div class="diag-section-title"><span>🎯</span> Cuál es su dolor</div>
-      <div class="diag-generated" id="diag-dolor-gen"></div>
-      <textarea class="diag-edit" id="diag-dolor-edit" style="display:none"></textarea>
-    </div>
-
-    <!-- 3. TE RECOMIENDO -->
-    <div class="diag-section">
-      <div class="diag-section-title" style="display:flex;align-items:center;justify-content:space-between">
-        <span>💡 Te recomiendo</span>
-        <span id="accion-loading" style="font-size:11px;color:#94a3b8;display:none">Analizando...</span>
-      </div>
-      <div class="diag-generated" id="diag-real-gen"></div>
-    </div>
-
-    <!-- 4. MENSAJE LISTO -->
-    <div class="diag-section">
-      <div class="diag-section-title">
-        <span>✉️ Mensaje listo para enviar</span>
-        <button onclick="copiarMensajeDiag()" style="font-size:11px;padding:3px 10px;border-radius:6px;border:none;background:var(--blue);color:white;cursor:pointer;font-weight:500">📋 Copiar</button>
-      </div>
-      <div class="diag-generated" id="diag-accion-gen" style="background:#eff6ff;border-color:var(--blue-m);color:#1e40af;font-style:normal"></div>
-      <textarea class="diag-edit" id="diag-accion-edit" placeholder="El mensaje se genera al guardar..." style="display:none"></textarea>
-    </div>
-
-    <!-- hidden fields for compatibility -->
-    <div style="display:none">
-      <textarea id="diag-valor-edit"></textarea>
-      <textarea id="diag-incentivo-edit"></textarea>
-      <textarea id="diag-stakeholders-edit"></textarea>
-    </div>
-
-    <div class="diag-section">
-      <div class="diag-section-title"><span>📝</span> Algo que quieras agregar</div>
-      <textarea class="diag-edit" id="diag-extra-edit" placeholder="Contexto adicional que Claude debería considerar: lo que sabes del contacto, algo que te dijeron, intuiciones..."></textarea>
-    </div>
-
+<!-- MODAL IMPORTAR -->
+<div class="overlay" id="import-overlay">
+  <div class="modal" style="width:480px">
+    <h3>Importar datos</h3>
+    <p style="font-size:12px;color:#64748b;margin-bottom:10px;line-height:1.5">Pega aquí un JSON exportado antes. Esto <strong>reemplaza</strong> el pipeline actual.</p>
+    <div class="field"><textarea id="import-text" style="height:140px" placeholder='{"contacts":[...],"nextId":60}'></textarea></div>
     <div class="modal-btns">
-      <button class="btn-c" onclick="closeDiag()">Cancelar</button>
-      <button class="btn-s" onclick="saveDiag()">Guardar diagnóstico</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL NEGOCIACION -->
-<div class="overlay" id="neg-overlay">
-  <div class="modal" style="width:560px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-      <h3 id="neg-title" style="margin-bottom:0">Modulo de propuesta</h3>
-      <span style="font-size:11px;background:#f5f3ff;color:#7c3aed;padding:3px 10px;border-radius:99px;font-weight:500">Francisco mode</span>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:10px" id="neg-body"></div>
-    <div class="modal-btns" style="margin-top:1rem">
-      <button class="btn-s" onclick="closeNeg()">Cerrar</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL CONSEJO -->
-<div class="overlay" id="consejo-overlay">
-  <div class="modal" style="width:500px">
-    <h3 id="consejo-title">Consejo</h3>
-    <div class="consejo-ctx" id="consejo-ctx"></div>
-    <div class="consejo-msg" id="consejo-msg"></div>
-    <button class="copy-btn" id="copy-btn" onclick="copyConsejo()">📋 Copiar mensaje</button>
-    <div class="modal-btns" style="margin-top:1rem">
-      <button class="btn-s" onclick="closeConsejo()">Cerrar</button>
+      <button class="btn-c" onclick="closeImport()">Cancelar</button>
+      <button class="btn-s" onclick="doImport()">Importar</button>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
-
 <script>
 const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 const UF=38500;
-const STAGES=[
-  {k:'Por contactar',ico:'',cls:'',color:'#94a3b8'},
-  {k:'Contactado',ico:'',cls:'',color:'#94a3b8'},
-  {k:'Respondió',ico:'',cls:'',color:'#94a3b8'},
-  {k:'Reunión',ico:'',cls:'',color:'#94a3b8'},
-  {k:'Propuesta',ico:'',cls:'',color:'#94a3b8'},
-  {k:'Ganado',ico:'',cls:'',color:'#94a3b8'},
-];
+const STAGES=['Por contactar','Contactado','Respondió','Reunión','Propuesta','Ganado'];
 const ORD={'Reunión':0,'Respondió':1,'Propuesta':2,'En proceso':3,'Contactado':4,'Por contactar':5,'On hold':6,'Ganado':7,'No':8};
 function bc(s){return {'Por contactar':'b-pc','Contactado':'b-co','Respondió':'b-re','Reunión':'b-ru','Propuesta':'b-pr','Ganado':'b-ga','On hold':'b-oh','No':'b-no','En proceso':'b-ep'}[s]||'b-pc';}
 
+// ---------- SEED: pipeline original ----------
+const SEED=[
+{id:1,emp:'Niu Sushi',cont:'Alan Schoihet',cargo:'Dueño',status:'No',canal:'',dias:30,notas:'No respondió'},
+{id:2,emp:'Japi Jane',cont:'Mail de contacto',cargo:'Dueño',status:'No',canal:'',dias:30,notas:'No respondió'},
+{id:3,emp:'Coca Cola',cont:'Romina Elgueta',cargo:'Mejora continua',status:'No',canal:'',dias:30,notas:'Eligieron otra empresa'},
+{id:4,emp:'Benbo',cont:'Nicolás Borobio',cargo:'Dueño',status:'On hold',canal:'',dias:20,accion:'Esperar que se ordenen',notas:'Esperando a ordenarse'},
+{id:5,emp:'Tagler Foods',cont:'Luis Cheriff',cargo:'Gerente Operaciones',status:'Reunión',canal:'Reunión',uf:3.5,horas:40,accion:'Cobrar y entregar informe',notas:'Informe visita pendiente, pago atrasado',fechaContacto:'2026-05-14',historial:[{fecha:'2026-05-14',tipo:'Reunión',texto:'Primera reunión realizada.'}]},
+{id:6,emp:'HDG',cont:'Seba',cargo:'Producción',status:'Contactado',canal:'Email',accion:'Seguimiento email',fechaContacto:'2026-05-25',historial:[{fecha:'2026-05-25',tipo:'Email',texto:'Email inicial enviado.'}]},
+{id:7,emp:'Coca Cola',cont:'Cristina Arancibia',cargo:'Mejora continua',status:'On hold',canal:'',dias:15,accion:'Esperar info',notas:'Sin info por ahora'},
+{id:8,emp:'Forus',cont:'Caro',cargo:'Gerente Marketing',status:'On hold',canal:'',dias:21,accion:'Investigar antes de contactar'},
+{id:9,emp:'Arauco',cont:'Luciano Villarroel',cargo:'-',status:'On hold',canal:'',dias:30,accion:'Retomar en 2 semanas'},
+{id:10,emp:'Neumaérica',cont:'Gabriela Rodriguez',cargo:'Gerente Comercial',status:'Contactado',canal:'Email',accion:'Mail seguimiento',fechaContacto:'2026-05-14',historial:[{fecha:'2026-05-14',tipo:'Email',texto:'Email inicial enviado.'}]},
+{id:11,emp:'Transportes Jofre Hidalgo',cont:'-',cargo:'-',status:'Contactado',canal:'',accion:'Seguimiento',fechaContacto:'2026-05-21'},
+{id:12,emp:'Transportes Sahid',cont:'Enrique Peña / Felipe Armijo',cargo:'Dueño',status:'Contactado',canal:'WhatsApp',accion:'Seguimiento WhatsApp',fechaContacto:'2026-05-21',historial:[{fecha:'2026-05-21',tipo:'WhatsApp',texto:'Primer contacto.'}]},
+{id:13,emp:'Transportes Dliverys',cont:'Cristopher Olguin',cargo:'Dueño',status:'En proceso',canal:'WhatsApp',uf:2.5,horas:16,accion:'Insistir - dejó en visto',notas:'No llegó a reunión acordada',fechaContacto:'2026-05-28',historial:[{fecha:'2026-05-28',tipo:'WhatsApp',texto:'Acordaron reunión pero no llegó.'}]},
+{id:14,emp:'Transportes Concha',cont:'Victor Muñoz',cargo:'-',status:'Contactado',canal:'WhatsApp',accion:'Seguimiento WhatsApp',fechaContacto:'2026-05-25'},
+{id:15,emp:'Wild Foods',cont:'Javier Castro',cargo:'Co Founder & CEO',status:'Por contactar',canal:'LinkedIn',accion:'Enviar mail',notas:'Invitación LinkedIn'},
+{id:16,emp:'Transportes Nazar',cont:'José Miguel Gelvez',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',accion:'Enviar mail',notas:'Invitación LinkedIn'},
+{id:17,emp:'Loginsa',cont:'Tomás Cox',cargo:'Gerente General',status:'Contactado',canal:'LinkedIn',accion:'Seguimiento LinkedIn',fechaContacto:'2026-05-25'},
+{id:18,emp:'Clínica Bupa',cont:'Rafael Córdova',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',accion:'Enviar mail',notas:'Invitación LinkedIn'},
+{id:19,emp:'Karün',cont:'Ignacio Ureta',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',accion:'Enviar mail',notas:'Invitación LinkedIn'},
+{id:20,emp:'Casa Idea',cont:'Cedric Moller',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',accion:'Enviar mail',notas:'Invitación LinkedIn'},
+{id:21,emp:'Dimarc',cont:'Valentin Flores',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',accion:'Enviar mail',notas:'Invitación LinkedIn'},
+{id:22,emp:'Prisa',cont:'Martín Grosso',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',accion:'Enviar mail',notas:'Invitación LinkedIn'},
+{id:23,emp:'Dimerc',cont:'Karim Eltit',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',accion:'Enviar mail',notas:'Invitación LinkedIn'},
+{id:24,emp:'Disal',cont:'Daniel Palma',cargo:'Gerente Corporativo',status:'Por contactar',canal:'LinkedIn',accion:'Enviar mail',notas:'Invitación LinkedIn'},
+{id:25,emp:'Grupo K',cont:'Sebastian Khamis',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',accion:'Enviar mail',notas:'Invitación LinkedIn'},
+{id:26,emp:'Leco Consortium',cont:'Luis Cárcamo',cargo:'Gerente General',status:'Contactado',canal:'LinkedIn',accion:'Seguimiento LinkedIn',fechaContacto:'2026-05-25'},
+{id:27,emp:'Salfa',cont:'Derek Bull',cargo:'Gerente Logística',status:'Contactado',canal:'LinkedIn',accion:'Seguimiento LinkedIn',fechaContacto:'2026-05-25'},
+{id:28,emp:'DHL',cont:'Alejandro Trello',cargo:'Operation Manager',status:'Contactado',canal:'LinkedIn',accion:'Seguimiento LinkedIn',fechaContacto:'2026-05-25'},
+{id:29,emp:'Neulin Graneles',cont:'Carlos Pineda',cargo:'Gerente/Socio/Director',status:'Contactado',canal:'LinkedIn',accion:'Seguimiento LinkedIn',fechaContacto:'2026-05-25'},
+{id:30,emp:'Dmerco',cont:'Marco',cargo:'Dueño',status:'Reunión',canal:'WhatsApp',uf:3.0,horas:20,accion:'Confirmar fecha reunión jue/vie',notas:'Próxima semana. Vive en incendios.',fechaContacto:'2026-05-21',historial:[{fecha:'2026-05-21',tipo:'WhatsApp',texto:'Contacto inicial.'}]},
+{id:31,emp:'RockTruck',cont:'-',cargo:'-',status:'Contactado',canal:'WhatsApp',accion:'Seguimiento',notas:'Era de finanzas, compartirá contacto',fechaContacto:'2026-05-25'},
+{id:32,emp:'Casablanca',cont:'-',cargo:'-',status:'Contactado',canal:'WhatsApp',accion:'Seguimiento',notas:'No ha contestado',fechaContacto:'2026-05-25'},
+{id:33,emp:'Antofagasta Terminal',cont:'Alex Munoz',cargo:'Ops Manager',status:'Respondió',canal:'Email',accion:'Seguimiento - abrió email',notas:'Abrió email Instantly',com:15,email:'amunoz@atiport.cl',ciudad:'Antofagasta',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}]},
+{id:34,emp:'Puerto San Antonio',cont:'Jorge Santos',cargo:'Gerente Operaciones',status:'Respondió',canal:'Email',accion:'Seguimiento - abrió email',notas:'Abrió email Instantly',email:'jsantos@puertosanantonio.com',ciudad:'San Antonio',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}]},
+{id:35,emp:'Almar Water',cont:'Yilian Collao',cargo:'Subgerente Ops',status:'Respondió',canal:'Email',accion:'Seguimiento - abrió email',notas:'Abrió email Instantly',email:'yilian.collao@almarwaterservices.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}]},
+{id:36,emp:'Implementos Chile',cont:'Hans Meyer',cargo:'Jefe Ops CD',status:'Respondió',canal:'Email',accion:'Seguimiento - abrió email',notas:'Abrió email Instantly',email:'hans.meyer@implementos.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}]},
+{id:37,emp:'ULOG',cont:'Manuel Salazar',cargo:'Ops Manager',status:'Contactado',canal:'Email',accion:'Esperar respuesta',notas:'Campaña Instantly',email:'msalazar@ulog.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}]},
+{id:38,emp:'Transportes Maquehua',cont:'Igor Jofre',cargo:'Asst. Ops Manager',status:'Contactado',canal:'Email',accion:'Esperar respuesta',notas:'Campaña Instantly',email:'ijofre@maquehua.cl',fechaContacto:'2026-06-03'},
+{id:39,emp:'Empresas Marval',cont:'Javier Droguett',cargo:'Ops Manager',status:'Contactado',canal:'Email',accion:'Esperar respuesta',notas:'Campaña Instantly',email:'jdroguett@marval.cl',fechaContacto:'2026-06-03'},
+{id:40,emp:'Grupo MBO',cont:'Carlos Corvalan',cargo:'Supply Chain Mgr',status:'Contactado',canal:'Email',accion:'Esperar respuesta',notas:'Campaña Instantly',email:'carlos.corvalan@grupombo.com',fechaContacto:'2026-06-03'},
+{id:41,emp:'APRO',cont:'Consuelo Camaggi',cargo:'Supply Chain Corp.',status:'Contactado',canal:'Email',accion:'Esperar respuesta',notas:'Campaña Instantly',email:'consuelo.camaggi@apro.cl',fechaContacto:'2026-06-03'},
+{id:42,emp:'Miniso Chile',cont:'Gonzalo Salgueiro',cargo:'Ops Manager',status:'Contactado',canal:'Email',accion:'Esperar respuesta',notas:'Campaña Instantly',email:'gonzalo.salgueiro@miniso.cl',fechaContacto:'2026-06-03'},
+{id:43,emp:'La Fête Chocolat',cont:'Martin Bunster',cargo:'Ops Manager',status:'Contactado',canal:'Email',accion:'Esperar respuesta',notas:'Campaña Instantly',email:'mbunster@lafetechocolat.com',fechaContacto:'2026-06-03'},
+{id:44,emp:'ID Logistics',cont:'Franco Salinas',cargo:'Ops Manager',status:'Contactado',canal:'Email',accion:'Esperar respuesta',notas:'Campaña Instantly',email:'fsalinas@id-logistics.com',fechaContacto:'2026-06-03'},
+{id:45,emp:'RFP Logistica',cont:'Mauricio Contreras',cargo:'Ops Manager',status:'Contactado',canal:'Email',accion:'Esperar respuesta',notas:'Campaña Instantly',email:'mcontreras@rfplogistica.com',fechaContacto:'2026-06-03'},
+{id:46,emp:'Recibelo.cl',cont:'Mauricio Rivera',cargo:'Ops Manager',status:'Contactado',canal:'Email',accion:'Esperar respuesta',notas:'Campaña Instantly',email:'mauricio@recibelo.cl',fechaContacto:'2026-06-03'},
+{id:47,emp:'RPM Parts',cont:'Valentina Rayman',cargo:'Supply Chain Mgr',status:'Contactado',canal:'Email',accion:'Esperar respuesta',notas:'Campaña Instantly',email:'vrayman@rpm.parts',fechaContacto:'2026-06-03'},
+{id:48,emp:'Caja Los Héroes',cont:'(vía Berna)',cargo:'-',status:'Por contactar',canal:'Referido',accion:'Pedir contacto a Berna',notas:'Papá de Berna trabaja ahí'},
+{id:49,emp:'Alemán Experto',cont:'(vía Sofi)',cargo:'Dueño',status:'Por contactar',canal:'Referido',accion:'Contactar por Sofi/Berna',notas:'Sofi es esposa del dueño'},
+{id:50,emp:'Ferreterías Lonza',cont:'Simón Lonza',cargo:'Ejecutivo',status:'Contactado',canal:'Email',accion:'Seguimiento en 5 días',notas:'Referido de Luzma. Perfil emprendedor, ecoturismo.',fechaContacto:'2026-06-06',historial:[{fecha:'2026-06-06',tipo:'Email',texto:'Correo personalizado enviado vía Luzma.'}]}
+];
+function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,accion:'',notas:'',com:15,email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:''},c);}
+
+let contacts=[],nextId=60,activeFilter='todos',detailId=null,sortCol='default',sortDesc=true,loaded=false;
+
+// ---------- PERSISTENCIA (storage del artifact) ----------
+async function persist(){
+  try{await window.storage.set('sales-coach-v2',JSON.stringify({contacts,nextId}));}
+  catch(e){console.error('storage error',e);}
+}
+async function loadData(){
+  try{
+    const r=await window.storage.get('sales-coach-v2');
+    if(r&&r.value){const d=JSON.parse(r.value);contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;loaded=true;return;}
+  }catch(e){/* key no existe aún */}
+  contacts=SEED.map(normalize);nextId=60;loaded=true;
+  persist();
+}
+
+// ---------- LÓGICA BASE ----------
 function getDias(c){
-  if(c.fechaContacto){
-    const d=Math.floor((new Date()-new Date(c.fechaContacto))/(1000*60*60*24));
-    return Math.max(0,d);
-  }
+  if(c.fechaContacto){const d=Math.floor((new Date()-new Date(c.fechaContacto))/(1000*60*60*24));return Math.max(0,d);}
   return c.dias||0;
 }
-
 function timing(c){
   const d=getDias(c);
-  if(c.status==='Respondió'){
-    if(d<3) return {txt:`Espera ${3-d}d más`,color:'#22c55e'};
-    if(d<=6) return {txt:'Momento ideal',color:'#f59e0b'};
-    return {txt:'Urgente: escríbele',color:'#ef4444'};
-  }
-  if(c.status==='Contactado'){
-    if(d<5) return {txt:`Seguimiento en ${5-d}d`,color:'#22c55e'};
-    if(d<=8) return {txt:'Momento ideal',color:'#f59e0b'};
-    return {txt:'Sin contacto hace mucho',color:'#ef4444'};
-  }
-  if(c.status==='Reunión'){
-    if(d<=3) return {txt:'Reunión reciente',color:'#22c55e'};
-    if(d<=7) return {txt:'Confirma siguientes pasos',color:'#f59e0b'};
-    return {txt:'Urgente: confirma avance',color:'#ef4444'};
-  }
+  if(c.status==='Respondió'){if(d<3)return{txt:'Espera '+(3-d)+'d más',color:'#22c55e'};if(d<=6)return{txt:'Momento ideal',color:'#f59e0b'};return{txt:'Urgente: escríbele',color:'#ef4444'};}
+  if(c.status==='Contactado'){if(d<5)return{txt:'Seguimiento en '+(5-d)+'d',color:'#22c55e'};if(d<=8)return{txt:'Momento ideal',color:'#f59e0b'};return{txt:'Sin contacto hace mucho',color:'#ef4444'};}
+  if(c.status==='Reunión'){if(d<=3)return{txt:'Reunión reciente',color:'#22c55e'};if(d<=7)return{txt:'Confirma siguientes pasos',color:'#f59e0b'};return{txt:'Urgente: confirma avance',color:'#ef4444'};}
+  if(c.status==='Propuesta'){if(d<=5)return{txt:'Esperando decisión',color:'#f59e0b'};return{txt:'Pregunta qué falta',color:'#ef4444'};}
   return null;
 }
-
-// --- DIAGNOSTICO AUTOMATICO ---
-function generarDiagReal(c){
-  var d=getDias(c);
-  var canal=c.canal||'desconocido';
-  var ultimoHist=(c.historial||[]).slice(-1)[0];
-  var ultimoTexto=ultimoHist?ultimoHist.texto:'';
-  var ctx='';
-  if(c.contexto&&c.contexto.length>0) ctx+=' Contexto: "'+c.contexto+'".';
-  if(c.analisis&&c.analisis.length>0) ctx+=' Analisis: '+c.analisis.slice(0,200)+(c.analisis.length>200?'...':'')+' ';
-  if(c.incentivo&&c.incentivo.length>0) ctx+=' Incentivo: '+c.incentivo+'.';
-  if(c.stakeholders&&c.stakeholders.length>0) ctx+=' Otros que aprueban: '+c.stakeholders+'.';
-
-  if(c.status==='Respondio'||c.status==='Respondió'){
-    var via=canal==='Email'?'el email':canal==='WhatsApp'?'tu mensaje de WhatsApp':canal==='LinkedIn'?'tu mensaje de LinkedIn':'tu mensaje de '+canal;
-    return ctx+'Leyo '+via+' hace '+d+' dias pero no respondio. Hay interes (lo leyo), pero falta friccion para responder. No es rechazo - es silencio. El segundo toque tiene 40% mas probabilidad de exito.'+(ultimoTexto?' Contexto: '+ultimoTexto:'');
-  }
-  if(c.status==='Contactado'&&d>14)
-    return ctx+'Lleva '+d+' dias sin respuesta por '+canal+'. Probablemente nunca leyo el mensaje, o lo postergo. No es rechazo - es silencio. Falta un segundo toque.'+(ultimoTexto?' Ultimo registro: '+ultimoTexto:'');
-  if(c.status==='Contactado'&&d>7)
-    return ctx+d+' dias desde el primer contacto por '+canal+' sin respuesta. El momentum se esta enfriando. Momento ideal para un seguimiento corto.';
-  if(c.status==='Contactado')
-    return ctx+'Recien contactado hace '+d+' dias por '+canal+'. Demasiado pronto para insistir - el timing esta bien. Solo hay que esperar.';
-  if(c.status==='Reunión'||c.status==='Reunion'){
-    if(d>7) return ctx+'Reunion hace '+d+' dias sin avance documentado. El riesgo es que pierda prioridad.'+(c.notas?' Contexto: '+c.notas:'')+' Falta propuesta o confirmacion de siguiente paso.';
-    return ctx+'Reunion realizada hace '+d+' dias. El momentum esta activo.'+(c.notas?' Nota: '+c.notas+'. ':'')+' La propuesta debe llegar antes de 48 horas.';
-  }
-  if(c.status==='Por contactar')
-    return ctx+'Nunca contactado. Canal planificado: '+(canal||'sin definir')+'. '+(c.notas?'Contexto: '+c.notas+'. ':'')+' El unico bloqueador eres tu - falta enviar el primer mensaje.';
-  if(c.status==='On hold')
-    return ctx+'En pausa. '+(c.notas||'Sin razon documentada')+'. El riesgo es que on hold se convierta en descarte silencioso.';
-  if(c.status==='En proceso')
-    return ctx+'En proceso por '+canal+' pero sin avance claro en '+d+' dias. '+(c.notas||'')+'. Hay que definir si hay dolor real.';
-  return ctx+'Estado: '+c.status+'. '+d+' dias desde ultimo contacto por '+canal+'. Revisar si sigue siendo prioritario.';
-}
-
-function generarDiagAccion(c){
-  var d=getDias(c);
-  var nombre=c.cont?c.cont.split(' ')[0]:'el contacto';
-  var canal=c.canal||'Email';
-  var nivel=nivelCargo(c);
-  var rubro=inferRubro(c.emp)||'sin rubro detectado';
-  var pregunta=getPreguntaDolor(c);
-  var dolor=getDolorCorto(c);
-  var notas=(c.notas||'').toLowerCase();
-  var contexto=(c.contexto||'').toLowerCase();
-  var ciudad=c.ciudad||c.region||'';
-  var esNorte=['Antofagasta','Iquique','Arica','Calama','Tocopilla','Tarapaca','Arica y Parinacota'].some(function(z){return ciudad.includes(z);});
-  var contextoNorte=esNorte?' Ademas, estamos con un proyecto activo en Antofagasta  -  estamos cerca y disponibles para ir a terreno.':'';
-  var esTerreno=contexto.includes('terreno')||contexto.includes('maneja')||contexto.includes('armó')||contexto.includes('armo')||contexto.includes('fundó')||contexto.includes('fundo');
-
-  var analisisResumen=c.analisis&&c.analisis.length>0?'Basado en el analisis: '+c.analisis.slice(0,150)+(c.analisis.length>150?'...':'')+' ':'';
-  // Construir accion que integra todo el contexto
-  var intro='';
-  if(nivel==='dueño'&&esTerreno) intro='Es dueño que viene del terreno  -  no quiere script de consultor, quiere alguien que entienda su realidad. ';
-  else if(nivel==='dueño') intro='Es dueño  -  decide solo, va directo al dolor de negocio. ';
-  else if(nivel==='gg') intro='Es GG  -  le importa el crecimiento y el control. ';
-  else if(nivel==='gerente') intro='Es gerente  -  le importa que la operacion funcione sin depender de él. ';
-  intro=analisisResumen+intro;
-
-  var rubroCtx=rubro!=='sin rubro detectado'?'Rubro '+rubro+'. ':'';
-  var ciudadCtx=ciudad?'Empresa en '+ciudad+'.'+contextoNorte+' ':'';
-
-  if(c.status==='Respondió'){
-    var timing=d<=3?'El momentum esta activo, no lo pierdas.':'Han pasado '+d+' dias, el momentum se esta enfriando  -  actua hoy.';
-    return intro+rubroCtx+ciudadCtx+
-      'Segundo toque por '+canal+'. No reenvies lo mismo. Pregunta genuina al dolor: "'+pregunta+'" '+
-      'Una pregunta, sin explicar nada mas, sin vender. '+timing;
-  }
-
-  if(c.status==='Contactado'&&d>=14)
-    return intro+rubroCtx+ciudadCtx+
-      'Ultimo intento. '+d+' dias sin respuesta. Mensaje directo: "'+nombre+', '+pregunta+' Si no es el momento, sin problema  -  aca vamos a estar." '+
-      'Si no responde en 5 dias, cierra el loop. El silencio es del otro, no tuyo.';
-
-  if(c.status==='Contactado'&&d>=5)
-    return intro+rubroCtx+ciudadCtx+
-      'Segundo toque por '+canal+'. Angulo nuevo al dolor: "'+nombre+', '+dolor+'. Si eso resuena, vale 20 minutos." '+
-      'Un mensaje, espera. No persigas.';
-
-  if(c.status==='Contactado')
-    return intro+'Llevas '+d+' dias desde el primer contacto. Todavia es pronto para insistir  -  parece desesperado. '+
-      'Proxima accion en dia '+(5-d<=0?'hoy':5-d)+'. Soporta la ansiedad de la incertidumbre.';
-
-  if(c.status==='Reunión'){
-    if(d>7) return intro+rubroCtx+ciudadCtx+
-      'Urgente: '+d+' dias desde la reunion sin propuesta. Antes del precio, ancla el valor: cuanto les cuesta el problema hoy. '+
-      'Luego el numero en silencio. Sin disculpas, sin justificar.'+contextoNorte;
-    if(d>3) return intro+rubroCtx+ciudadCtx+
-      'Enviar propuesta antes del fin de semana. Incluye: que resuelves, como se mide el exito, que incluye y que NO. '+
-      'Precio anclado al costo del problema, no a tus horas.';
-    return intro+rubroCtx+ciudadCtx+
-      'Momentum activo  -  enviar propuesta en 48 horas. '+
-      'Antes de que firmen: fija expectativas en voz alta. Que incluye, que no incluye, cuando termina.';
-  }
-
-  if(c.status==='Por contactar'){
-    if(c.canal==='Referido') return intro+rubroCtx+ciudadCtx+
-      'Es referido  -  la confianza ya esta instalada. Primer mensaje esta semana. '+
-      'Directo al dolor: "'+nombre+', '+pregunta+'" Sin presentacion corporativa, sin pedir favor.';
-    return intro+rubroCtx+ciudadCtx+
-      'Primer contacto esta semana por '+canal+'. Arrancar con pregunta genuina: "'+pregunta+'" '+
-      'No vendas en el primer mensaje. Genera curiosidad, nada mas.';
-  }
-
-  if(c.status==='En proceso'){
-    var ctxVisto=notas.includes('visto')||notas.includes('reunion')?'Dejo en visto o no llego a la reunion. ':'';
-    return intro+ctxVisto+rubroCtx+ciudadCtx+
-      'Definir si hay dolor real antes de seguir invirtiendo tiempo. '+
-      'Pregunta directa: "'+pregunta+'" Si evade o no responde, probablemente no hay urgencia  -  libera esa energia.';
-  }
-
-  if(c.status==='On hold')
-    return intro+rubroCtx+
-      'Esta en pausa. Poner fecha limite de revision. '+
-      'Si en 2 semanas no hay señal, descartar con dignidad. No todos son tu cliente y esta bien.';
-
-  return intro+rubroCtx+ciudadCtx+
-    'Retomar con pregunta genuina: "'+pregunta+'" Si no responde, cerrar el loop.';
-}
-
-function nivelCargo(c){
-  var cargo=(c.cargo||'').toLowerCase();
-  if(cargo.includes('dueño')||cargo.includes('ceo')||cargo.includes('founder')||cargo.includes('co founder')||cargo.includes('socio')) return 'dueño';
-  if(cargo.includes('gerente general')||cargo.includes('director general')) return 'gg';
-  if(cargo.includes('gerente')||cargo.includes('director')||cargo.includes('subgerente')) return 'gerente';
-  if(cargo.includes('jefe')||cargo.includes('manager')||cargo.includes('mgr')||cargo.includes('coord')) return 'jefe';
-  return 'general';
-}
-
-function getCanalTono(canal){
-  if(canal==='WhatsApp') return {tono:'muy corto y directo, maximo 3 lineas, sin formalismos', firma:'', largo:'cortisimo'};
-  if(canal==='LinkedIn') return {tono:'profesional pero cercano, maximo 4 lineas, sin adjuntos', firma:'', largo:'corto'};
-  if(canal==='Email') return {tono:'un poco mas desarrollado, con asunto atractivo de menos de 7 palabras', firma:'Jael Crutchik - Rave & Crutchik', largo:'medio'};
-  if(canal==='Llamada') return {tono:'script de apertura de llamada, 3 oraciones maximas antes de preguntar', firma:'', largo:'muy corto'};
-  return {tono:'directo y humano', firma:'', largo:'corto'};
-}
-
-function getDolorCorto(c){
-  var rubro=inferRubro(c.emp)||'default';
-  var nivel=nivelCargo(c);
-
-  var dolores={
-    'Transporte/Logistica':{
-      'dueño':'cada mes gastas mas en flota y no sabes exactamente por que',
-      'gg':'el negocio crece pero el margen no acompaña y la operacion es cada vez mas dificil de controlar',
-      'gerente':'coordinar rutas, choferes y clientes depende de llamadas y planillas que nadie actualiza igual',
-      'jefe':'los tiempos muertos entre rutas se comen la productividad y nadie los esta midiendo bien',
-      'general':'la operacion crece pero se vuelve mas cara y menos predecible'
-    },
-    'Puertos/Operaciones':{
-      'dueño':'cada hora de espera no planificada te cuesta plata que no ves en ningun reporte',
-      'gg':'la coordinacion entre areas funciona hasta que algo falla, y cuando falla es caro',
-      'gerente':'la informacion esta en silos y para saber que esta pasando hay que llamar a tres personas',
-      'jefe':'los turnos dependen de que todos hagan lo mismo pero nadie lo tiene escrito igual',
-      'general':'la operacion portuaria tiene costos ocultos que se ven solo cuando ya es tarde'
-    },
-    'Retail/Consumo':{
-      'dueño':'tienes quiebres de stock o despachos tarde que te cuestan clientes y no sabes cuanto',
-      'gg':'crecer en ventas no sirve si la operacion no escala y el margen se erosiona',
-      'gerente':'el picking, el despacho y las devoluciones consumen mas tiempo y plata de lo que deberian',
-      'jefe':'cada dia hay apagados de incendio que podrian evitarse si los procesos estuvieran mas claros',
-      'general':'la operacion de tienda y bodega se complica a medida que crece el volumen'
-    },
-    'Alimentos':{
-      'dueño':'si tuvieras un problema de calidad hoy, cuanto tardarias en saber de que lote viene',
-      'gg':'el crecimiento en volumen trae riesgo si los procesos no estan estandarizados',
-      'gerente':'cumplir las normas consume tiempo manual que podria ir a producir mas',
-      'jefe':'la merma y los reprocesos cuestan mas de lo que aparece en los numeros',
-      'general':'con el crecimiento los procesos de control se vuelven el cuello de botella'
-    },
-    '3PL/Operadores':{
-      'dueño':'sabes exactamente cuanto margen te deja cada cliente despues de los costos reales',
-      'gg':'diferenciarte de la competencia es cada vez mas dificil si la operacion no es mas eficiente que la de ellos',
-      'gerente':'el onboarding de clientes nuevos es lento y manual y eso tiene un costo',
-      'jefe':'los SLA se incumplen porque no hay alertas tempranas, solo apagados despues',
-      'general':'operar para otros exige niveles de servicio que son dificiles de mantener sin procesos solidos'
-    },
-    'Mineria/Industria':{
-      'dueño':'cada parada no programada te cuesta mas de lo que cuesta prevenirla',
-      'gg':'la operacion depende demasiado de personas clave y eso es un riesgo que nadie quiere ver hasta que pasa',
-      'gerente':'el mantenimiento reactivo sale mas caro que el preventivo pero igual seguimos apagando incendios',
-      'jefe':'los turnos no estan estandarizados y cada uno los hace a su manera',
-      'general':'en mineria el costo de no tener los procesos claros se mide en horas de produccion perdidas'
-    },
-    'Salud':{
-      'dueño':'cuanto tiempo clinico se esta yendo en tareas que no son clinicas',
-      'gg':'el flujo de pacientes tiene cuellos de botella que afectan la experiencia y el ingreso',
-      'gerente':'el abastecimiento de insumos tiene quiebres que generan problemas operacionales todos los meses',
-      'jefe':'los procesos administrativos consumen tiempo que deberia ir a atencion',
-      'general':'en salud la ineficiencia operacional tiene un costo clinico ademas del economico'
-    },
-    'Arquitectura/Construccion':{
-      'dueño':'proyectos que te exigen estar encima de todo para que salgan bien, sin poder delegar',
-      'gg':'coordinacion entre proyectos y clientes que genera fricciones que se podrian evitar',
-      'gerente':'procesos de entrega que consumen mas tiempo del que deberian por falta de estandares',
-      'jefe':'cada proyecto se hace diferente segun quien lo lidere, sin un proceso comun',
-      'general':'estudios que crecen en proyectos pero no en estructura, y eso genera desorden visible para los clientes'
-    },
-    'Manufactura/Packaging':{
-      'dueño':'produccion que depende de ti para que salga bien y eso no escala',
-      'gg':'crecimiento en pedidos que la operacion actual no puede absorber sin perder calidad',
-      'gerente':'reprocesos y merma que se comen el margen sin que nadie los este midiendo bien',
-      'jefe':'cada turno se hace diferente segun quien este porque los procesos no estan escritos',
-      'general':'capacidad productiva que no escala porque los procesos dependen de personas clave'
-    },
-    'Manufactura/Packaging':{
-      'dueño':'¿Cuánto tiempo de tu semana se va en resolver problemas de produccion que deberian funcionar solos?',
-      'gg':'¿El crecimiento en pedidos que tienen hoy, la operacion actual lo puede absorber sin que baje la calidad?',
-      'gerente':'¿Saben exactamente cuanto merma o reproceso tienen por linea o turno cada semana?',
-      'jefe':'¿Los procedimientos de produccion estan escritos o dependen de quien los aprendio primero?',
-      'general':'¿Si un operario clave no llega manana, que pasa con la produccion del dia?'
-    },
-    'default':{
-      'dueño':'cuanto tiempo de tu semana se va en cosas que deberian funcionar solas',
-      'gg':'el negocio crece pero cada vez dependes mas de ti mismo para que las cosas salgan bien',
-      'gerente':'los procesos que funcionaban antes ya no escalan con el tamano actual del equipo',
-      'jefe':'hay cosas que se hacen diferente segun quien este y eso genera errores que se repiten',
-      'general':'hay un punto en el crecimiento donde lo que funcionaba antes deja de funcionar'
-    }
-  };
-
-  var rubDolores=dolores[rubro]||dolores['default'];
-  return rubDolores[nivel]||rubDolores['general'];
-}
-
-function getPreguntaDolor(c){
-  var rubro=inferRubro(c.emp)||'default';
-  var nivel=nivelCargo(c);
-  var contexto=(c.contexto||'').toLowerCase();
-  var notas=(c.notas||'').toLowerCase();
-
-  // Si hay contexto del contacto, adaptar el tono
-  var esTerreno=contexto.includes('terreno')||contexto.includes('maneja')||contexto.includes('armó')||contexto.includes('armo')||contexto.includes('fundó')||contexto.includes('fundo')||contexto.includes('creció')||contexto.includes('crecio');
-  var esDesconfiado=contexto.includes('desconfía')||contexto.includes('desconfia')||contexto.includes('escéptico')||contexto.includes('esceptico');
-  var esTecnico=contexto.includes('técnico')||contexto.includes('tecnico')||contexto.includes('ingeniero')||contexto.includes('experto');
-
-  // Preguntas humanas por rubro y nivel - sin setup de venta
-  var preguntas={
-    'Transporte/Logistica':{
-      'dueño': esTerreno?
-        'Cuando tienes que salir tú mismo a resolver algo en la operación, ¿qué es lo que más te complica ese día?':
-        '¿Qué es lo que más te quita el sueño de la operación hoy? ¿Qué sientes que no funciona solo?',
-      'gg':'¿Cómo está funcionando la coordinación entre el equipo de ruta y la parte administrativa? ¿Hay cosas que caen entre medio?',
-      'gerente':'¿Qué parte del día a día operacional consume más tiempo del que debería en tu equipo?',
-      'jefe':'¿Cuándo algo sale mal en una ruta, cómo se enteran y cuánto tarda en resolverse?',
-      'general':'¿Qué es lo que más tiempo le consume a tu equipo que sientes que podría funcionar mejor?'
-    },
-    'Puertos/Operaciones':{
-      'dueño':'¿Qué es lo que más te complica cuando hay un problema operacional inesperado?',
-      'gg':'¿Cómo manejan hoy la coordinación entre las distintas áreas cuando algo se sale del plan?',
-      'gerente':'¿Cuándo hay una demora no planificada, cómo se entera el equipo y qué pasa después?',
-      'jefe':'¿Los procedimientos de turno están documentados o cada uno los hace a su manera?',
-      'general':'¿Qué parte de la operación sientes que depende demasiado de que todo salga perfecto para funcionar?'
-    },
-    'Retail/Consumo':{
-      'dueño':'¿Hay cosas en la operación que sientes que deberían funcionar solas pero siguen necesitando que tú estés encima?',
-      'gg':'¿Cómo está el margen hoy comparado con hace dos años? ¿Qué cambió en la operación?',
-      'gerente':'¿Qué parte del proceso de despacho o bodega genera más problemas de forma recurrente?',
-      'jefe':'¿Cuándo hay un quiebre de stock o un despacho tarde, cómo se detecta?',
-      'general':'¿Qué es lo que más tiempo consume en la operación que sientes que no debería ser tan difícil?'
-    },
-    'Alimentos':{
-      'dueño':'¿Si mañana hubiera un problema de calidad en un lote, cuánto tardarías en saber exactamente qué pasó?',
-      'gg':'¿El crecimiento que han tenido ha traído más complejidad operacional de la que esperaban?',
-      'gerente':'¿Qué parte del proceso de producción o bodega genera más reprocesos o merma?',
-      'jefe':'¿Los procedimientos de control están escritos o viven en la cabeza de las personas?',
-      'general':'¿Qué es lo que más incertidumbre genera en la operación día a día?'
-    },
-    '3PL/Operadores':{
-      'dueño':'¿Sabes exactamente cuánto te deja cada cliente después de todos los costos reales de operarlos?',
-      'gg':'¿Cómo se diferencian hoy de otros operadores que ofrecen algo parecido?',
-      'gerente':'¿Cuánto tarda en promedio que un cliente nuevo esté operando de forma normal?',
-      'jefe':'¿Cómo se enteran cuando se está por incumplir un SLA antes de que ya pasó?',
-      'general':'¿Qué parte del servicio a clientes genera más fricción interna?'
-    },
-    'Mineria/Industria':{
-      'dueño':'¿Si la persona que más sabe de un proceso crítico se va mañana, qué pasa?',
-      'gg':'¿Qué porcentaje del mantenimiento es reactivo versus planificado hoy?',
-      'gerente':'¿Cómo documentan los procedimientos de turno para que no dependan de quién esté ese día?',
-      'jefe':'¿Cuándo hay una parada no programada, cuánto tarda en identificarse la causa raíz?',
-      'general':'¿Qué es lo que más impacta la continuidad operacional cuando algo inesperado ocurre?'
-    },
-    'Salud':{
-      'dueño':'¿Qué parte de la operación sientes que consume tiempo que debería ir a la atención clínica?',
-      'gg':'¿Cómo está el flujo de pacientes hoy? ¿Hay cuellos de botella que ya identificaron pero no han podido resolver?',
-      'gerente':'¿Con qué frecuencia hay quiebres de insumos que afectan la atención?',
-      'jefe':'¿Los procesos administrativos están estandarizados o dependen de quién los aprendió primero?',
-      'general':'¿Qué es lo que más fricción genera en la operación día a día?'
-    },
-    'Arquitectura/Construccion':{
-      'dueño':'proyectos que te exigen estar encima de todo para que salgan bien, sin poder delegar',
-      'gg':'coordinacion entre proyectos y clientes que genera fricciones que se podrian evitar',
-      'gerente':'procesos de entrega que consumen mas tiempo del que deberian por falta de estandares',
-      'jefe':'cada proyecto se hace diferente segun quien lo lidere, sin un proceso comun',
-      'general':'estudios que crecen en proyectos pero no en estructura, y eso genera desorden visible para los clientes'
-    },
-    'Manufactura/Packaging':{
-      'dueño':'produccion que depende de ti para que salga bien y eso no escala',
-      'gg':'crecimiento en pedidos que la operacion actual no puede absorber sin perder calidad',
-      'gerente':'reprocesos y merma que se comen el margen sin que nadie los este midiendo bien',
-      'jefe':'cada turno se hace diferente segun quien este porque los procesos no estan escritos',
-      'general':'capacidad productiva que no escala porque los procesos dependen de personas clave'
-    },
-    'Manufactura/Packaging':{
-      'dueño':'¿Cuánto tiempo de tu semana se va en resolver problemas de produccion que deberian funcionar solos?',
-      'gg':'¿El crecimiento en pedidos que tienen hoy, la operacion actual lo puede absorber sin que baje la calidad?',
-      'gerente':'¿Saben exactamente cuanto merma o reproceso tienen por linea o turno cada semana?',
-      'jefe':'¿Los procedimientos de produccion estan escritos o dependen de quien los aprendio primero?',
-      'general':'¿Si un operario clave no llega manana, que pasa con la produccion del dia?'
-    },
-    'default':{
-      'dueño': esTerreno?
-        '¿Hay cosas en el negocio que sientes que deberían funcionar solas pero todavía dependen de que tú estés?':
-        '¿Qué es lo que más te quita tiempo hoy que sientes que no debería necesitar tu atención?',
-      'gg':'¿Si el negocio creciera el doble mañana, la operación actual lo aguantaría sin que todo se complique?',
-      'gerente':'¿Qué procesos del equipo funcionan diferente según quién esté ese día?',
-      'jefe':'¿Cuándo algo sale mal, cuánto tarda en resolverse y cuántas personas tienen que involucrarse?',
-      'general':'¿Qué es lo que más incertidumbre genera en la operación cuando las cosas no salen como se planificaron?'
-    }
-  };
-
-  var rubPreguntas=preguntas[rubro]||preguntas['default'];
-  return rubPreguntas[nivel]||rubPreguntas['general'];
-}
-
-function getMensaje(c){
-  var nombre=c.cont?c.cont.split(' ')[0]:'[Nombre]';
-  var dias=getDias(c);
-  var dolor=getDolorCorto(c);
-  var pregunta=getPreguntaDolor(c);
-  var canal=c.canal||'Email';
-  var esNorte=['Antofagasta','Iquique','Arica','Calama','Tocopilla','Tarapaca','Arica y Parinacota'].some(function(z){return (c.ciudad||'').includes(z)||(c.region||'').includes(z);});
-  var norte=esNorte?' Ademas, estamos con proyecto activo en Antofagasta, estamos cerca.':'';
-  var firma='Jael Crutchik - Rave & Crutchik';
-  var wa=canal==='WhatsApp';
-  var li=canal==='LinkedIn';
-
-  if(c.status==='Respondió'){
-    if(dias<=3) return {
-      ctx:'Leyo tu '+canal+' hace '+dias+' dias. Momentum activo.',
-      msg:wa?'Hola '+nombre+'! '+pregunta+' Si algo suena familiar, vale 20 min esta semana.':
-         li?'Hola '+nombre+', te escribo de nuevo: '+pregunta+' Si resuena, agendemos 20 minutos.':
-         'Hola '+nombre+', '+pregunta+' Si la respuesta genera algo de ruido, vale conversar. Tienes 20 minutos esta semana? '+firma
-    };
-    return {
-      ctx:''+dias+' dias. Segundo toque con angulo nuevo.',
-      msg:wa?'Hola '+nombre+'! '+dolor+'. Pasa algo de eso hoy? 20 min esta semana.':
-         li?'Hola '+nombre+', te escribo con un angulo distinto: '+dolor+'. Si resuena, vale 20 minutos. Esta semana?':
-         'Hola '+nombre+', estuve pensando en algo especifico: '+dolor+'. Cuando pasa, el costo no siempre es visible hasta que alguien lo mide. Tienes 20 minutos esta semana? '+firma
-    };
-  }
-
-  if(c.status==='Contactado'&&dias>=14) return {
-    ctx:''+dias+' dias sin respuesta. Ultimo toque.',
-    msg:wa?'Hola '+nombre+', ultimo mensaje de mi parte: '+pregunta+' Si no es el momento, sin problema, aca vamos a estar.':
-       li?'Hola '+nombre+', ultima consulta: '+pregunta+' Si no es el momento, sin problema.':
-       'Hola '+nombre+', '+pregunta+' Si no es el momento, sin problema, aca vamos a estar. '+firma
-  };
-
-  if(c.status==='Contactado'&&dias>=5) return {
-    ctx:''+dias+' dias. Segundo toque.',
-    msg:wa?'Hola '+nombre+'! '+dolor+'. Es algo que pasa en '+c.emp+'? 20 min esta semana.':
-       li?'Hola '+nombre+', retomo con algo concreto: '+dolor+'. Si resuena, vale 20 minutos.':
-       'Hola '+nombre+', '+dolor+'. Si eso resuena, vale una conversacion de 20 minutos. Esta semana? '+firma
-  };
-
-  if(c.status==='Contactado') return {
-    ctx:'Solo '+dias+' dias. Esperar hasta dia 5.',
-    msg:wa?'Hola '+nombre+'! Pudiste revisar mi mensaje? 20 min esta semana.':
-       'Hola '+nombre+', pudiste revisar mi mensaje? Vale 20 minutos esta semana? '+firma
-  };
-
-  if(c.status==='Reunión'){
-    if(dias>5) return {
-      ctx:dias+' dias desde reunion. Propuesta urgente.',
-      msg:wa?'Hola '+nombre+'! Queria retomar lo que conversamos. Puedo enviarte una propuesta esta semana?':
-         'Hola '+nombre+', quedo pensando en lo que conversamos. Puedo enviarte una propuesta concreta esta semana con un primer paso sin compromiso largo. Te parece? '+firma
-    };
-    return {
-      ctx:'Reunion reciente. Cierra propuesta.',
-      msg:wa?'Hola '+nombre+'! Gracias por la reunion. Esta semana te mando la propuesta. Va?':
-         'Hola '+nombre+', gracias por la reunion. Esta semana te envio una propuesta concreta. Te parece? '+firma
-    };
-  }
-
-  if(c.status==='Por contactar'){
-    if(c.canal==='Referido') return {
-      ctx:'Referido. Usar el nexo de confianza.',
-      msg:wa?'Hola '+nombre+'! Me paso tu contacto alguien en quien confio. '+pregunta+' Vale 20 min?':
-         'Hola '+nombre+', me paso tu contacto alguien en quien confio mucho. Te escribo porque '+dolor+'.'+norte+' Tienes 20 minutos esta semana? '+firma
-    };
-    return {
-      ctx:'Primer contacto. Directo al dolor.',
-      msg:wa?'Hola '+nombre+'! Soy Jael de Rave & Crutchik. '+pregunta+' Si algo resuena, vale 20 min.':
-         li?'Hola '+nombre+', soy Jael de Rave & Crutchik. '+pregunta+' Si resuena, agendemos 20 minutos.':
-         'Hola '+nombre+', mi nombre es Jael de Rave & Crutchik. '+dolor+'.'+norte+' '+pregunta+' Si resuena, vale 20 minutos. Esta semana? '+firma
-    };
-  }
-
-  if(c.status==='En proceso') return {
-    ctx:'En proceso. Definir si hay dolor real.',
-    msg:wa?'Hola '+nombre+'! '+pregunta+' Tienes 20 min para contarme?':
-       'Hola '+nombre+', '+pregunta+' Tienes 20 minutos para contarme? '+firma
-  };
-
-  return {
-    ctx:'Retomar contacto.',
-    msg:wa?'Hola '+nombre+'! Tienes 20 min esta semana?':
-       'Hola '+nombre+', tienes 20 minutos esta semana para conversar? '+firma
-  };
-}
-
-let contacts=[
-  {id:1,emp:'Niu Sushi',cont:'Alan Schoihet',cargo:'Dueño',status:'No',canal:'',dias:30,uf:0,horas:0,accion:'',notas:'No respondió',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:2,emp:'Japi Jane',cont:'Mail de contacto',cargo:'Dueño',status:'No',canal:'',dias:30,uf:0,horas:0,accion:'',notas:'No respondió',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:3,emp:'Coca Cola',cont:'Romina Elgueta',cargo:'Mejora continua',status:'No',canal:'',dias:30,uf:0,horas:0,accion:'',notas:'Eligieron otra empresa',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:4,emp:'Benbo',cont:'Nicolás Borobio',cargo:'Dueño',status:'On hold',canal:'',dias:20,uf:0,horas:0,accion:'Esperar que se ordenen',notas:'Esperando a ordenarse',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:5,emp:'Tagler Foods',cont:'Luis Cheriff',cargo:'Gerente Operaciones',status:'Reunión',canal:'Reunión',dias:21,uf:3.5,horas:40,accion:'Cobrar y entregar informe',notas:'Informe visita pendiente, pago atrasado',com:15,email:'',fechaContacto:'2026-05-14',historial:[{fecha:'2026-05-14',tipo:'Reunión',texto:'Primera reunión realizada.'}],diagReal:'',diagAccion:''},
-  {id:6,emp:'HDG',cont:'Seba',cargo:'Producción',status:'Contactado',canal:'Email',dias:10,uf:0,horas:0,accion:'Seguimiento email',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[{fecha:'2026-05-25',tipo:'Email',texto:'Email inicial enviado.'}],diagReal:'',diagAccion:''},
-  {id:7,emp:'Coca Cola',cont:'Cristina Arancibia',cargo:'Mejora continua',status:'On hold',canal:'',dias:15,uf:0,horas:0,accion:'Esperar info',notas:'Sin info por ahora',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:8,emp:'Forus',cont:'Caro',cargo:'Gerente Marketing',status:'On hold',canal:'',dias:21,uf:0,horas:0,accion:'Investigar antes de contactar',notas:'',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:9,emp:'Arauco',cont:'Luciano Villarroel',cargo:'-',status:'On hold',canal:'',dias:30,uf:0,horas:0,accion:'Retomar en 2 semanas',notas:'',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:10,emp:'Neumaérica',cont:'Gabriela Rodriguez',cargo:'Gerente Comercial',status:'Contactado',canal:'Email',dias:21,uf:0,horas:0,accion:'Mail seguimiento',notas:'',com:15,email:'',fechaContacto:'2026-05-14',historial:[{fecha:'2026-05-14',tipo:'Email',texto:'Email inicial enviado.'}],diagReal:'',diagAccion:''},
-  {id:11,emp:'Transportes Jofre Hidalgo',cont:'-',cargo:'-',status:'Contactado',canal:'',dias:14,uf:0,horas:0,accion:'Seguimiento',notas:'',com:15,email:'',fechaContacto:'2026-05-21',historial:[],diagReal:'',diagAccion:''},
-  {id:12,emp:'Transportes Sahid',cont:'Enrique Peña / Felipe Armijo',cargo:'Dueño',status:'Contactado',canal:'WhatsApp',dias:14,uf:0,horas:0,accion:'Seguimiento WhatsApp',notas:'',com:15,email:'',fechaContacto:'2026-05-21',historial:[{fecha:'2026-05-21',tipo:'WhatsApp',texto:'Primer contacto.'}],diagReal:'',diagAccion:''},
-  {id:13,emp:'Transportes Dliverys',cont:'Cristopher Olguin',cargo:'Dueño',status:'En proceso',canal:'WhatsApp',dias:7,uf:2.5,horas:16,accion:'Insistir  -  dejó en visto',notas:'No llegó a reunión acordada',com:15,email:'',fechaContacto:'2026-05-28',historial:[{fecha:'2026-05-28',tipo:'WhatsApp',texto:'Acordaron reunión pero no llegó.'}],diagReal:'',diagAccion:''},
-  {id:14,emp:'Transportes Concha',cont:'Victor Muñoz',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento WhatsApp',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[],diagReal:'',diagAccion:''},
-  {id:15,emp:'Wild Foods',cont:'Javier Castro',cargo:'Co Founder & CEO',status:'Por contactar',canal:'LinkedIn',dias:5,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:16,emp:'Transportes Nazar',cont:'José Miguel Gelvez',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:5,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:17,emp:'Loginsa',cont:'Tomás Cox',cargo:'Gerente General',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[],diagReal:'',diagAccion:''},
-  {id:18,emp:'Clínica Bupa',cont:'Rafael Córdova',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:19,emp:'Karün',cont:'Ignacio Ureta',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:20,emp:'Casa Idea',cont:'Cedric Moller',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:21,emp:'Dimarc',cont:'Valentin Flores',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:22,emp:'Prisa',cont:'Martín Grosso',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:23,emp:'Dimerc',cont:'Karim Eltit',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:24,emp:'Disal',cont:'Daniel Palma',cargo:'Gerente Corporativo',status:'Por contactar',canal:'LinkedIn',dias:3,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:25,emp:'Grupo K',cont:'Sebastian Khamis',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',dias:5,uf:0,horas:0,accion:'Enviar mail',notas:'Invitación LinkedIn',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:26,emp:'Leco Consortium',cont:'Luis Cárcamo',cargo:'Gerente General',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[],diagReal:'',diagAccion:''},
-  {id:27,emp:'Salfa',cont:'Derek Bull',cargo:'Gerente Logística',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[],diagReal:'',diagAccion:''},
-  {id:28,emp:'DHL',cont:'Alejandro Trello',cargo:'Operation Manager',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[],diagReal:'',diagAccion:''},
-  {id:29,emp:'Neulin Graneles',cont:'Carlos Pineda',cargo:'Gerente/Socio/Director',status:'Contactado',canal:'LinkedIn',dias:10,uf:0,horas:0,accion:'Seguimiento LinkedIn',notas:'',com:15,email:'',fechaContacto:'2026-05-25',historial:[],diagReal:'',diagAccion:''},
-  {id:30,emp:'Dmerco',cont:'Marco',cargo:'Dueño',status:'Reunión',canal:'WhatsApp',dias:14,uf:3.0,horas:20,accion:'Confirmar fecha reunión jue/vie',notas:'Próxima semana. Vive en incendios.',com:15,email:'',fechaContacto:'2026-05-21',historial:[{fecha:'2026-05-21',tipo:'WhatsApp',texto:'Contacto inicial.'}],diagReal:'',diagAccion:''},
-  {id:31,emp:'RockTruck',cont:'-',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento',notas:'Era de finanzas, compartirá contacto',com:15,email:'',fechaContacto:'2026-05-25',historial:[],diagReal:'',diagAccion:''},
-  {id:32,emp:'Casablanca',cont:'-',cargo:'-',status:'Contactado',canal:'WhatsApp',dias:10,uf:0,horas:0,accion:'Seguimiento',notas:'No ha contestado',com:15,email:'',fechaContacto:'2026-05-25',historial:[],diagReal:'',diagAccion:''},
-  {id:33,emp:'Antofagasta Terminal',cont:'Alex Munoz',cargo:'Ops Manager',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento  -  abrió email',notas:'Abrió email Instantly ✅',com:15,email:'amunoz@atiport.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}],diagReal:'',diagAccion:''},
-  {id:34,emp:'Puerto San Antonio',cont:'Jorge Santos',cargo:'Gerente Operaciones',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento  -  abrió email',notas:'Abrió email Instantly ✅',com:15,email:'jsantos@puertosanantonio.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}],diagReal:'',diagAccion:''},
-  {id:35,emp:'Almar Water',cont:'Yilian Collao',cargo:'Subgerente Ops',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento  -  abrió email',notas:'Abrió email Instantly ✅',com:15,email:'yilian.collao@almarwaterservices.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}],diagReal:'',diagAccion:''},
-  {id:36,emp:'Implementos Chile',cont:'Hans Meyer',cargo:'Jefe Ops CD',status:'Respondió',canal:'Email',dias:1,uf:0,horas:0,accion:'Seguimiento  -  abrió email',notas:'Abrió email Instantly ✅',com:15,email:'hans.meyer@implementos.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly. Abrió el email.'}],diagReal:'',diagAccion:''},
-  {id:37,emp:'ULOG',cont:'Manuel Salazar',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'msalazar@ulog.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}],diagReal:'',diagAccion:''},
-  {id:38,emp:'Transportes Maquehua',cont:'Igor Jofre',cargo:'Asst. Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'ijofre@maquehua.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}],diagReal:'',diagAccion:''},
-  {id:39,emp:'Empresas Marval',cont:'Javier Droguett',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'jdroguett@marval.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}],diagReal:'',diagAccion:''},
-  {id:40,emp:'Grupo MBO',cont:'Carlos Corvalan',cargo:'Supply Chain Mgr',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'carlos.corvalan@grupombo.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}],diagReal:'',diagAccion:''},
-  {id:41,emp:'APRO',cont:'Consuelo Camaggi',cargo:'Supply Chain Corp.',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'consuelo.camaggi@apro.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}],diagReal:'',diagAccion:''},
-  {id:42,emp:'Miniso Chile',cont:'Gonzalo Salgueiro',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'gonzalo.salgueiro@miniso.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}],diagReal:'',diagAccion:''},
-  {id:43,emp:'La Fête Chocolat',cont:'Martin Bunster',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'mbunster@lafetechocolat.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}],diagReal:'',diagAccion:''},
-  {id:44,emp:'ID Logistics',cont:'Franco Salinas',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'fsalinas@id-logistics.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}],diagReal:'',diagAccion:''},
-  {id:45,emp:'RFP Logistica',cont:'Mauricio Contreras',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'mcontreras@rfplogistica.com',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}],diagReal:'',diagAccion:''},
-  {id:46,emp:'Recibelo.cl',cont:'Mauricio Rivera',cargo:'Ops Manager',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'mauricio@recibelo.cl',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}],diagReal:'',diagAccion:''},
-  {id:47,emp:'RPM Parts',cont:'Valentina Rayman',cargo:'Supply Chain Mgr',status:'Contactado',canal:'Email',dias:1,uf:0,horas:0,accion:'Esperar respuesta',notas:'Campaña Instantly',com:15,email:'vrayman@rpm.parts',fechaContacto:'2026-06-03',historial:[{fecha:'2026-06-03',tipo:'Email',texto:'Campaña Instantly enviada.'}],diagReal:'',diagAccion:''},
-  {id:48,emp:'Caja Los Héroes',cont:'(vía Berna)',cargo:'-',status:'Por contactar',canal:'Referido',dias:0,uf:0,horas:0,accion:'Pedir contacto a Berna',notas:'Papá de Berna trabaja ahí',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:49,emp:'Alemán Experto',cont:'(vía Sofi)',cargo:'Dueño',status:'Por contactar',canal:'Referido',dias:0,uf:0,horas:0,accion:'Contactar por Sofi/Berna',notas:'Sofi es esposa del dueño',com:15,email:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:''},
-  {id:50,emp:'Ferreterías Lonza',cont:'Simón Lonza',cargo:'Ejecutivo',status:'Contactado',canal:'Email',dias:0,uf:0,horas:0,accion:'Seguimiento en 5 días',notas:'Referido de Luzma. Perfil emprendedor, ecoturismo.',com:15,email:'',fechaContacto:'2026-06-06',historial:[{fecha:'2026-06-06',tipo:'Email',texto:'Correo personalizado enviado vía Luzma.'}],diagReal:'',diagAccion:''},
-];
-
-let nextId=60,activeFilter='todos',editingId=null,histId=null,diagId=null,consejoMsg='',sortCol='default',sortDesc=true;
-
-function calcV(c){return c.uf&&c.horas?Math.round(c.uf*c.horas*UF):0;}
-function calcC(c){return Math.round(calcV(c)*(c.com||15)/100);}
 function urg(c){
   const d=getDias(c);
-  if(['No','Ganado'].includes(c.status)) return 'l';
-  if(c.status==='Reunión'&&d>5) return 'h';
-  if(c.status==='Respondió'&&d>3) return 'h';
-  if(c.status==='En proceso'&&d>7) return 'h';
-  if(['Contactado','Por contactar'].includes(c.status)&&d>14) return 'h';
-  if(d>7) return 'm';
-  return 'l';
+  if(['No','Ganado'].includes(c.status))return 'l';
+  if(c.status==='Reunión'&&d>5)return 'h';
+  if(c.status==='Respondió'&&d>3)return 'h';
+  if(c.status==='En proceso'&&d>7)return 'h';
+  if(['Contactado','Por contactar'].includes(c.status)&&d>14)return 'h';
+  if(d>7)return 'm';return 'l';
+}
+function nivelCargo(c){
+  const cargo=(c.cargo||'').toLowerCase();
+  if(cargo.includes('dueño')||cargo.includes('ceo')||cargo.includes('founder')||cargo.includes('socio'))return 'dueño';
+  if(cargo.includes('gerente general')||cargo.includes('director general'))return 'gg';
+  if(cargo.includes('gerente')||cargo.includes('director')||cargo.includes('subgerente'))return 'gerente';
+  if(cargo.includes('jefe')||cargo.includes('manager')||cargo.includes('mgr')||cargo.includes('coord'))return 'jefe';
+  return 'general';
+}
+function inferRubro(emp){
+  emp=(emp||'').toLowerCase();
+  if(emp.includes('transport')||emp.includes('logis')||emp.includes('truck')||emp.includes('flota'))return 'Transporte/Logística';
+  if(emp.includes('port')||emp.includes('terminal')||emp.includes('almar')||emp.includes('granel'))return 'Puertos/Operaciones';
+  if(emp.includes('clinic')||emp.includes('salud')||emp.includes('medic')||emp.includes('bupa'))return 'Salud';
+  if(emp.includes('food')||emp.includes('chocolat')||emp.includes('sushi')||emp.includes('fête'))return 'Alimentos';
+  if(emp.includes('coca')||emp.includes('miniso')||emp.includes('forus')||emp.includes('casa idea'))return 'Retail/Consumo';
+  if(emp.includes('dhl')||emp.includes('id log')||emp.includes('rfp'))return '3PL/Operadores';
+  if(emp.includes('arauco')||emp.includes('sqm')||emp.includes('neulin'))return 'Minería/Industria';
+  if(emp.includes('arquit')||emp.includes('construc')||emp.includes('inmobil')||emp.includes('obra')||emp.includes('estudio'))return 'Arquitectura/Construcción';
+  if(emp.includes('packag')||emp.includes('envase')||emp.includes('embalaj')||emp.includes('manufac')||emp.includes('fabrica'))return 'Manufactura/Packaging';
+  return null;
+}
+function calcScore(c){
+  let score=0;const d=getDias(c);const cargo=(c.cargo||'').toLowerCase();const emp=(c.emp||'').toLowerCase();const notas=(c.notas||'').toLowerCase();
+  if(c.status==='Respondió')score+=30;if(c.status==='Reunión')score+=28;if(c.status==='Propuesta')score+=32;
+  if(c.status==='En proceso')score+=15;if(c.status==='Contactado')score+=5;if(c.status==='Por contactar')score+=3;
+  if(c.canal==='Referido')score+=25;else if(c.canal==='Reunión')score+=10;else if(c.canal==='WhatsApp')score+=6;else if(c.canal==='LinkedIn'||c.canal==='Email')score+=3;
+  const n=nivelCargo(c);
+  if(n==='dueño')score+=18;else if(n==='gg')score+=15;else if(n==='gerente')score+=10;else if(n==='jefe')score+=5;
+  const altaFit=['terminal','puerto','port','logis','transport','distribuc','bodega','supply','operac','granel','mineria','arauco'];
+  const mediaFit=['food','aliment','chocolat','retail','tienda','wild','karün','bupa','clinica','ferreteri'];
+  const bajaFit=['dhl','coca cola','id logistics','rfp'];
+  if(altaFit.some(k=>emp.includes(k)))score+=15;else if(mediaFit.some(k=>emp.includes(k)))score+=8;else if(bajaFit.some(k=>emp.includes(k)))score-=10;
+  const h=(c.historial||[]).length;if(h>=3)score+=10;else if(h>=2)score+=5;
+  if(c.diagDolor&&c.diagDolor.length>10)score+=8;
+  if(d>20&&c.status==='Contactado')score-=12;else if(d>10&&c.status==='Contactado')score-=5;
+  if(c.status==='On hold')score-=15;
+  if(notas.includes('no respondio')||notas.includes('no respondió'))score-=8;
+  return Math.min(10,Math.max(1,Math.round(score/10)));
+}
+function calcBloqueador(c){
+  const d=getDias(c);
+  if(c.status==='Por contactar')return 'Falta el primer contacto';
+  if(c.status==='On hold')return 'Decisión pausada';
+  if(c.status==='Contactado'&&d>14)return 'Sin respuesta — mensaje frío';
+  if(c.status==='Contactado'&&d>7)return 'Seguimiento pendiente';
+  if(c.status==='Contactado')return 'Esperando respuesta';
+  if(c.status==='Respondió'&&d>5)return 'Perdiendo momentum';
+  if(c.status==='Respondió')return 'Falta el segundo toque';
+  if(c.status==='Reunión'&&d>7)return 'Sin propuesta enviada';
+  if(c.status==='Reunión')return 'Falta propuesta';
+  if(c.status==='En proceso')return 'Definir si hay dolor real';
+  if(c.status==='Propuesta')return 'Esperando decisión';
+  return '';
 }
 
-function saveLS(){try{localStorage.setItem('ryc_contacts',JSON.stringify(contacts));}catch(e){}}
-
-// --- APRENDIZAJES AGREGADOS ---
-function renderLearnings(){
-  const activos=contacts.filter(c=>c.status!=='No'&&c.status!=='Ganado');
-  const respondieron=contacts.filter(c=>c.status==='Respondió').length;
-  const totalContactados=contacts.filter(c=>['Contactado','Respondió','Reunión','Propuesta'].includes(c.status)).length;
-  const tasaRespuesta=totalContactados>0?Math.round(respondieron/totalContactados*100):0;
-
-  const canales={};
-  activos.forEach(c=>{if(c.canal) canales[c.canal]=(canales[c.canal]||0)+1;});
-  const topCanal=Object.entries(canales).sort((a,b)=>b[1]-a[1])[0];
-
-  const rubros={};
-  activos.forEach(c=>{const r=inferRubro(c.emp);if(r) rubros[r]=(rubros[r]||0)+1;});
-  const topRubro=Object.entries(rubros).sort((a,b)=>b[1]-a[1])[0];
-
-  const conDolor=activos.filter(c=>c.diagDolor&&c.diagDolor.length>0).length;
-  const sinDolor=activos.filter(c=>!c.diagDolor||c.diagDolor.length===0).length;
-
-  // Score promedio del pipeline
-  const scorePromedio=activos.length>0?Math.round(activos.reduce((s,c)=>s+calcScore(c),0)/activos.length):0;
-  
-  // Calientes vs tibios vs fr-os
-  const calientes=activos.filter(c=>calcTemperatura(c).label.includes('Caliente')).length;
-  const tibios=activos.filter(c=>calcTemperatura(c).label.includes('Tibio')).length;
-  const frios=activos.filter(c=>calcTemperatura(c).label.includes('Frío')).length;
-
-  // Rubro que m-s responde (tiene estado Respondi- o Reuni-n)
-  const rubrosCalientes={};
-  activos.filter(c=>['Respondió','Reunión','Propuesta'].includes(c.status)).forEach(c=>{
-    const r=inferRubro(c.emp);if(r) rubrosCalientes[r]=(rubrosCalientes[r]||0)+1;
-  });
-  const topRubroCaliente=Object.entries(rubrosCalientes).sort((a,b)=>b[1]-a[1])[0];
-
-  document.getElementById('learn-grid').innerHTML=`
-    <div class="learn-card">
-            <div class="learn-card-label">Estado del pipeline</div>
-      <div class="learn-card-val"><span style="color:#dc2626">● ${calientes}</span> &nbsp;·&nbsp; <span style="color:#d97706">● ${tibios}</span> &nbsp;·&nbsp; <span style="color:#94a3b8">● ${frios}</span></div>
-      <div class="learn-card-sub">Prioridad alta &nbsp;·&nbsp; Media &nbsp;·&nbsp; Baja</div>
-    </div>
-    <div class="learn-card">
-      <div class="learn-card-label">Score promedio</div>
-      <div class="learn-card-val" style="color:${scorePromedio>=6?'var(--green)':scorePromedio>=4?'var(--amber)':'var(--red)'}">${scorePromedio}/10</div>
-      <div class="learn-card-sub">Probabilidad promedio de cierre</div>
-    </div>
-    <div class="learn-card">
-      <div class="learn-card-label">Tasa de apertura</div>
-      <div class="learn-card-val" style="color:${tasaRespuesta>20?'var(--green)':'var(--amber)'}">${tasaRespuesta}%</div>
-      <div class="learn-card-sub">${respondieron} respondieron de ${totalContactados} contactados</div>
-    </div>
-    <div class="learn-card">
-      <div class="learn-card-label">Rubro más caliente</div>
-      <div class="learn-card-val">${topRubroCaliente?topRubroCaliente[0].split('/')[0]:' - '}</div>
-      <div class="learn-card-sub">${topRubroCaliente?topRubroCaliente[1]+' con interés confirmado':'Sin señales aún'}</div>
-    </div>
-    <div class="learn-card">
-      <div class="learn-card-label">Canal principal</div>
-      <div class="learn-card-val">${topCanal?topCanal[0]:' - '}</div>
-      <div class="learn-card-sub">${topCanal?topCanal[1]+' contactos en este canal':'Sin datos'}</div>
-    </div>
-    <div class="learn-card">
-      <div class="learn-card-label">Dolor documentado</div>
-      <div class="learn-card-val" style="color:${conDolor>5?'var(--green)':'var(--amber)'}">${conDolor}</div>
-      <div class="learn-card-sub">${sinDolor} sin dolor identificado  -  prioridad</div>
-    </div>
-  `;
+// ---------- LIBRERÍA DE DOLOR (fallback sin API) ----------
+const PREGUNTAS={
+'Transporte/Logística':{'dueño':'¿Qué es lo que más te quita el sueño de la operación hoy? ¿Qué sientes que no funciona solo?','gg':'¿Cómo está funcionando la coordinación entre el equipo de ruta y la parte administrativa?','gerente':'¿Qué parte del día a día operacional consume más tiempo del que debería en tu equipo?','jefe':'¿Cuando algo sale mal en una ruta, cómo se enteran y cuánto tarda en resolverse?','general':'¿Qué es lo que más tiempo le consume a tu equipo que sientes que podría funcionar mejor?'},
+'Puertos/Operaciones':{'dueño':'¿Qué es lo que más te complica cuando hay un problema operacional inesperado?','gg':'¿Cómo manejan hoy la coordinación entre las distintas áreas cuando algo se sale del plan?','gerente':'¿Cuando hay una demora no planificada, cómo se entera el equipo y qué pasa después?','jefe':'¿Los procedimientos de turno están documentados o cada uno los hace a su manera?','general':'¿Qué parte de la operación depende demasiado de que todo salga perfecto para funcionar?'},
+'Retail/Consumo':{'dueño':'¿Hay cosas en la operación que deberían funcionar solas pero siguen necesitando que tú estés encima?','gg':'¿Cómo está el margen hoy comparado con hace dos años? ¿Qué cambió en la operación?','gerente':'¿Qué parte del proceso de despacho o bodega genera más problemas de forma recurrente?','jefe':'¿Cuando hay un quiebre de stock o un despacho tarde, cómo se detecta?','general':'¿Qué es lo que más tiempo consume en la operación que no debería ser tan difícil?'},
+'Alimentos':{'dueño':'¿Si mañana hubiera un problema de calidad en un lote, cuánto tardarías en saber exactamente qué pasó?','gg':'¿El crecimiento que han tenido ha traído más complejidad operacional de la que esperaban?','gerente':'¿Qué parte del proceso de producción o bodega genera más reprocesos o merma?','jefe':'¿Los procedimientos de control están escritos o viven en la cabeza de las personas?','general':'¿Qué es lo que más incertidumbre genera en la operación día a día?'},
+'3PL/Operadores':{'dueño':'¿Sabes exactamente cuánto te deja cada cliente después de todos los costos reales de operarlos?','gg':'¿Cómo se diferencian hoy de otros operadores que ofrecen algo parecido?','gerente':'¿Cuánto tarda en promedio que un cliente nuevo esté operando de forma normal?','jefe':'¿Cómo se enteran cuando se está por incumplir un SLA antes de que ya pasó?','general':'¿Qué parte del servicio a clientes genera más fricción interna?'},
+'Minería/Industria':{'dueño':'¿Si la persona que más sabe de un proceso crítico se va mañana, qué pasa?','gg':'¿Qué porcentaje del mantenimiento es reactivo versus planificado hoy?','gerente':'¿Cómo documentan los procedimientos de turno para que no dependan de quién esté ese día?','jefe':'¿Cuando hay una parada no programada, cuánto tarda en identificarse la causa raíz?','general':'¿Qué es lo que más impacta la continuidad operacional cuando algo inesperado ocurre?'},
+'Salud':{'dueño':'¿Qué parte de la operación consume tiempo que debería ir a la atención clínica?','gg':'¿Cómo está el flujo de pacientes hoy? ¿Hay cuellos de botella identificados sin resolver?','gerente':'¿Con qué frecuencia hay quiebres de insumos que afectan la atención?','jefe':'¿Los procesos administrativos están estandarizados o dependen de quién los aprendió primero?','general':'¿Qué es lo que más fricción genera en la operación día a día?'},
+'Arquitectura/Construcción':{'dueño':'¿Hay proyectos que te exigen estar encima de todo para que salgan bien, sin poder delegar?','gg':'¿La coordinación entre proyectos y clientes genera fricciones que se podrían evitar?','gerente':'¿Los procesos de entrega consumen más tiempo del que deberían por falta de estándares?','jefe':'¿Cada proyecto se hace diferente según quién lo lidere, o hay un proceso común?','general':'¿El crecimiento en proyectos ha venido acompañado de estructura, o genera desorden visible?'},
+'Manufactura/Packaging':{'dueño':'¿Cuánto tiempo de tu semana se va en resolver problemas de producción que deberían funcionar solos?','gg':'¿El crecimiento en pedidos que tienen hoy, la operación actual lo puede absorber sin que baje la calidad?','gerente':'¿Saben exactamente cuánta merma o reproceso tienen por línea o turno cada semana?','jefe':'¿Los procedimientos de producción están escritos o dependen de quién los aprendió primero?','general':'¿Si un operario clave no llega mañana, qué pasa con la producción del día?'},
+'default':{'dueño':'¿Qué es lo que más te quita tiempo hoy que sientes que no debería necesitar tu atención?','gg':'¿Si el negocio creciera el doble mañana, la operación actual lo aguantaría sin que todo se complique?','gerente':'¿Qué procesos del equipo funcionan diferente según quién esté ese día?','jefe':'¿Cuando algo sale mal, cuánto tarda en resolverse y cuántas personas tienen que involucrarse?','general':'¿Qué es lo que más incertidumbre genera cuando las cosas no salen como se planificaron?'}
+};
+function getPreguntaDolor(c){
+  const r=PREGUNTAS[inferRubro(c.emp)]||PREGUNTAS['default'];
+  return r[nivelCargo(c)]||r['general'];
 }
 
+// Mensaje fallback local (si la API falla)
+function getMensajeLocal(c){
+  const nombre=c.cont&&c.cont!=='-'?c.cont.split(' ')[0]:'[Nombre]';
+  const d=getDias(c);const pregunta=getPreguntaDolor(c);const canal=c.canal||'Email';
+  const firma='\n\nJael Crutchik — Rave & Crutchik';
+  const wa=canal==='WhatsApp';
+  if(c.status==='Respondió')return 'Hola '+nombre+', te escribo de nuevo con una pregunta concreta: '+pregunta+' Si algo de eso resuena, vale 20 minutos esta semana.'+(wa?'':firma);
+  if(c.status==='Contactado'&&d>=14)return 'Hola '+nombre+', último mensaje de mi parte: '+pregunta+' Si no es el momento, sin problema — acá vamos a estar.'+(wa?'':firma);
+  if(c.status==='Contactado'&&d>=5)return 'Hola '+nombre+', retomo con algo concreto: '+pregunta+' Si resuena, vale una conversación de 20 minutos.'+(wa?'':firma);
+  if(c.status==='Contactado')return 'Hola '+nombre+', ¿pudiste revisar mi mensaje? ¿Vale 20 minutos esta semana?'+(wa?'':firma);
+  if(c.status==='Reunión')return 'Hola '+nombre+', quedé pensando en lo que conversamos. Esta semana te envío una propuesta concreta con un primer paso sin compromiso largo. ¿Te parece?'+(wa?'':firma);
+  if(c.status==='Por contactar'&&c.canal==='Referido')return 'Hola '+nombre+', me pasó tu contacto alguien en quien confío mucho. '+pregunta+' Si resuena, vale 20 minutos.'+(wa?'':firma);
+  if(c.status==='Por contactar')return 'Hola '+nombre+', soy Jael de Rave & Crutchik. '+pregunta+' Si algo resuena, vale 20 minutos esta semana.'+(wa?'':firma);
+  return 'Hola '+nombre+', '+pregunta+' ¿Tienes 20 minutos esta semana?'+(wa?'':firma);
+}
+function getRecoLocal(c){
+  const d=getDias(c);const bloq=calcBloqueador(c);
+  return bloq+'. '+(urg(c)==='h'?'Prioridad alta: actúa hoy.':'Timing razonable — sigue el plan de la próxima acción.');
+}
+
+// ---------- COACH CON CLAUDE ----------
+async function generarCoach(c,force){
+  const recoEl=document.getElementById('coach-reco');
+  const msgEl=document.getElementById('coach-msg');
+  const loadEl=document.getElementById('coach-loading');
+  if(!force&&c.diagReal&&c.diagAccion){
+    if(recoEl)recoEl.textContent=c.diagReal;
+    if(msgEl)msgEl.textContent=c.diagAccion;
+    return;
+  }
+  if(loadEl)loadEl.style.display='block';
+  if(recoEl)recoEl.textContent='';
+  if(msgEl)msgEl.textContent='';
+  const canal=c.canal||'Email';const dias=getDias(c);
+  const nombre=c.cont&&c.cont!=='-'?c.cont.split(' ')[0]:'el contacto';
+  const hist=(c.historial||[]).slice(-3).map(h=>h.fecha+' ('+h.tipo+'): '+h.texto).join(' | ')||'sin historial';
+  const tono=canal==='WhatsApp'?'Tono WhatsApp: muy corto, máximo 3 líneas, sin formalismos, como persona real, sin firma.':canal==='LinkedIn'?'Tono LinkedIn: profesional pero cercano, máximo 4 líneas, sin firma.':'Tono email: habla al dolor específico, termina con una pregunta concreta, firma "Jael Crutchik — Rave & Crutchik".';
+  const prompt='Eres el sales coach de Jael Crutchik, cofundadora de Rave & Crutchik, consultora de operaciones y supply chain en Chile (Lean, excelencia operacional, 3 UF/hora). Su estilo de venta sigue los principios de Francisco Pereira (NEGOCIAR O PERDER): hablar al dolor del otro, nunca sonar desesperada, preguntas genuinas sin script de vendedor, el poder lo dan las alternativas del otro, toda concesión con condición.\n\nProspecto:\n- Empresa: '+c.emp+' ('+(c.ciudad||'Chile')+')'+(c.analisis?'\n- Análisis previo: '+c.analisis:'')+'\n- Contacto: '+nombre+' — '+(c.cargo||'sin cargo')+'\n- Estado: '+c.status+' — '+dias+' días desde el último contacto\n- Canal: '+canal+'\n- Notas: '+(c.notas||'sin notas')+(c.contexto?'\n- Contexto del contacto: '+c.contexto:'')+(c.diagDolor?'\n- Dolor documentado: '+c.diagDolor:'')+'\n- Historial reciente: '+hist+'\n\nResponde SOLO con JSON válido, sin backticks ni texto adicional: {"empresa":"si no hay análisis previo: 2 oraciones sobre qué hace esta empresa y sus desafíos operacionales típicos; si ya hay análisis, string vacío","recomendacion":"en 2 oraciones máximo: qué hacer HOY con este contacto y por qué. Directo, sin relleno.","mensaje":"mensaje listo para enviar por '+canal+'. '+tono+' Usa el nombre '+nombre+'. Habla al dolor específico y probable de ESTA empresa, no genérico. Pregunta concreta al final. Nunca desesperado."}';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    const text=data.content.map(i=>i.text||'').join('');
+    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
+    if(parsed.empresa&&parsed.empresa.length>10&&(!c.analisis||c.analisis.length<20))c.analisis=parsed.empresa;
+    c.diagReal=parsed.recomendacion||getRecoLocal(c);
+    c.diagAccion=parsed.mensaje||getMensajeLocal(c);
+  }catch(e){
+    c.diagReal=getRecoLocal(c);
+    c.diagAccion=getMensajeLocal(c);
+    showToast('Coach sin conexión — usando lógica local');
+  }
+  persist();
+  if(loadEl)loadEl.style.display='none';
+  if(recoEl)recoEl.textContent=c.diagReal;
+  if(msgEl)msgEl.textContent=c.diagAccion;
+}
+
+// ---------- FRANCISCO MODE ----------
+function franciscoCards(c){
+  const nombre=c.cont&&c.cont!=='-'?c.cont.split(' ')[0]:'el contacto';
+  const pregunta=getPreguntaDolor(c);
+  return [
+    {color:'#16a34a',t:'Antes de todo: incentivos individuales',items:[
+      c.incentivo?'Incentivo personal de '+nombre+': '+c.incentivo:'¿Qué gana '+nombre+' personalmente si esto funciona? ¿Y si no funciona? Eso mueve la decisión, no el ROI de la empresa.',
+      c.stakeholders?'Otros que aprueban: '+c.stakeholders+'. '+nombre+' debe ser tu champion interno.':'¿Quién más tiene que comprar la idea? Pregúntale: "¿con quién más tendrías que alinear esto antes de avanzar?"',
+      'Negociar es identificar las necesidades del otro y generar una oferta que cubra las tuyas también. No es convencer, es intercambiar.']},
+    {color:'#7c3aed',t:'Paso 0: ancla el valor antes del precio',items:[
+      'El precio no lo defines desde tus horas. Lo defines desde lo que vale resolver el problema para ellos.',
+      'Antes de decir el número, haz que ellos pongan el número: "¿cuánto te cuesta al mes este problema?" Si no lo saben, ayúdalos a estimarlo.',
+      'Las cosas valen lo que valen para el que las recibe. Tu servicio vale lo que vale para ellos en este momento.']},
+    {color:'#2563eb',t:'Paso 1: confirma el dolor',items:[
+      'Pregunta directa: "'+pregunta+'"',
+      'Si no saben responder ni el dolor ni el costo, no están listos. Retrocede y diagnostica.',
+      'No justifiques el precio antes de que lo pidan. El que justifica primero negocia contra sí mismo.']},
+    {color:'#475569',t:'Paso 1.5: fija expectativas antes de cerrar',items:[
+      'Antes de que firmen, di en voz alta qué incluye y qué NO incluye. Como conversación honesta, no cláusula legal.',
+      'Define cómo se mide el éxito: qué tiene que pasar para que en 3 meses ambos digan que funcionó.',
+      'Fijar expectativas es respetar al otro. Y te ahorra el 80% de los problemas post-cierre.']},
+    {color:'#16a34a',t:'Paso 2: presenta el precio con confianza',items:[
+      'Di el número y calla. Los 3 segundos de silencio son del otro, no tuyos.',
+      '"Son X UF." Punto. Sin "más o menos", sin "dependería", sin disculpa.',
+      'Si itemizas todo, negociarán línea por línea. Da solo el desglose necesario.']},
+    {color:'#d97706',t:'Paso 3: si piden descuento (regla CC)',items:[
+      'Nunca des descuento a cambio de nada. Concesión siempre con condición.',
+      '"¿Qué presupuesto tienes? Así veo qué puedo darte por esa plata." Reduce el scope, no el precio.',
+      '"No hago descuentos, pero si cerramos esta semana puedo incluir X sin costo adicional."']},
+    {color:'#dc2626',t:'Paso 4: si dicen que lo van a pensar',items:[
+      '"Perfecto, cotiza en otro lado. Si nada te convence, acá vamos a estar." Desprendimiento real, no performance.',
+      '"¿Qué necesitarías ver para decidir?" Si no saben, el problema no es el precio.',
+      'No persigas. El síndrome del adolescente es creer que este es el único. Tienes 50 en el pipeline.']},
+    {color:'#1a1a2e',t:'Mindset de cierre',items:[
+      'El poder en la negociación lo dan las alternativas del otro. Probablemente tiene menos de las que crees.',
+      'Te prestigia perder clientes por no transar lo que no va. No todos son tu cliente y está bien.',
+      'El que se ve más desesperado, cierra menos. Ve con confianza y desprendimiento real.']}
+  ];
+}
+
+// ---------- RENDER ----------
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function renderStats(){
   const act=contacts.filter(c=>c.status!=='No');
-  const comEst=act.reduce((s,c)=>s+calcC(c),0);
   const urg_n=contacts.filter(c=>urg(c)==='h').length;
-  document.getElementById('stats').innerHTML=`
-    <div class="stat"><div class="stat-label">Pipeline</div><div class="stat-val">${act.length}</div><div class="stat-sub">${contacts.filter(c=>c.status==='No').length} descartados</div></div>
-    <div class="stat"><div class="stat-label">Comisión est.</div><div class="stat-val" style="color:var(--blue)">$${comEst?Math.round(comEst/1000)+'k':'-'}</div><div class="stat-sub">CLP · 15%</div></div>
-    <div class="stat"><div class="stat-label">Para escribir hoy</div><div class="stat-val" style="color:${urg_n?'var(--red)':'var(--green)'}">${urg_n}</div><div class="stat-sub">según timing</div></div>
-    <div class="stat"><div class="stat-label">Abrieron email</div><div class="stat-val" style="color:var(--amber)">${contacts.filter(c=>c.status==='Respondió').length}</div><div class="stat-sub">leads calientes</div></div>`;
+  const comEst=act.reduce((s,c)=>s+(c.uf&&c.horas?Math.round(c.uf*c.horas*UF*(c.com||15)/100):0),0);
+  document.getElementById('stats').innerHTML=
+    '<div class="stat"><div class="stat-label">Pipeline</div><div class="stat-val">'+act.length+'</div><div class="stat-sub">'+contacts.filter(c=>c.status==='No').length+' descartados</div></div>'+
+    '<div class="stat"><div class="stat-label">Para escribir hoy</div><div class="stat-val" style="color:'+(urg_n?'var(--red)':'var(--green)')+'">'+urg_n+'</div><div class="stat-sub">según timing</div></div>'+
+    '<div class="stat"><div class="stat-label">Leads calientes</div><div class="stat-val" style="color:var(--amber)">'+contacts.filter(c=>c.status==='Respondió').length+'</div><div class="stat-sub">respondieron / abrieron</div></div>'+
+    '<div class="stat"><div class="stat-label">Comisión est.</div><div class="stat-val" style="color:var(--blue)">'+(comEst?'$'+Math.round(comEst/1000)+'k':'—')+'</div><div class="stat-sub">CLP · sobre valorizado</div></div>';
 }
-
 function renderFunnel(){
   const act=contacts.filter(c=>c.status!=='No'),tot=act.length||1;
   document.getElementById('funnel-stages').innerHTML=STAGES.map(s=>{
-    const n=contacts.filter(c=>c.status===s.k).length,pct=Math.round(n/tot*100);
-    return `<div class="stage${activeFilter===s.k?' active':''}" onclick="setF('${s.k}')"><div class="s-name">${s.k}</div><div class="s-num">${n}</div><div class="s-pct">${pct}%</div><div class="s-bar"><div class="s-bar-fill" style="width:${pct}%;background:${s.color}"></div></div></div>`;
+    const n=contacts.filter(c=>c.status===s).length,pct=Math.round(n/tot*100);
+    return '<div class="stage'+(activeFilter===s?' active':'')+'" onclick="setF(\''+s+'\')"><div class="s-name">'+s+'</div><div class="s-num">'+n+'</div><div class="s-pct">'+pct+'%</div></div>';
   }).join('');
-  document.getElementById('funnel-totals').innerHTML=`<span>Total activos: <span>${act.length}</span></span><span>Ganados: <span>${contacts.filter(c=>c.status==='Ganado').length}</span></span><span>Descartados: <span>${contacts.filter(c=>c.status==='No').length}</span></span>`;
 }
-
 function renderFilters(){
-  const ss=['todos',...[...new Set(contacts.filter(c=>c.status!=='No').map(c=>c.status))]];
-  document.getElementById('filter-btns').innerHTML=ss.map(s=>`<button class="fb${s===activeFilter?' on':''}" onclick="setF('${s}')">${s==='todos'?'Todos':s}</button>`).join('');
+  const ss=['todos',...new Set(contacts.map(c=>c.status))];
+  document.getElementById('filter-btns').innerHTML=ss.map(s=>'<button class="fb'+(s===activeFilter?' on':'')+'" onclick="setF(\''+s+'\')">'+(s==='todos'?'Todos':s)+'</button>').join('');
 }
-
 function setF(f){activeFilter=f;renderFilters();renderFunnel();renderContacts();}
-
+function toggleSort(col){if(sortCol===col){sortDesc=!sortDesc;}else{sortCol=col;sortDesc=true;}renderContacts();}
 function renderContacts(){
-  const q=(document.getElementById('search-input')?.value||'').toLowerCase().trim();
+  const q=(document.getElementById('search-input').value||'').toLowerCase().trim();
   let list=activeFilter==='todos'?contacts.filter(c=>c.status!=='No'):contacts.filter(c=>c.status===activeFilter);
-  if(q) list=list.filter(c=>(c.emp||'').toLowerCase().includes(q)||(c.cont||'').toLowerCase().includes(q));
+  if(q)list=contacts.filter(c=>(c.emp||'').toLowerCase().includes(q)||(c.cont||'').toLowerCase().includes(q));
   const sorted=[...list].sort((a,b)=>{
-    if(sortCol==='score') return sortDesc?calcScore(b)-calcScore(a):calcScore(a)-calcScore(b);
-    if(sortCol==='status') return sortDesc?(ORD[a.status]||9)-(ORD[b.status]||9):(ORD[b.status]||9)-(ORD[a.status]||9);
-    if(sortCol==='emp') return sortDesc?a.emp.localeCompare(b.emp):b.emp.localeCompare(a.emp);
+    if(sortCol==='score')return sortDesc?calcScore(b)-calcScore(a):calcScore(a)-calcScore(b);
+    if(sortCol==='emp')return sortDesc?a.emp.localeCompare(b.emp):b.emp.localeCompare(a.emp);
+    if(sortCol==='dias')return sortDesc?getDias(b)-getDias(a):getDias(a)-getDias(b);
     return (ORD[a.status]||9)-(ORD[b.status]||9)||getDias(b)-getDias(a);
   });
-
-  const thead=`<thead><tr>
-    <th class="col-emp" style="cursor:pointer" onclick="toggleSort('emp')">Empresa ↕</th>
-    <th class="col-cont">Contacto</th>
-    <th class="col-cargo">Cargo</th>
-    <th class="col-city">Ciudad</th>
-    <th class="col-status" style="text-align:center;cursor:pointer" onclick="toggleSort('status')">Status ↕</th>
-    <th class="col-score" style="text-align:center;cursor:pointer" onclick="toggleSort('score')" title="Ordenar por prioridad">Prioridad ↕</th>
-    <th class="col-timing">Timing</th>
-    <th class="col-dias" style="text-align:center">Días</th>
-    <th class="col-acc" style="text-align:center">Acciones</th>
-  </tr></thead>`;
-
+  const thead='<thead><tr><th onclick="toggleSort(\'emp\')">Empresa ↕</th><th>Status</th><th onclick="toggleSort(\'score\')" style="text-align:center">Prioridad ↕</th><th>Timing</th><th onclick="toggleSort(\'dias\')" style="text-align:center">Días ↕</th><th>Próxima acción</th></tr></thead>';
   const rows=sorted.map(c=>{
-    const u=urg(c),d=getDias(c),t=timing(c);
-    const timingHtml=t?`<span class="timing-txt" style="color:${t.color}">${t.txt}</span>`:`<span style="color:#e2e8f0;font-size:10px"> - </span>`;
-    const score=calcScore(c);
-    const temp=calcTemperatura(c);
+    const u=urg(c),d=getDias(c),t=timing(c),score=calcScore(c);
     const scoreColor=score>=7?'#16a34a':score>=4?'#d97706':'#94a3b8';
-    return `<tr>
-      <td class="col-emp" style="white-space:normal">
-        <div class="td-emp">${c.emp}</div>
-
-      </td>
-      <td class="col-cont" style="white-space:normal">
-        <div class="td-cont">${c.cont&&c.cont!=='-'?c.cont:' - '}</div>
-
-      </td>
-      <td class="col-cargo"><span style="font-size:11px;color:#475569">${c.cargo&&c.cargo!=='-'?c.cargo:' - '}</span></td>
-      <td class="col-city"><span style="font-size:11px;color:#64748b">${c.ciudad||' - '}</span></td>
-      <td class="col-status" style="text-align:center"><span class="badge ${bc(c.status)}">${c.status}</span></td>
-      <td class="col-score" style="text-align:center"><span style="font-size:15px;font-weight:700;color:${scoreColor}">${score}</span><span style="font-size:10px;color:#94a3b8">/10</span></td>
-      <td class="col-timing">${timingHtml}</td>
-      <td class="col-dias" style="text-align:center"><span class="td-dias${u==='h'?' hot':''}">${d===0?'hoy':d+'d'}</span></td>
-      <td class="col-acc" style="text-align:center">
-        <div class="row-btns" style="justify-content:center">
-          <button class="rb" onclick="openModal(${c.id})" title="Editar">✏️</button>
-          <button class="rb hist" onclick="openHist(${c.id})" title="Historial">📋</button>
-          <button class="rb diag" onclick="openDiag(${c.id})" title="Diagnóstico">🔍</button>
-          <button class="rb ask" onclick="openConsejo(${c.id})" title="Consejo">🎯</button>${(c.status==="Propuesta"||c.status==="Reunión")?"<button class=\"rb\" onclick=\"openNeg(${c.id})\" title=\"Negociacion\" style=\"color:#7c3aed\">⚖️</button>":""}
-        </div>
-      </td>
-    </tr>`;
+    return '<tr onclick="openDetail('+c.id+')">'+
+      '<td><div class="td-emp">'+esc(c.emp)+'</div><div class="td-cont">'+esc(c.cont&&c.cont!=='-'?c.cont+(c.cargo&&c.cargo!=='-'?' · '+c.cargo:''):'')+'</div></td>'+
+      '<td><span class="badge '+bc(c.status)+'">'+c.status+'</span></td>'+
+      '<td style="text-align:center"><span style="font-size:14px;font-weight:700;color:'+scoreColor+'">'+score+'</span><span style="font-size:10px;color:#94a3b8">/10</span></td>'+
+      '<td>'+(t?'<span class="timing-txt" style="color:'+t.color+'">'+t.txt+'</span>':'<span style="color:#e2e8f0;font-size:10px">—</span>')+'</td>'+
+      '<td style="text-align:center"><span class="td-dias'+(u==='h'?' hot':'')+'">'+(d===0?'hoy':d+'d')+'</span></td>'+
+      '<td><span style="font-size:11px;color:#64748b">'+esc(c.accion||'—')+'</span></td></tr>';
   }).join('');
-
-  document.getElementById('clist').innerHTML=thead+`<tbody>${rows}</tbody>`;
+  document.getElementById('clist').innerHTML=thead+'<tbody>'+(rows||'<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:1.5rem">Sin contactos en este filtro. Agrega uno con + Nuevo contacto.</td></tr>')+'</tbody>';
 }
 
-function toggleSort(col){
-  if(sortCol===col){sortDesc=!sortDesc;}else{sortCol=col;sortDesc=true;}
-  renderContacts();
-}
-
-function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();}
-
-// --- DOLORES POR RUBRO ---
-const DOLORES_RUBRO = {
-  'Transporte/Logística': [
-    'Tiempos muertos entre rutas  -  conductores esperando sin carga',
-    'Sin visibilidad en tiempo real de dónde están los vehículos',
-    'Coordinación manual entre operaciones, cliente y facturación',
-    'Costos de flota fuera de control sin KPIs claros',
-    'Crecimiento de clientes sin procesos que escalen'
-  ],
-  'Puertos/Operaciones': [
-    'Coordinación manual entre terminales, agentes y aduana',
-    'Sin trazabilidad end-to-end de la carga',
-    'Tiempos de espera en berth que generan penalidades',
-    'Datos de operación en silos, sin dashboard integrado',
-    'Procesos de turno que dependen de personas clave'
-  ],
-  'Retail/Consumo': [
-    'Quiebres de stock frecuentes sin sistema de alerta',
-    'Logística de última milla cara y poco confiable',
-    'Devoluciones sin proceso claro  -  pérdida de margen',
-    'Inventario desactualizado entre tiendas y bodega',
-    'Picking lento en CD que frena el despacho'
-  ],
-  'Alimentos': [
-    'Trazabilidad de lotes débil  -  riesgo de recall',
-    'Cadena de frío sin monitoreo continuo',
-    'Merma alta por mal manejo en bodega y transporte',
-    'Cumplimiento normativo (HACCP, ISO) consume tiempo manual',
-    'Planificación de producción desconectada de la demanda real'
-  ],
-  '3PL/Operadores': [
-    'Onboarding de clientes nuevo lento y manual',
-    'Sin visibilidad de márgenes por cliente o contrato',
-    'Operación depende de personas clave  -  sin documentación',
-    'Tecnología desactualizada frente a competidores',
-    'SLAs incumplidos por falta de alertas tempranas'
-  ],
-  'Minería/Industria': [
-    'Mantenimiento reactivo  -  paradas no programadas',
-    'Gestión de repuestos sin control de stock crítico',
-    'Procesos de turno sin estandarización ni registro',
-    'Indicadores de OEE bajos sin causa raíz identificada',
-    'Contratistas sin integración real al sistema de gestión'
-  ],
-  'Salud': [
-    'Flujo de pacientes con cuellos de botella no mapeados',
-    'Abastecimiento de insumos con quiebres frecuentes',
-    'Indicadores de calidad desconectados de la operación',
-    'Procesos administrativos que consumen tiempo clínico'
-  ],
-  'default': [
-    'Procesos que funcionaban antes pero ya no escalan con el crecimiento',
-    'Decisiones que dependen de pocas personas clave  -  riesgo operacional',
-    'Sin visibilidad real de la operación  -  apagando incendios',
-    'Datos dispersos en planillas Excel sin integración',
-    'Crecimiento desordenado  -  cada área hace lo suyo sin estándar'
-  ]
-};
-
-function generarDolor(c){
-  var rubro = inferRubro(c.emp) || 'default';
-  var dolores = DOLORES_RUBRO[rubro] || DOLORES_RUBRO['default'];
-  var cargo = (c.cargo||'').toLowerCase();
-  var intro = '';
-  if(cargo.includes('gerente general') || cargo.includes('dueño') || cargo.includes('ceo') || cargo.includes('founder'))
-    intro = 'Decisor top - dolor estrategico: ';
-  else if(cargo.includes('ops') || cargo.includes('operac'))
-    intro = 'Rol operacional - dolor tactico: ';
-  else if(cargo.includes('supply') || cargo.includes('cadena'))
-    intro = 'Supply chain - dolor de visibilidad: ';
-  else
-    intro = 'Dolor probable segun rubro/rol: ';
-  var lista = dolores.slice(0,3).map(function(d){ return '- ' + d; }).join(' / ');
-  return intro + lista + ' (Rubro detectado: ' + rubro + '. Valida cual aplica antes de la reunion.)';
-}
-
-// --- SCORE Y TEMPERATURA ---
-function calcScore(c){
-  let score = 0;
-  const d = getDias(c);
-  const cargo = (c.cargo||'').toLowerCase();
-  const emp = (c.emp||'').toLowerCase();
-  const notas = (c.notas||'').toLowerCase();
-
-  // 1. SE-ALES DE INTERES REALES (peso mas alto)
-  if(c.status === 'Respondió') score += 30;  // abrio o respondio = señal concreta
-  if(c.status === 'Reunión') score += 28;
-  if(c.status === 'Propuesta') score += 32;
-  if(c.status === 'En proceso') score += 15;
-  if(c.status === 'Contactado') score += 5;
-  if(c.status === 'Por contactar') score += 3;
-
-  // 2. NEXO O REFERIDO (confianza ya instalada)
-  if(c.canal === 'Referido') score += 25;
-  else if(c.canal === 'Reunión') score += 10;
-  else if(c.canal === 'WhatsApp') score += 6;
-  else if(c.canal === 'LinkedIn' || c.canal === 'Email') score += 3;
-
-  // 3. PODER DE DECISION
-  if(cargo.includes('dueño') || cargo.includes('ceo') || cargo.includes('founder') || cargo.includes('co founder')) score += 18;
-  else if(cargo.includes('gerente general') || cargo.includes('director general') || cargo.includes('socio')) score += 15;
-  else if(cargo.includes('gerente') || cargo.includes('director') || cargo.includes('subgerente')) score += 10;
-  else if(cargo.includes('jefe') || cargo.includes('manager') || cargo.includes('mgr') || cargo.includes('coord')) score += 5;
-
-  // 4. FIT CON LA PROPUESTA (operacion compleja = dolor obvio)
-  const altaFit = ['terminal','puerto','port','logis','transport','distribuc','bodega','cd ','supply','operac','granel','mineria','sqm','arauco'];
-  const mediaFit = ['food','aliment','chocolat','retail','tienda','wild','karün','karün','bupa','clinica','ferreteri'];
-  const bajaFit = ['dhl','coca cola','id logistics','rfp'];  // corporativos grandes
-  if(altaFit.some(k => emp.includes(k))) score += 15;
-  else if(mediaFit.some(k => emp.includes(k))) score += 8;
-  else if(bajaFit.some(k => emp.includes(k))) score -= 10;
-
-  // 5. HISTORIAL - touchpoints demuestran interes sostenido
-  const h = (c.historial||[]).length;
-  if(h >= 3) score += 10;
-  else if(h >= 2) score += 5;
-
-  // 6. DOLOR DOCUMENTADO
-  if(c.diagDolor && c.diagDolor.length > 10) score += 8;
-
-  // 7. PENALIZACIONES
-  if(d > 20 && c.status === 'Contactado') score -= 12;  // mucho tiempo sin respuesta
-  else if(d > 10 && c.status === 'Contactado') score -= 5;
-  if(c.status === 'On hold') score -= 15;
-  if(notas.includes('no respondio') || notas.includes('no contesto')) score -= 8;
-
-  return Math.min(10, Math.max(1, Math.round(score / 10)));
-}
-
-function calcTemperatura(c){
-  const score = calcScore(c);
-  const d = getDias(c);
-  if(c.status === 'Reunión' || c.status === 'Propuesta') return {label:'\u25CF Caliente', color:'#dc2626'};
-  if(c.status === 'Respondió' && d <= 5) return {label:'\u25CF Caliente', color:'#dc2626'};
-  if(score >= 7) return {label:'\u25CF Tibio', color:'#d97706'};
-  if(score >= 4) return {label:'\u25CF Tibio', color:'#d97706'};
-  return {label:'\u25CF Fr\u00EDo', color:'#64748b'};
-}
-
-function calcBloqueador(c){
-  const d = getDias(c);
-  const h = (c.historial||[]).length;
-  if(c.status === 'Por contactar') return 'Falta primer contacto';
-  if(c.status === 'On hold') return 'Decisión pausada';
-  if(c.status === 'Contactado' && d > 14) return 'Sin respuesta  -  mensaje frío';
-  if(c.status === 'Contactado' && d > 7) return 'Seguimiento pendiente';
-  if(c.status === 'Contactado' && d <= 5) return 'Esperando respuesta';
-  if(c.status === 'Respondió' && d > 5) return 'Perdiendo momentum';
-  if(c.status === 'Respondió') return 'Falta segundo toque';
-  if(c.status === 'Reunión' && d > 7) return 'Sin propuesta enviada';
-  if(c.status === 'Reunión') return 'Falta propuesta';
-  if(c.status === 'En proceso') return 'Definir dolor real';
-  if(c.status === 'Propuesta') return 'Esperando decisión';
-  return 'Sin bloqueo claro';
-}
-
-function generarEmpresaResumen(c){
-  var rubro=inferRubro(c.emp)||'sin rubro detectado';
-  var nivel=nivelCargo(c);
-  var ciudad=c.ciudad?'ubicada en '+c.ciudad+'.':'en Chile.';
-  var analisis=c.analisis&&c.analisis.length>10?c.analisis:'';
-  if(analisis) return analisis;
-  var rubDesc={
-    'Transporte/Logistica':'Empresa de transporte y logistica '+ciudad+' Con crecimiento suelen aparecer costos ocultos de flota, coordinacion manual y falta de visibilidad en tiempo real.',
-    'Puertos/Operaciones':'Operador portuario o de terminales '+ciudad+' La complejidad operacional con multiples actores (agentes, aduana, equipos) genera fricciones costosas.',
-    'Retail/Consumo':'Empresa de retail o consumo '+ciudad+' El crecimiento en puntos de venta trae desafios de stock, despacho y margen que se erosiona sin procesos claros.',
-    'Alimentos':'Empresa de alimentos '+ciudad+' La trazabilidad, merma y cumplimiento normativo son los dolores tipicos cuando escala el volumen.',
-    'Arquitectura/Construccion':'Estudio de arquitectura o constructora '+ciudad+' La gestion simultanea de multiples proyectos sin procesos claros genera desorden visible para los clientes.',
-    '3PL/Operadores':'Operador logistico '+ciudad+' Diferenciarse de la competencia y mantener margen por cliente son los desafios centrales.',
-    'Mineria/Industria':'Empresa minera o industrial '+ciudad+' Procesos criticos que dependen de personas clave y mantenimiento reactivo son los dolores tipicos.',
-    'Salud':'Empresa o clinica de salud '+ciudad+' Los flujos internos que consumen tiempo clinico y quiebres de insumos son los problemas mas frecuentes.',
-    'default':'Empresa en rubro '+rubro+' '+ciudad+' Usa el boton Investigar para obtener un analisis especifico de esta empresa.'
-  };
-  return rubDesc[rubro]||rubDesc['default'];
-}
-
-function generarValorEstimado(c){
-  var nivel=nivelCargo(c);
-  var rubro=inferRubro(c.emp)||'default';
-  var nombre=c.cont?c.cont.split(' ')[0]:'el contacto';
-
-  var intro='Antes de proponer, estima cuanto les cuesta el problema hoy. ';
-  var guias={
-    'Transporte/Logistica':'Ejercicio: cuantos vehiculos tienen x horas muertas/dia x costo hora. Eso es lo minimo que vale resolverlo. Si no lo sabes, preguntaselo a '+nombre+' en la reunion antes de hablar de precio.',
-    'Puertos/Operaciones':'Ejercicio: cuantas horas de espera no planificada tienen al mes x costo hora de berth o equipo. Ese numero puesto sobre la mesa antes del precio cambia toda la conversacion.',
-    'Retail/Consumo':'Ejercicio: cuantas unidades pierden por quiebre de stock al mes x margen por unidad, mas costo de despachos tarde y devoluciones. Eso es lo que vale resolverlo.',
-    'Alimentos':'Ejercicio: porcentaje de merma actual x volumen x costo. Mas el costo potencial de un recall si la trazabilidad falla. Ese segundo numero suele ser el que mueve la decision.',
-    '3PL/Operadores':'Ejercicio: cuantos clientes tienen x margen promedio por cliente. Si el margen real es 30% menor al estimado por ineficiencias, eso es lo que vale medir y resolver.',
-    'Mineria/Industria':'Ejercicio: cuantas horas de parada no programada tuvieron el ultimo trimestre x costo hora de produccion parada. Ese numero suele ser 10x el costo de prevenirlo.',
-    'Salud':'Ejercicio: cuantas horas clinicas se van en admin por semana x costo hora clinico. Mas el costo de quiebres de insumos que generan atencion de menor calidad.',
-    'Arquitectura/Construccion':'Ejercicio: cuantos proyectos tienen en paralelo x horas de coordinacion no planificada por semana x costo hora del equipo. Mas el costo de un cliente insatisfecho que no vuelve ni recomienda. Ese segundo numero suele ser el mas grande.',
-    'default':'Ejercicio: cuanto tiempo pierde el equipo en el problema por semana x costo de ese tiempo. Mas el costo de las decisiones que se toman sin buena informacion. Si no puedes estimarlo, no tienes suficiente informacion para proponer todavia.'
-  };
-
-  return intro+(guias[rubro]||guias['default'])+' Recuerda: el precio correcto no lo defines desde tus horas. Lo defines desde lo que vale para ellos.';
-}
-
-// --- MODAL DIAGNOSTICO ---
-function openDiag(id){
-  diagId=id;
-  var c=contacts.find(function(x){return x.id===id;});if(!c) return;
-
-  var score=calcScore(c);
-  var temp=calcTemperatura(c);
-  var bloq=calcBloqueador(c);
-
-  var _st=function(eid,val){var e=document.getElementById(eid);if(e) e.textContent=val||'';};
-  var _sv=function(eid,val){var e=document.getElementById(eid);if(e) e.value=val||'';};
-
-  _st('diag-title','🔍 '+c.emp);
-
-  var badge=document.getElementById('diag-score-badge');
-  if(badge){
-    var scoreColor=score>=7?'#16a34a':score>=4?'#d97706':'#94a3b8';
-    badge.style.background=scoreColor+'18';
-    badge.style.color=scoreColor;
-    badge.style.border='1px solid '+scoreColor+'40';
-    badge.textContent=score+'/10 probabilidad';
+// ---------- INSIGHTS ----------
+function renderTips(){
+  const box=document.getElementById('tips-grid');
+  const activos=contacts.filter(c=>c.status!=='No'&&c.status!=='Ganado');
+  const dia=new Date().getDay();const tips=[];
+  const tipsDia={1:{i:'📅',l:'Lunes: activa el pipeline',x:'Los decisores revisan su semana y están más receptivos. Prioriza referidos y quienes abrieron tu email.'},2:{i:'🔥',l:'Martes: mejor día para escribir',x:'Martes y miércoles tienen la tasa de respuesta más alta en B2B. Haz seguimientos a quienes llevan más de 5 días.'},3:{i:'🔥',l:'Miércoles: día peak de respuesta',x:'Mayor tasa de apertura B2B de la semana. Escríbele a los que abrieron tu email y aún no responden.'},4:{i:'📞',l:'Jueves: cierra reuniones',x:'Ideal para confirmar reuniones de la próxima semana. Si tienes contactos en Reunión sin fecha, hoy es el día.'},5:{i:'⚡',l:'Viernes: seguimiento express',x:'Mensajes cortos y directos. Guarda las propuestas largas para la próxima semana.'},6:{i:'😴',l:'Sábado: planifica el lunes',x:'Revisa el pipeline, actualiza estados y prepara los mensajes del lunes.'},0:{i:'🗓️',l:'Domingo: prepara tu semana',x:'Revisa quién lleva más de 7 días sin contacto y prepara 3 mensajes para el lunes.'}};
+  tips.push({icono:tipsDia[dia].i,label:tipsDia[dia].l,texto:tipsDia[dia].x});
+  const abrieron=activos.filter(c=>c.status==='Respondió').sort((a,b)=>getDias(b)-getDias(a));
+  const enReunion=activos.filter(c=>c.status==='Reunión').sort((a,b)=>getDias(b)-getDias(a));
+  const referidos=activos.filter(c=>c.canal==='Referido'&&c.status==='Por contactar');
+  const estancados=activos.filter(c=>c.status==='Contactado'&&getDias(c)>10).sort((a,b)=>getDias(b)-getDias(a));
+  if(abrieron.length>0){
+    const n=abrieron.slice(0,2).map(c=>(c.cont&&c.cont!=='-'?c.cont.split(' ')[0]:'')+' ('+c.emp+')').join(' y ');
+    tips.push({icono:'🎯',label:'Escribe hoy: mostraron interés',texto:n+(abrieron.length>2?' y '+(abrieron.length-2)+' más':'')+' leyeron tu mensaje y no respondieron. El segundo toque tiene mucha más probabilidad de éxito. Toca el contacto para generar el mensaje.',id:abrieron[0].id});
+  }else if(enReunion.length>0){
+    const c=enReunion[0];
+    tips.push({icono:'💼',label:'Reunión sin cierre: '+c.emp,texto:(c.cont?c.cont.split(' ')[0]:'')+' lleva '+getDias(c)+' días desde la reunión sin propuesta. Cada día baja la probabilidad de cierre.',id:c.id});
+  }else if(referidos.length>0){
+    tips.push({icono:'🤝',label:'Referidos sin contactar',texto:referidos.length+' referido(s) esperando: '+referidos.slice(0,2).map(c=>c.emp).join(' y ')+'. Cierran mucho más que el contacto frío.',id:referidos[0].id});
+  }else if(estancados.length>0){
+    const c=estancados[0];
+    tips.push({icono:'⚠️',label:'Contacto estancado: '+c.emp,texto:getDias(c)+' días sin respuesta. Momento del segundo toque: corto, sin volver a explicar nada.',id:c.id});
   }
-
-  _st('diag-temp-val',temp.label);
-  var tv=document.getElementById('diag-temp-val');if(tv) tv.style.color=temp.color;
-  _st('diag-score-val',score+' / 10');
-  _st('diag-bloq-val',bloq);
-
-  _st('diag-empresa-gen', c.analisis && c.analisis.length > 20 ? c.analisis : generarEmpresaResumen(c));
-  _st('diag-dolor-gen', generarDolor(c));
-
-  var diagReal=c.diagReal&&c.diagReal.length>5?c.diagReal:generarDiagReal(c);
-  var diagAccion=getMensaje(c).msg;
-  _st('diag-real-gen',diagReal);
-  _st('diag-accion-gen',diagAccion);
-
-  _sv('diag-dolor-edit',c.diagDolor);
-  _sv('diag-real-edit',c.diagReal);
-  _sv('diag-accion-edit',c.diagAccion);
-  _sv('diag-contexto-edit',c.contexto);
-  _sv('diag-analisis-edit',c.analisis);
-  _sv('diag-incentivo-edit',c.incentivo);
-  _sv('diag-stakeholders-edit',c.stakeholders);
-  _sv('diag-extra-edit','');
-
-  document.getElementById('diag-overlay').classList.add('open');
-
-  // Always auto-generate recommendation + message on open
-  autoGenerarDiag(c);
-}
-
-async function autoGenerarDiag(c){
-  var elEmpresa=document.getElementById('diag-empresa-gen');
-  var elReal=document.getElementById('diag-real-gen');
-  var elAccion=document.getElementById('diag-accion-gen');
-  var btn=document.getElementById('inv-btn');
-  var status=document.getElementById('inv-status');
-  var loadingEl=document.getElementById('accion-loading');
-
-  var needsInvestiga=!c.analisis||c.analisis.length<20;
-  var empresa=needsInvestiga?'':c.analisis;
-
-  if(loadingEl) loadingEl.style.display='inline';
-  if(status) status.textContent='Analizando...';
-  if(btn) btn.disabled=true;
-
-  var canal=c.canal||'Email';
-  var dias=getDias(c);
-  var nombre=c.cont?c.cont.split(' ')[0]:'el contacto';
-  var ciudad=c.ciudad||'Chile';
-  var wa=canal==='WhatsApp';
-  var li=canal==='LinkedIn';
-  var tono=wa?'Tono WhatsApp: muy corto maximo 3 lineas sin formalismos como persona real.':li?'Tono LinkedIn: profesional pero cercano maximo 4 lineas.':'Tono email: habla al dolor especifico termina con una pregunta concreta. Sin firma.';
-
-  var parteEmpresa=needsInvestiga?'Investiga esta empresa y dame: que hace su tamano modelo de negocio y desafios tipicos. Luego genera los otros campos.':'Empresa ya analizada: '+empresa+'.';
-  var prompt='Eres Jael Crutchik de Rave & Crutchik consultora de operaciones y supply chain en Chile. '+parteEmpresa+' Empresa: '+c.emp+' ('+ciudad+'). Contacto: '+nombre+' - '+c.cargo+'. Estado: '+c.status+' '+dias+' dias sin contacto. Canal: '+canal+'. Dolor: '+c.diagDolor+'. Contexto: '+(c.contexto||'sin contexto')+'. Responde SOLO en JSON sin backticks: {"empresa":"2-3 oraciones sobre que hace la empresa su tamano y desafios tipicos","dolores":"2-3 dolores operacionales especificos y probables","recomendacion":"en 2 oraciones que hacer hoy y por que. Directo.","mensaje":"mensaje listo para enviar por '+canal+'. '+tono+' Usa el nombre '+nombre+'. Habla al dolor especifico de esta empresa no generico."}';
-
-  try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:700,messages:[{role:'user',content:prompt}]})});
-    var data=await res.json();
-    var text=data.content.map(function(i){return i.text||'';}).join('');
-    var clean=text.replace(/```json|```/g,'').trim();
-    var parsed=JSON.parse(clean);
-
-    if(needsInvestiga&&parsed.empresa){
-      var analisisCompleto=(parsed.empresa||'')+(parsed.dolores?' Dolores: '+parsed.dolores:'');
-      c.analisis=analisisCompleto;
-      var analisisEl=document.getElementById('diag-analisis-edit');
-      if(analisisEl) analisisEl.value=analisisCompleto;
-    }
-    c.diagReal=parsed.recomendacion||generarDiagReal(c);
-    c.diagAccion=parsed.mensaje||getMensaje(c).msg;
-    saveLS();
-
-    if(elEmpresa) elEmpresa.textContent=c.analisis||generarEmpresaResumen(c);
-    if(elReal) elReal.textContent=c.diagReal;
-    if(elAccion) elAccion.textContent=c.diagAccion;
-  }catch(e){
-    if(elReal) elReal.textContent=generarDiagReal(c);
-    if(elAccion) elAccion.textContent=getMensaje(c).msg;
-    console.error(e);
+  const reuUrg=enReunion.filter(c=>getDias(c)>5);
+  const sinDolor=activos.filter(c=>(!c.diagDolor||!c.diagDolor.length)&&['Reunión','Respondió','En proceso'].includes(c.status));
+  if(reuUrg.length>0){
+    tips.push({icono:'🚨',label:'Reunión(es) sin propuesta',texto:reuUrg.map(c=>c.emp).join(', ')+': tuviste reunión pero no has enviado propuesta. Sin propuesta no hay cierre.',id:reuUrg[0].id});
+  }else if(sinDolor.length>0){
+    tips.push({icono:'🔍',label:'Diagnostica antes de proponer',texto:sinDolor.slice(0,2).map(c=>c.emp).join(' y ')+' están avanzados sin dolor documentado. Sin dolor claro, la propuesta no tiene ancla.',id:sinDolor[0].id});
+  }else{
+    tips.push({icono:'💡',label:'Pipeline saludable',texto:'Mantén el volumen: agrega 2-3 contactos nuevos por semana para asegurar cierres sostenidos.'});
   }
-  if(loadingEl) loadingEl.style.display='none';
-  if(status) status.textContent='';
-  if(btn) btn.disabled=false;
+  box.innerHTML=tips.map(t=>'<div class="tip-item'+(t.id?' clickable" onclick="openDetail('+t.id+')':'"')+'"><div class="tip-ico">'+t.icono+'</div><div><div class="tip-label">'+t.label+'</div><div class="tip-text">'+t.texto+'</div></div></div>').join('');
 }
 
-async function autoInvestigarDiag(c){
-  var el=document.getElementById('diag-empresa-gen');
-  var btn=document.getElementById('inv-btn');
-  var status=document.getElementById('inv-status');
-  if(status) status.textContent='Investigando...';
-  if(btn) btn.disabled=true;
+function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderTips();}
 
-  var cargo=c.cargo||'directivo';
-  var ciudad=c.ciudad||'Chile';
-  var prompt='Analiza la empresa "'+c.emp+'" ubicada en '+ciudad+' para una venta consultiva de operaciones y supply chain. Mi contacto es '+cargo+'. Dame informacion especifica y concreta. Responde SOLO en JSON sin backticks: {"empresa":"2-3 oraciones sobre que hace esta empresa, su tamano aproximado, su modelo de negocio y posicion en el mercado","dolores":"2-3 dolores operacionales especificos y probables para este tipo de empresa y rubro","angulo":"el mejor angulo de entrada para ofrecer mejora de procesos a esta empresa","incentivo":"que gana personalmente el '+cargo+' si esto funciona","stakeholders":"quienes mas probablemente aprueban esta decision"}';
-
-  try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:prompt}]})
-    });
-    var data=await res.json();
-    var text=data.content.map(function(i){return i.text||'';}).join('');
-    var clean=text.replace(/```json|```/g,'').trim();
-    var parsed=JSON.parse(clean);
-
-    var analisisCompleto=(parsed.empresa||'')+(parsed.dolores?' Dolores probables: '+parsed.dolores:'')+(parsed.angulo?' Angulo: '+parsed.angulo:'');
-    c.analisis=analisisCompleto;
-    if(parsed.incentivo&&!c.incentivo) c.incentivo=parsed.incentivo;
-    if(parsed.stakeholders&&!c.stakeholders) c.stakeholders=parsed.stakeholders;
-    saveLS();
-
-    if(el) el.textContent=analisisCompleto;
-    if(status) status.textContent='';
-    if(btn) btn.disabled=false;
-  }catch(e){
-    if(status) status.textContent='';
-    if(btn) btn.disabled=false;
-    console.error(e);
-  }
-}
-
-async function saveDiag(){
-  var c=contacts.find(function(x){return x.id===diagId;});if(!c) return;
-  var dolorExtra=document.getElementById('diag-dolor-edit')?document.getElementById('diag-dolor-edit').value.trim():'';
-  var extra=document.getElementById('diag-extra-edit')?document.getElementById('diag-extra-edit').value.trim():'';
-  c.diagDolor=document.getElementById('diag-dolor-gen').textContent.trim()+(dolorExtra?' Ademas: '+dolorExtra:'');
-  c.analisis=document.getElementById('diag-analisis-edit')?document.getElementById('diag-analisis-edit').value.trim():c.analisis||'';
-  c.contexto=document.getElementById('diag-contexto-edit')?document.getElementById('diag-contexto-edit').value.trim():c.contexto||'';
-  var loadingEl=document.getElementById('accion-loading');
-  if(loadingEl) loadingEl.style.display='inline';
-  var empresa=document.getElementById('diag-empresa-gen')?document.getElementById('diag-empresa-gen').textContent:'';
-  var canal=c.canal||'Email';
-  var dias=getDias(c);
-  var nombre=c.cont?c.cont.split(' ')[0]:'el contacto';
-  var ciudad=c.ciudad||'Chile';
-  var wa=canal==='WhatsApp';
-  var li=canal==='LinkedIn';
-  var tono=wa?'Tono WhatsApp: muy corto, maximo 3 lineas, sin formalismos, como persona real.':li?'Tono LinkedIn: profesional pero cercano, maximo 4 lineas.':'Tono email: habla al dolor especifico, termina con una pregunta concreta. Sin firma.';
-  var prompt='Eres Jael Crutchik de Rave & Crutchik, consultora de operaciones y supply chain en Chile. Genera DOS cosas para este prospecto. Empresa: '+c.emp+' ('+ciudad+'). Contacto: '+nombre+' - '+c.cargo+'. Estado: '+c.status+' - '+dias+' dias sin contacto. Canal: '+canal+'. Analisis empresa: '+empresa+'. Dolor: '+c.diagDolor+'. Contexto contacto: '+(c.contexto||'no disponible')+'. Info adicional: '+(extra||'ninguna')+'. Responde SOLO en JSON sin backticks: {"recomendacion":"en 2 oraciones que hacer hoy y por que considerando todo el contexto. Directo.","mensaje":"mensaje listo para enviar por '+canal+'. '+tono+' Usa el nombre '+nombre+'. Habla al dolor especifico de esta empresa no generico."}';
-  try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})});
-    var data=await res.json();
-    var text=data.content.map(function(i){return i.text||'';}).join('');
-    var clean=text.replace(/```json|```/g,'').trim();
-    var parsed=JSON.parse(clean);
-    c.diagReal=parsed.recomendacion||generarDiagReal(c);
-    c.diagAccion=parsed.mensaje||getMensaje(c).msg;
-  }catch(e){
-    c.diagReal=generarDiagReal(c);
-    c.diagAccion=getMensaje(c).msg;
-  }
-  var realEl=document.getElementById('diag-real-gen');
-  var accionEl=document.getElementById('diag-accion-gen');
-  if(realEl) realEl.textContent=c.diagReal;
-  if(accionEl) accionEl.textContent=c.diagAccion;
-  if(loadingEl) loadingEl.style.display='none';
-  saveLS();renderAll();showToast('Diagnostico guardado');
-}
-
-function closeDiag(){document.getElementById('diag-overlay').classList.remove('open');}
-
-function copiarMensajeDiag(){
-  var el=document.getElementById('diag-accion-gen');
-  if(!el) return;
-  var txt=el.textContent.trim();
-  if(!txt){showToast('Guarda primero para generar el mensaje');return;}
-  navigator.clipboard.writeText(txt).then(function(){showToast('Mensaje copiado');}).catch(function(){showToast('Copia manualmente');});
-}
-
-function openNeg(id){
-  var c=contacts.find(function(x){return x.id===id;});if(!c) return;
-  var nombre=c.cont?c.cont.split(' ')[0]:'el contacto';
-  var dolor=getDolorCorto(c);
-  var pregunta=getPreguntaDolor(c);
-  document.getElementById('neg-title').textContent='Propuesta - '+c.emp;
-  var cards=[
-    {color:'#16a34a',titulo:'ANTES DE TODO: Incentivos individuales y domesticos',items:[
-      c.incentivo?'Incentivo personal de '+nombre+': '+c.incentivo:'No has registrado que gana el personalmente. Preguntate: que le pasa a el si esto funciona? Y si no funciona? Eso mueve la decision, no el ROI de la empresa.',
-      c.stakeholders?'Otros que deben aprobar: '+c.stakeholders+'. Necesitas que '+nombre+' sea tu champion interno  -  el que vende la idea adentro cuando tu no estas.':'No sabes quien mas tiene que comprar la idea. Preguntale: con quien mas tendrias que alinear esto antes de avanzar?',
-      'Negociar es identificar las necesidades del otro  -  individuales y domesticas  -  y generar una oferta que cubra las tuyas tambien. No es convencer, es intercambiar.',
-      'La empresa puede necesitar el servicio, pero la persona tiene que querer contratarte a ti. Son dos cosas distintas.'
-    ]},
-    {color:'#7c3aed',titulo:'PASO 0: Ancla el valor antes del precio (Francisco)',items:[
-      'El precio no lo defines desde tus horas. Lo defines desde lo que vale resolver el problema para ellos.',
-      'Antes de decir el numero, haz que ellos pongan el numero: "cuanto te cuesta al mes este problema?" Si no lo saben, ayudalos a estimarlo.',
-      'Si '+c.emp+' pierde $X al mes en este problema, tu propuesta de $Y no es cara, es barata. Eso es valor relativo.',
-      '"Las cosas valen lo que valen para el que las recibe." El café cuesta lo que cuesta en el aeropuerto porque ahi lo necesitas. Tu servicio vale lo que vale para ellos en este momento.',
-      'No compitas con otras consultoras. No tienes tiempo para mirar lo que hacen. Tu unico objetivo: que no les caguen con una solucion generica que no funciona en su operacion real.'
-    ]},
-    {color:'#2563eb',titulo:'PASO 1: Confirma el dolor y el valor antes del precio',items:[
-      'Pregunta directa: "'+pregunta+'"',
-      'Luego pregunta: cuanto te cuesta ese problema al mes? Ayudalos a estimarlo si no saben. Ese numero es tu ancla.',
-      'Si no saben responder ni el dolor ni el costo, no estan listos. Retrocede y diagnostica.',
-      'No justifiques el precio antes de que lo pidan. El que justifica primero negocia contra si mismo.',
-      'La negociacion no se trata de tu tiempo ni de lo que te demoras. Se trata de cuanto vale para ellos.'
-    ]},
-    {color:'#475569',titulo:'PASO 1.5: Fija expectativas antes de cerrar',items:[
-      'Antes de que firmen, di en voz alta que incluye y que NO incluye. No como clausula legal, como conversacion honesta.',
-      'Define como se mide el exito: que tiene que pasar para que en 3 meses ambos digan que esto funciono.',
-      'Define cuando termina el proyecto y que pasa despues. La ambiguedad genera conflicto.',
-      'Fijar expectativas no es protegerte a ti. Es respetar al otro. Y te ahorra el 80% de los problemas post-cierre.'
-    ]},
-    {color:'#16a34a',titulo:'PASO 2: Presenta el precio con confianza',items:[
-      'Di el numero y calla. Los 3 segundos de silencio son del otro, no tuyos.',
-      '"Son X UF." Punto. Sin mas o menos, sin dependeria, sin disculpa.',
-      'Si preguntan por el desglose: da solo lo necesario. Si itemizas todo, negociaran linea por linea.',
-      'No te estan haciendo un favor por escucharte. Tu resuelves algo que les cuesta plata. Eso tiene valor.'
-    ]},
-    {color:'#d97706',titulo:'PASO 3: Si piden descuento (regla CC)',items:[
-      'Nunca des descuento a cambio de nada. Concesion siempre con condicion.',
-      '"Que presupuesto tienes? Asi veo que puedo darte por esa plata." Reduce el scope, no el precio.',
-      '"Puedo ajustar si sacamos X de la propuesta. Que priorizas tu?" Ellos deciden que pierden.',
-      '"No hago descuentos, pero si cerramos esta semana puedo incluir X sin costo adicional."',
-      'Hacer descuento a cambio de nada es admitir que el precio estaba inflado. No lo hagas.'
-    ]},
-    {color:'#dc2626',titulo:'PASO 4: Si dicen que lo van a pensar',items:[
-      '"Perfecto, cotiza en otro lado y revisa que hay en el mercado. Si nada te convence, aca vamos a estar." Desprendimiento real, no performance.',
-      '"Que necesitarias ver para decidir?" Si no saben, el problema no es el precio.',
-      '"Hay algo que no quedo claro?" El lo pienso suele ser una objecion disfrazada.',
-      'No persigas. Tienes 50 contactos en el pipeline. El sindrome del adolescente es creer que este es el unico.'
-    ]},
-    {color:'#1a1a2e',titulo:'Mindset de cierre (Francisco)',items:[
-      'No te importa lo que digan de ti. Cuando vas adelantado te critican. Eso es senal de que vas bien.',
-      'No mires a la competencia. No tienes tiempo. Enfocate en el dolor de este cliente.',
-      'El poder en la negociacion lo dan las alternativas del otro. Probablemente tiene menos de las que crees.',
-      'Te prestigia perder clientes por no transar lo que no va. No todos son tu cliente y esta bien.',
-      'El que se ve mas desesperado, cierra menos. Ve con confianza y desprendimiento real.'
-    ]}
-  ];
-  document.getElementById('neg-body').innerHTML=cards.map(function(card){
-    return '<div style="background:var(--cream);border-left:3px solid '+card.color+';border-radius:8px;padding:10px 14px;margin-bottom:4px">'+
-      '<div style="font-size:11px;font-weight:600;color:'+card.color+';text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px">'+card.titulo+'</div>'+
-      card.items.map(function(i){return '<div style="font-size:12px;color:#475569;line-height:1.6;margin-bottom:3px">- '+i+'</div>';}).join('')+
-      '</div>';
-  }).join('');
-  document.getElementById('neg-overlay').classList.add('open');
-}
-
-function closeNeg(){document.getElementById('neg-overlay').classList.remove('open');}
-
-async function investigarDesdeModal(){
-  var c=contacts.find(function(x){return x.id===diagId;});
-  if(!c){showToast('Guarda el contacto primero');return;}
-  var btn=document.getElementById('inv-btn');
-  var status=document.getElementById('inv-status');
-  btn.textContent='Analizando...';btn.disabled=true;
-  if(status) status.textContent='Claude esta investigando...';
-  var cargo=c.cargo||'directivo';
-  var ciudad=c.ciudad||'Chile';
-  var prompt='Analiza la empresa "'+c.emp+'" ubicada en '+ciudad+' para una venta consultiva. Soy Jael Crutchik de Rave & Crutchik, consultora de operaciones y supply chain. Mi contacto es '+cargo+'. Responde SOLO en JSON sin texto adicional ni backticks: {"analisis":"3-4 oraciones sobre que tipo de empresa es como opera y que desafios tipicos tiene","dolores":"2-3 dolores operacionales especificos y probables","angulo":"mejor angulo de entrada para consultoria de operaciones","incentivo":"que gana personalmente el '+cargo+' si esto funciona en terminos de estres tiempo reconocimiento o control","stakeholders":"quienes mas probablemente tienen que aprobar esta decision internamente","pregunta":"una pregunta concreta y humana para abrir la conversacion - que no suene a script de vendedor"}';
-  try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
-    var data=await res.json();
-    var text=data.content.map(function(i){return i.text||'';}).join('');
-    var clean=text.replace(/```json|```/g,'').trim();
-    var parsed=JSON.parse(clean);
-    var analisisText=(parsed.analisis||'')+(parsed.dolores?' Dolores: '+parsed.dolores:'')+(parsed.angulo?' Angulo: '+parsed.angulo:'')+(parsed.pregunta?' Pregunta: '+parsed.pregunta:'');
-    document.getElementById('diag-analisis-edit').value=analisisText;
-    if(parsed.incentivo) document.getElementById('diag-incentivo-edit').value=parsed.incentivo;
-    if(parsed.stakeholders) document.getElementById('diag-stakeholders-edit').value=parsed.stakeholders;
-    if(status) status.textContent='Analisis listo - revisa y ajusta';
-    showToast('Analisis de '+c.emp+' completado');
-  }catch(e){
-    if(status) status.textContent='';
-    showToast('No se pudo analizar - intenta de nuevo');
-  }
-  btn.textContent='Investigar con Claude';btn.disabled=false;
-}
-
-async function autoInvestigar(){
-  var emp=document.getElementById('f-emp').value.trim();
-  if(!emp) return;
-  // Only auto-investigate if fields are empty
-  var analisisEl=document.getElementById('f-analisis');
-  var analisisVal=analisisEl?analisisEl.value.trim():'';
-  if(analisisVal.length>10) return; // already has content, don't overwrite
-  await investigarEmpresa(emp);
-}
-
-async function abrirInvestigar(){
-  var emp=document.getElementById('f-emp').value.trim();
-  if(!emp){alert('Primero ingresa el nombre de la empresa');return;}
-  await investigarEmpresa(emp);
-}
-
-async function investigarEmpresa(emp){
-  var cargo=document.getElementById('f-cargo')?document.getElementById('f-cargo').value.trim():'';
-  var ciudad=document.getElementById('f-ciudad')?document.getElementById('f-ciudad').value.trim():'';
-  var status=document.getElementById('inv-status');
-  if(status) status.textContent='Analizando...';
-
-  var prompt='Analiza la empresa "'+emp+'" ubicada en '+(ciudad||'Chile')+' para ayudarme a prepararme para una venta consultiva. Soy Jael Crutchik de Rave & Crutchik, consultora de operaciones y supply chain. Mi contacto es '+(cargo||'un directivo')+'. Responde SOLO en JSON sin texto adicional ni backticks: {"analisis":"3-4 oraciones sobre que tipo de empresa es como opera y que desafios tipicos tiene","dolores":"2-3 dolores operacionales especificos y probables","angulo":"mejor angulo de entrada para ofrecer consultoria de operaciones","incentivo":"que gana personalmente el '+(cargo||'contacto')+' si esto funciona en terminos de estres tiempo reconocimiento o control","stakeholders":"quienes mas probablemente tienen que aprobar esta decision internamente","pregunta":"una pregunta concreta y humana para abrir la conversacion - que no suene a script de vendedor"}';
-
-  try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        messages:[{role:'user',content:prompt}]
-      })
-    });
-    var data=await res.json();
-    var text=data.content.map(function(i){return i.text||'';}).join('');
-    var clean=text.replace(/```json|```/g,'').trim();
-    var parsed=JSON.parse(clean);
-
-    var analisisText=(parsed.analisis||'')+(parsed.dolores?' Dolores probables: '+parsed.dolores:'')+(parsed.angulo?' Angulo de entrada: '+parsed.angulo:'')+(parsed.pregunta?' Pregunta sugerida: '+parsed.pregunta:'');
-    var _fa=document.getElementById('f-analisis');if(_fa) _fa.value=analisisText;
-    var _fi=document.getElementById('f-incentivo');if(_fi&&parsed.incentivo) _fi.value=parsed.incentivo;
-    var _fst=document.getElementById('f-stakeholders');if(_fst&&parsed.stakeholders) _fst.value=parsed.stakeholders;
-
-    if(status) status.textContent='✅ Listo';
-    setTimeout(function(){if(status) status.textContent='';},3000);
-    showToast('✅ Análisis de '+emp+' completado');
-  }catch(e){
-    if(status) status.textContent='';
-    showToast('No se pudo analizar  -  intenta de nuevo');
-    console.error(e);
-  }
-}
-
-async function syncInstantly(){
-  const btn=document.getElementById('sync-btn');
-  btn.textContent='⏳ Sync...';btn.disabled=true;
-  try{
-    const r=await fetch('/api/instantly');
-    const d=await r.json();
-    if(d.error) throw new Error(d.error);
-    if(d.leads) d.leads.forEach(l=>{
-      if(l.opened_count>0){
-        const email=(l.email||'').toLowerCase();
-        const c=contacts.find(c=>(c.email||'').toLowerCase()===email);
-        if(c&&c.status==='Contactado'){
-          c.status='Respondió';
-          c.accion='Seguimiento  -  abrió el email ✅';
-          if(!c.historial) c.historial=[];
-          c.historial.push({fecha:new Date().toISOString().split('T')[0],tipo:'Email',texto:'Abrió el email de Instantly ✅'});
-        }
-      }
-    });
-    saveLS();showToast('✅ Instantly sincronizado');renderAll();
-  }catch(e){showToast('⚠️ '+e.message);}
-  btn.textContent='⚡ Sync Instantly';btn.disabled=false;
-}
-
-function openHist(id){
-  histId=id;
-  const c=contacts.find(x=>x.id===id);if(!c) return;
-  document.getElementById('hist-title').textContent='Historial  -  '+c.emp;
+// ---------- DETALLE (todo en uno) ----------
+function openDetail(id){
+  detailId=id;
+  const c=contacts.find(x=>x.id===id);if(!c)return;
+  const score=calcScore(c);
+  const scoreColor=score>=7?'#16a34a':score>=4?'#d97706':'#94a3b8';
+  const showFrancisco=['Reunión','Propuesta'].includes(c.status);
+  const m=document.getElementById('detail-modal');
+  m.innerHTML=
+    '<h3>'+esc(c.emp)+'</h3>'+
+    '<div style="font-size:12px;color:#64748b;margin-bottom:10px">'+esc(c.cont&&c.cont!=='-'?c.cont:'Sin contacto')+(c.cargo&&c.cargo!=='-'?' · '+esc(c.cargo):'')+(c.ciudad?' · '+esc(c.ciudad):'')+'</div>'+
+    '<div class="detail-top">'+
+      '<select id="d-status" onchange="changeStatus()">'+['Por contactar','Contactado','Respondió','Reunión','Propuesta','Ganado','En proceso','On hold','No'].map(s=>'<option'+(c.status===s?' selected':'')+'>'+s+'</option>').join('')+'</select>'+
+      '<span style="font-size:11px;color:#94a3b8">'+getDias(c)+' días · '+(c.canal||'sin canal')+'</span>'+
+      '<span class="score-pill" style="background:'+scoreColor+'18;color:'+scoreColor+';border:1px solid '+scoreColor+'40">'+score+'/10</span>'+
+    '</div>'+
+    '<div class="coach-block">'+
+      '<div class="coach-hdr"><span class="t">🎯 Coach</span><button class="mini-btn" onclick="regenCoach()">↻ Regenerar</button></div>'+
+      '<div class="loading-line" id="coach-loading" style="display:none"><span class="spinner"></span>El coach está analizando a '+esc(c.emp)+'...</div>'+
+      '<div class="coach-reco" id="coach-reco"></div>'+
+      '<div class="coach-msg" id="coach-msg"></div>'+
+      '<div class="coach-actions"><button class="mini-btn primary" onclick="copyMsg()">📋 Copiar mensaje</button></div>'+
+    '</div>'+
+    '<div class="dsec'+(showFrancisco?' open':'')+'" id="sec-fr"><div class="dsec-hdr" onclick="toggleSec(\'sec-fr\')"><span class="t">⚖️ Francisco mode — negociación</span><span>▾</span></div><div class="dsec-body" id="fr-body"></div></div>'+
+    '<div class="dsec" id="sec-hist"><div class="dsec-hdr" onclick="toggleSec(\'sec-hist\')"><span class="t">📋 Historial ('+(c.historial||[]).length+')</span><span>▾</span></div><div class="dsec-body">'+
+      '<div id="hist-entries"></div>'+
+      '<div class="hist-add"><select class="hist-sel" id="hist-type"><option>Email</option><option>LinkedIn</option><option>WhatsApp</option><option>Llamada</option><option>Reunión</option><option>Nota</option></select><input class="hist-input" id="hist-input" placeholder="¿Qué pasó?" onkeydown="if(event.key===\'Enter\')addHist()"><button class="mini-btn primary" onclick="addHist()">+</button></div>'+
+    '</div></div>'+
+    '<div class="dsec" id="sec-datos"><div class="dsec-hdr" onclick="toggleSec(\'sec-datos\')"><span class="t">✏️ Datos del contacto</span><span>▾</span></div><div class="dsec-body">'+
+      '<div class="field-row"><div class="field"><label>Contacto</label><input id="d-cont" value="'+esc(c.cont)+'"></div><div class="field"><label>Cargo</label><input id="d-cargo" value="'+esc(c.cargo)+'"></div></div>'+
+      '<div class="field-row3"><div class="field"><label>Canal</label><select id="d-canal">'+['','Email','LinkedIn','WhatsApp','Llamada','Referido','Reunión'].map(x=>'<option value="'+x+'"'+(c.canal===x?' selected':'')+'>'+(x||'-')+'</option>').join('')+'</select></div><div class="field"><label>Ciudad</label><input id="d-ciudad" value="'+esc(c.ciudad)+'"></div><div class="field"><label>Último contacto</label><input id="d-fecha" type="date" value="'+esc(c.fechaContacto)+'"></div></div>'+
+      '<div class="field-row3"><div class="field"><label>UF/hora</label><input id="d-uf" type="number" step="0.1" value="'+(c.uf||'')+'"></div><div class="field"><label>Horas est.</label><input id="d-horas" type="number" value="'+(c.horas||'')+'"></div><div class="field"><label>Comisión %</label><input id="d-com" type="number" value="'+(c.com||15)+'"></div></div>'+
+      '<div class="field"><label>Email</label><input id="d-email" value="'+esc(c.email)+'"></div>'+
+      '<div class="field"><label>Próxima acción</label><input id="d-accion" value="'+esc(c.accion)+'"></div>'+
+      '<div class="field"><label>Notas</label><textarea id="d-notas">'+esc(c.notas)+'</textarea></div>'+
+      '<div class="field"><label>Contexto del contacto (quién es, cómo piensa)</label><textarea id="d-contexto">'+esc(c.contexto)+'</textarea></div>'+
+      '<div class="field"><label>Dolor documentado</label><textarea id="d-dolor">'+esc(c.diagDolor)+'</textarea></div>'+
+      '<button class="mini-btn primary" onclick="saveDetail()">Guardar datos</button>'+
+    '</div></div>'+
+    '<div class="modal-btns"><button class="btn-del" onclick="deleteContact()">Eliminar</button><button class="btn-c" onclick="closeDetail()">Cerrar</button></div>';
+  document.getElementById('fr-body').innerHTML=franciscoCards(c).map(card=>'<div class="fr-card" style="border-left-color:'+card.color+'"><div class="ft" style="color:'+card.color+'">'+card.t+'</div>'+card.items.map(i=>'<div class="fi">— '+i+'</div>').join('')+'</div>').join('');
   renderHistEntries(c);
-  document.getElementById('hist-overlay').classList.add('open');
+  document.getElementById('detail-overlay').classList.add('open');
+  generarCoach(c,false);
 }
-
+function toggleSec(id){document.getElementById(id).classList.toggle('open');}
+function closeDetail(){document.getElementById('detail-overlay').classList.remove('open');detailId=null;renderAll();}
+function regenCoach(){const c=contacts.find(x=>x.id===detailId);if(c)generarCoach(c,true);}
+function copyMsg(){
+  const txt=(document.getElementById('coach-msg').textContent||'').trim();
+  if(!txt){showToast('Aún no hay mensaje generado');return;}
+  navigator.clipboard.writeText(txt).then(()=>showToast('✅ Mensaje copiado')).catch(()=>showToast('Copia manualmente'));
+}
+function changeStatus(){
+  const c=contacts.find(x=>x.id===detailId);if(!c)return;
+  const nuevo=document.getElementById('d-status').value;
+  if(nuevo!==c.status){
+    c.status=nuevo;
+    c.diagReal='';c.diagAccion='';
+    if(!c.historial)c.historial=[];
+    c.historial.push({fecha:new Date().toISOString().split('T')[0],tipo:'Nota',texto:'Cambio de etapa a: '+nuevo});
+    persist();
+    showToast('Etapa actualizada');
+    generarCoach(c,true);
+  }
+}
 function renderHistEntries(c){
   const entries=(c.historial||[]).slice().reverse();
-  document.getElementById('hist-entries').innerHTML=entries.length
-    ?entries.map(e=>`<div class="hist-entry"><div class="hist-type">${e.tipo}</div><div class="hist-date">${e.fecha}</div><div class="hist-text">${e.texto}</div></div>`).join('')
-    :'<div style="font-size:12px;color:#94a3b8;padding:0.5rem 0">Sin historial. Agrega la primera entrada.</div>';
+  document.getElementById('hist-entries').innerHTML=entries.length?entries.map(e=>'<div class="hist-entry"><span class="hist-type">'+e.tipo+'</span><span class="hist-date">'+e.fecha+'</span><div class="hist-text">'+esc(e.texto)+'</div></div>').join(''):'<div style="font-size:12px;color:#94a3b8;padding:4px 0">Sin historial todavía.</div>';
 }
-
 function addHist(){
-  const txt=document.getElementById('hist-input').value.trim();
-  if(!txt) return;
-  const tipo=document.getElementById('hist-type').value;
-  const c=contacts.find(x=>x.id===histId);if(!c) return;
-  if(!c.historial) c.historial=[];
-  c.historial.push({fecha:new Date().toISOString().split('T')[0],tipo,texto:txt});
+  const txt=document.getElementById('hist-input').value.trim();if(!txt)return;
+  const c=contacts.find(x=>x.id===detailId);if(!c)return;
+  if(!c.historial)c.historial=[];
+  c.historial.push({fecha:new Date().toISOString().split('T')[0],tipo:document.getElementById('hist-type').value,texto:txt});
   c.fechaContacto=new Date().toISOString().split('T')[0];
   document.getElementById('hist-input').value='';
-  saveLS();renderHistEntries(c);renderContacts();showToast('✅ Guardado');
+  persist();renderHistEntries(c);showToast('✅ Guardado');
 }
-
-function closeHist(){document.getElementById('hist-overlay').classList.remove('open');}
-
-function openConsejo(id){
-  const c=contacts.find(x=>x.id===id);if(!c) return;
-  const m=getMensaje(c);
-  consejoMsg=m.msg;
-  document.getElementById('consejo-title').textContent='🎯 '+c.emp+'  -  '+c.status;
-  document.getElementById('consejo-ctx').textContent=m.ctx;
-  document.getElementById('consejo-msg').textContent=m.msg;
-  document.getElementById('consejo-overlay').classList.add('open');
+function saveDetail(){
+  const c=contacts.find(x=>x.id===detailId);if(!c)return;
+  const gv=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
+  const prevCanal=c.canal,prevCargo=c.cargo;
+  c.cont=gv('d-cont');c.cargo=gv('d-cargo');c.canal=document.getElementById('d-canal').value;
+  c.ciudad=gv('d-ciudad');c.fechaContacto=gv('d-fecha');
+  c.uf=parseFloat(gv('d-uf'))||0;c.horas=parseInt(gv('d-horas'))||0;c.com=parseFloat(gv('d-com'))||15;
+  c.email=gv('d-email');c.accion=gv('d-accion');c.notas=gv('d-notas');
+  c.contexto=gv('d-contexto');c.diagDolor=gv('d-dolor');
+  if(prevCanal!==c.canal||prevCargo!==c.cargo){c.diagReal='';c.diagAccion='';}
+  persist();showToast('✅ Datos guardados');
 }
-
-function copyConsejo(){
-  navigator.clipboard.writeText(consejoMsg).then(()=>showToast('✅ Mensaje copiado')).catch(()=>showToast('Copia manualmente'));
-}
-
-function closeConsejo(){document.getElementById('consejo-overlay').classList.remove('open');}
-
-function openModal(id){
-  editingId=id||null;
-  document.getElementById('btn-del').style.display=id?'block':'none';
-  var sf=function(fid,val){var e=document.getElementById(fid);if(e) e.value=(val||'');};
-  var sr=function(fid,val){var e=document.getElementById(fid);if(e) e.value=(val||'');};
-  if(id){
-    const c=contacts.find(x=>x.id===id);if(!c) return;
-    document.getElementById('modal-title').textContent='Editar  -  '+c.emp;
-    sf('f-emp',c.emp);sf('f-cont',c.cont);sf('f-cargo',c.cargo);
-    sf('f-accion',c.accion);sf('f-notas',c.notas);
-    sf('f-email',c.email);sf('f-ciudad',c.ciudad);
-    sf('f-uf',c.uf||'');sf('f-horas',c.horas||'');
-    sf('f-com',c.com||15);sf('f-fecha',c.fechaContacto);
-    var fstatus=document.getElementById('f-status');if(fstatus) fstatus.value=c.status||'Por contactar';
-    var fcanal=document.getElementById('f-canal');if(fcanal) fcanal.value=c.canal||'';
-    var freg=document.getElementById('f-region');if(freg) freg.value=c.region||'';
-  }else{
-    document.getElementById('modal-title').textContent='Nuevo contacto';
-    ['f-emp','f-cont','f-cargo','f-uf','f-horas','f-accion','f-notas','f-email','f-ciudad'].forEach(function(fid){
-      var e=document.getElementById(fid);if(e) e.value='';
-    });
-    var fstatus2=document.getElementById('f-status');if(fstatus2) fstatus2.value='Por contactar';
-    var fcanal2=document.getElementById('f-canal');if(fcanal2) fcanal2.value='';
-    var freg2=document.getElementById('f-region');if(freg2) freg2.value='';
-    var fcom=document.getElementById('f-com');if(fcom) fcom.value=15;
-    var ffecha=document.getElementById('f-fecha');if(ffecha) ffecha.value='';
-  }
-  document.getElementById('overlay').classList.add('open');
-}
-
-function closeModal(){document.getElementById('overlay').classList.remove('open');}
-
 function deleteContact(){
-  if(!editingId||!confirm('¿Eliminar?')) return;
-  contacts=contacts.filter(x=>x.id!==editingId);
-  closeModal();saveLS();showToast('Eliminado');renderAll();loadTips();
+  if(!detailId||!confirm('¿Eliminar este contacto?'))return;
+  contacts=contacts.filter(x=>x.id!==detailId);
+  persist();closeDetail();showToast('Eliminado');
 }
 
-function saveContact(){
-  const emp=document.getElementById('f-emp').value.trim();
-  if(!emp){alert('Ingresa el nombre de la empresa');return;}
-  var _gv=function(fid){var e=document.getElementById(fid);return e?e.value.trim():'';};
-  var _gn=function(fid,def){var e=document.getElementById(fid);return e?(parseFloat(e.value)||def):def;};
-  var _gs=function(fid){var e=document.getElementById(fid);return e?e.value:'';};
-  const data={
-    emp,
-    cont:_gv('f-cont'),
-    cargo:_gv('f-cargo'),
-    status:_gs('f-status')||'Por contactar',
-    canal:_gs('f-canal'),
-    uf:_gn('f-uf',0),
-    horas:parseInt((document.getElementById('f-horas')||{value:'0'}).value)||0,
-    fechaContacto:_gv('f-fecha'),
-    com:_gn('f-com',15),
-    email:_gv('f-email'),
-    ciudad:_gv('f-ciudad'),
-    region:_gs('f-region'),
-    accion:_gv('f-accion'),
-    notas:_gv('f-notas')
-  };
-  if(editingId){
-    const i=contacts.findIndex(x=>x.id===editingId);
-    if(i>=0) contacts[i]={...contacts[i],...data};
-  } else {
-    contacts.push({id:nextId++,...data,historial:[],diagReal:'',diagAccion:'',diagDolor:'',diagValor:'',ciudad:'',region:'',contexto:'',analisis:'',incentivo:'',stakeholders:''});
-  }
-  // Reset cached message if key fields changed
-  var prev=contacts.find(function(x){return x.id===editingId;});
-  if(prev&&(prev.canal!==data.canal||prev.cargo!==data.cargo||prev.ciudad!==data.ciudad)){
-    var idx2=contacts.findIndex(function(x){return x.id===editingId;});
-    if(idx2>=0){contacts[idx2].diagAccion='';contacts[idx2].diagReal='';}
-  }
-  closeModal();saveLS();showToast('Guardado');renderAll();loadTips();
+// ---------- NUEVO CONTACTO ----------
+function openAdd(){
+  ['a-emp','a-accion','a-cont','a-cargo','a-ciudad','a-email','a-notas'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('a-status').value='Por contactar';
+  document.getElementById('a-canal').value='';
+  document.getElementById('add-more').style.display='none';
+  document.getElementById('add-more-link').textContent='+ Más campos (contacto, cargo, ciudad...)';
+  document.getElementById('add-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('a-emp').focus(),50);
+}
+function toggleAddMore(){
+  const m=document.getElementById('add-more');
+  const open=m.style.display==='none';
+  m.style.display=open?'block':'none';
+  document.getElementById('add-more-link').textContent=open?'− Menos campos':'+ Más campos (contacto, cargo, ciudad...)';
+}
+function closeAdd(){document.getElementById('add-overlay').classList.remove('open');}
+function saveAdd(){
+  const emp=document.getElementById('a-emp').value.trim();
+  if(!emp){showToast('Ingresa el nombre de la empresa');return;}
+  const gv=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
+  const c=normalize({id:nextId++,emp,status:document.getElementById('a-status').value,canal:document.getElementById('a-canal').value,accion:gv('a-accion'),cont:gv('a-cont'),cargo:gv('a-cargo'),ciudad:gv('a-ciudad'),email:gv('a-email'),notas:gv('a-notas'),fechaContacto:document.getElementById('a-status').value!=='Por contactar'?new Date().toISOString().split('T')[0]:''});
+  contacts.push(c);
+  persist();closeAdd();renderAll();showToast('✅ '+emp+' agregado');
+  openDetail(c.id);
 }
 
-['overlay','hist-overlay','consejo-overlay','diag-overlay','neg-overlay'].forEach(id=>{
-  document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
-});
+// ---------- EXPORT / IMPORT ----------
+function exportData(){
+  const json=JSON.stringify({contacts,nextId},null,1);
+  navigator.clipboard.writeText(json).then(()=>showToast('✅ Pipeline copiado al portapapeles (JSON)')).catch(()=>{
+    const blob=new Blob([json],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sales-coach-backup.json';a.click();
+  });
+}
+function openImport(){document.getElementById('import-text').value='';document.getElementById('import-overlay').classList.add('open');}
+function closeImport(){document.getElementById('import-overlay').classList.remove('open');}
+function doImport(){
+  try{
+    const d=JSON.parse(document.getElementById('import-text').value);
+    if(!d.contacts||!Array.isArray(d.contacts))throw new Error('formato');
+    contacts=d.contacts.map(normalize);nextId=d.nextId||Math.max(...contacts.map(c=>c.id))+1;
+    persist();closeImport();renderAll();showToast('✅ '+contacts.length+' contactos importados');
+  }catch(e){showToast('JSON inválido — revisa el formato');}
+}
 
-function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
-
+// ---------- UTIL ----------
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+['add-overlay','detail-overlay','import-overlay'].forEach(id=>{document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});});
 const now=new Date();
 document.getElementById('day-pill').textContent=DIAS[now.getDay()]+' '+now.getDate()+'/'+String(now.getMonth()+1).padStart(2,'0');
 
-try{
-  const saved=localStorage.getItem('ryc_contacts');
-  if(saved){
-    const d=JSON.parse(saved);
-    // Merge: preserve saved data, add new fields if missing
-    contacts=d.map(c=>({diagReal:'',diagAccion:'',diagDolor:'',diagValor:'',ciudad:'',region:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',...c}));
-    nextId=Math.max(...d.map(c=>c.id))+1;
-  }
-}catch(e){}
-
-renderAll();
-saveLS();
-syncInstantly();
-loadTips();
-
-function loadTips(){
-  var box=document.getElementById('tips-grid');
-  box.innerHTML='<div class="tips-loading"><div class="spinner"></div> Analizando tu pipeline...</div>';
-  setTimeout(function(){
-    var tips=generarInsights();
-    box.innerHTML=tips.map(function(t){
-      return '<div class="tip-item"><div class="tip-ico">'+t.icono+'</div><div><div class="tip-label">'+t.label+'</div><div class="tip-text">'+t.texto+'</div></div></div>';
-    }).join('');
-  },400);
-}
-
-function generarInsights(){
-  const activos=contacts.filter(c=>c.status!=='No'&&c.status!=='Ganado');
-  const hoy=new Date();const dia=hoy.getDay();const tips=[];
-
-  // TIP 1: siempre el del dia (fijo)
-  const tipsDia={
-    1:{icono:'📅',label:'Lunes: activa el pipeline',texto:'El lunes es ideal para enviar primeros contactos. Los decisores revisan su semana y estan mas receptivos a propuestas nuevas. Prioriza los referidos y los que abrieron tu email.'},
-    2:{icono:'🔥',label:'Martes: mejor dia para escribir',texto:'Martes y miercoles tienen la tasa de respuesta mas alta en B2B. Es el mejor momento para hacer seguimientos y escribir a quienes llevan mas de 5 dias sin responder.'},
-    3:{icono:'🔥',label:'Miercoles: dia peak de respuesta',texto:'Miercoles es el dia con mayor tasa de apertura de emails B2B en Latinoamerica. Aprovecha para escribirle a los contactos que abrieron tu email y aun no han respondido.'},
-    4:{icono:'📞',label:'Jueves: cierra reuniones',texto:'El jueves es ideal para confirmar reuniones de la proxima semana. Si tienes contactos en etapa Reunion sin fecha confirmada, hoy es el dia para insistir.'},
-    5:{icono:'⚡',label:'Viernes: seguimiento express',texto:'Los viernes son buenos para mensajes cortos y directos. Evita propuestas largas, guardalas para la proxima semana. Un mensaje de 2 lineas funciona mejor que uno largo.'},
-    6:{icono:'😴',label:'Sabado: planifica el lunes',texto:'Pocas personas responden el fin de semana. Usa este tiempo para revisar tu pipeline, actualizar estados y preparar los mensajes que enviaras el lunes.'},
-    0:{icono:'🗓️',label:'Domingo: prepara tu semana',texto:'Revisa quien lleva mas de 7 dias sin contacto y prepara 3 mensajes para enviar el lunes. La semana que empieza con plan, cierra mas.'},
-  };
-  tips.push(tipsDia[dia]);
-
-  // TIP 2: accionable con nombres reales - prioridad maxima del pipeline
-  const abrieron=activos.filter(c=>c.status==='Respondio'||c.status==='Respondió').sort((a,b)=>getDias(b)-getDias(a));
-  const enReunion=activos.filter(c=>c.status==='Reunión').sort((a,b)=>getDias(b)-getDias(a));
-  const referidosSinContactar=activos.filter(c=>c.canal==='Referido'&&c.status==='Por contactar');
-  const estancados=activos.filter(c=>c.status==='Contactado'&&getDias(c)>10).sort((a,b)=>getDias(b)-getDias(a));
-  const porContactarAlta=activos.filter(c=>c.status==='Por contactar'&&calcScore(c)>=4).sort((a,b)=>calcScore(b)-calcScore(a));
-
-  if(abrieron.length>0){
-    const nombres=abrieron.slice(0,2).map(c=>c.cont.split(' ')[0]+' ('+c.emp+')').join(' y ');
-    const extra=abrieron.length>2?' y '+(abrieron.length-2)+' mas':'';
-    tips.push({icono:'🎯',label:'Escribe hoy: abrieron tu mensaje',texto:''+nombres+extra+' leyeron tu mensaje y no respondieron. El segundo toque tiene 40% mas probabilidad de exito. Mensaje corto, pregunta directa.'});
-  } else if(enReunion.length>0){
-    const c=enReunion[0];
-    const d=getDias(c);
-    tips.push({icono:'💼',label:'Reunion sin cierre: '+c.emp,texto:''+c.cont.split(' ')[0]+' ('+c.emp+') lleva '+d+' dias desde la reunion sin propuesta enviada. Cada dia que pasa baja la probabilidad de cierre. Enviala hoy.'});
-  } else if(referidosSinContactar.length>0){
-    const nombres=referidosSinContactar.slice(0,2).map(c=>c.emp).join(' y ');
-    tips.push({icono:'🤝',label:'Referidos sin contactar',texto:'Tienes '+referidosSinContactar.length+' referido(s) sin contactar: '+nombres+'. Son tu mayor probabilidad de cierre rapido. Cierran 4x mas que contacto frio.'});
-  } else if(estancados.length>0){
-    const c=estancados[0];
-    tips.push({icono:'⚠️',label:'Contacto estancado: '+c.emp,texto:''+c.cont.split(' ')[0]+' ('+c.emp+') lleva '+getDias(c)+' dias sin respuesta. Es momento del segundo toque: mensaje corto por '+c.canal+', sin volver a explicar nada.'});
-  }
-
-  // TIP 3: insight de aprendizaje del pipeline
-  const topScore=activos.filter(c=>c.status==='Por contactar'||c.status==='Contactado').sort((a,b)=>calcScore(b)-calcScore(a)).slice(0,3);
-  const reunionesUrgentes=enReunion.filter(c=>getDias(c)>5);
-  const sinDolor=activos.filter(c=>(!c.diagDolor||c.diagDolor.length===0)&&['Reunión','Respondió','En proceso'].includes(c.status));
-
-  if(reunionesUrgentes.length>0){
-    const nombres=reunionesUrgentes.map(c=>c.emp).join(', ');
-    tips.push({icono:'🚨',label:'Reunion(es) sin propuesta urgente',texto:''+nombres+': tuviste reunion pero aun no enviaste propuesta. Sin propuesta no hay cierre. Priorizalos hoy sobre cualquier otro contacto.'});
-  } else if(sinDolor.length>0){
-    const nombres=sinDolor.slice(0,2).map(c=>c.emp).join(' y ');
-    tips.push({icono:'🔍',label:'Diagnostica antes de proponer',texto:''+nombres+' estan avanzados pero no tienes el dolor documentado. Sin dolor claro, la propuesta no tiene ancla. Abre el diagnostico y completa ese campo antes de la reunion.'});
-  } else if(topScore.length>0){
-    const nombres=topScore.map(c=>c.emp).join(', ');
-    tips.push({icono:'📈',label:'Proximos en la fila',texto:'Los contactos con mayor prioridad sin activar son: '+nombres+'. Usalos para llenar huecos entre seguimientos activos.'});
-  } else {
-    tips.push({icono:'💡',label:'Pipeline saludable',texto:'Tienes contactos en todas las etapas del funnel. Mantiene el volumen: agrega 2-3 contactos nuevos por semana para asegurarte cierres sostenidos.'});
-  }
-
-  return tips;
-}
-
-function inferRubro(emp){
-  emp=emp.toLowerCase();
-  if(emp.includes('transport')||emp.includes('logis')||emp.includes('truck')||emp.includes('flota')) return 'Transporte/Logística';
-  if(emp.includes('port')||emp.includes('terminal')||emp.includes('almar')||emp.includes('granel')) return 'Puertos/Operaciones';
-  if(emp.includes('clinic')||emp.includes('salud')||emp.includes('medic')) return 'Salud';
-  if(emp.includes('food')||emp.includes('chocolat')||emp.includes('sushi')||emp.includes('fête')) return 'Alimentos';
-  if(emp.includes('coca')||emp.includes('miniso')||emp.includes('forus')||emp.includes('casa idea')) return 'Retail/Consumo';
-  if(emp.includes('dhl')||emp.includes('id log')||emp.includes('rfp')) return '3PL/Operadores';
-  if(emp.includes('arauco')||emp.includes('sqm')||emp.includes('neulin')) return 'Minería/Industria';
-  if(emp.includes('arquit')||emp.includes('construc')||emp.includes('inmobil')||emp.includes('obra')||emp.includes('diseño')||emp.includes('estudio')) return 'Arquitectura/Construccion';
-  if(emp.includes('packag')||emp.includes('envase')||emp.includes('embalaj')||emp.includes('manufac')||emp.includes('industrial')||emp.includes('fabrica')) return 'Manufactura/Packaging';
-  return null;
-}
-
+(async function init(){
+  document.getElementById('tips-grid').innerHTML='<div class="loading-line"><span class="spinner"></span>Cargando pipeline...</div>';
+  await loadData();
+  renderAll();
+})();
 </script>
+
 </body>
 </html>
