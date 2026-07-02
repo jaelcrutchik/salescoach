@@ -288,10 +288,29 @@ function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contact
 
 let contacts=[],nextId=60,activeFilter='todos',ownerFilter='todos',detailId=null,sortCol='default',sortDesc=true,loaded=false;
 
+// ---------- CONTACTOS DE RAFA (carga automática de una sola vez) ----------
+const RAFA_SEED=[
+{emp:'Smart Fluid',cont:'Paulo Ojeda',status:'Propuesta',owner:'Rafa',fechaContacto:'2026-07-01',accion:'Esperar respuesta a la propuesta',notas:'Propuesta enviada, pendiente respuesta.',historial:[{fecha:'2026-07-01',tipo:'Nota',texto:'Seguimiento: se les preguntó si vieron la propuesta.'}]},
+{emp:'FCAB',cont:'Bernardo Márquez',status:'Reunión',owner:'Rafa',fechaContacto:'2026-07-01',accion:'Agendar reunión para levantar proyectos',notas:'Pendiente reunión para que expliquen en qué están y armar una propuesta que les sirva. Luego terminar de armar la propuesta y enviarla.'},
+{emp:'Claro',cont:'Cristóbal Claro',status:'Reunión',owner:'Rafa',accion:'Seguimiento post reunión',notas:'Tuvieron reunión con Rafa, sin novedades desde entonces.',historial:[{fecha:'2026-07-01',tipo:'Nota',texto:'Reunión realizada con Rafa (fecha exacta por confirmar). Sin respuesta posterior.'}]},
+{emp:'Araco Business',cont:'Melanie Vaide',status:'Propuesta',owner:'Rafa',ciudad:'Guatemala',fechaContacto:'2026-07-01',accion:'Esperar respuesta a la propuesta',notas:'Propuesta enviada hoy.',historial:[{fecha:'2026-07-01',tipo:'Email',texto:'Propuesta enviada.'}]},
+{emp:'Metcorp',cont:'Alejandra Cuesta',status:'Reunión',owner:'Rafa',fechaContacto:'2026-07-01',accion:'Primera reunión lunes 06/07',notas:'Venta empresa. Primera reunión agendada para el lunes 06 de julio.',historial:[{fecha:'2026-07-01',tipo:'Nota',texto:'Primera reunión agendada para el 06/07.'}]},
+{emp:'Jannsen',cont:'Juan Smith',status:'Propuesta',owner:'Rafa',fechaContacto:'2026-07-01',accion:'Esperar respuesta al recontacto',notas:'Propuesta enviada hace tiempo; respondieron que estaban en reestructuración.',historial:[{fecha:'2026-07-01',tipo:'Nota',texto:'Rafa volvió a contactar a Juan tras la pausa por reestructuración.'}]}
+];
+let rafaInit=false;
+function initRafa(){
+  if(rafaInit)return false;
+  RAFA_SEED.forEach(r=>{
+    const existe=contacts.some(c=>c.owner==='Rafa'&&c.emp.toLowerCase()===r.emp.toLowerCase());
+    if(!existe){const n=normalize(r);n.id=nextId++;contacts.push(n);}
+  });
+  rafaInit=true;
+  return true;
+}
 // ---------- PERSISTENCIA (almacenamiento COMPARTIDO: Jael y Rafa ven el mismo pipeline) ----------
 let ownersInit=false;
 async function persist(){
-  try{await window.storage.set('sales-coach-v2',JSON.stringify({contacts,nextId,ownersInit,updatedAt:new Date().toISOString()}),true);}
+  try{await window.storage.set('sales-coach-v2',JSON.stringify({contacts,nextId,ownersInit,rafaInit,updatedAt:new Date().toISOString()}),true);}
   catch(e){console.error('storage error',e);}
 }
 function initOwners(){
@@ -305,19 +324,22 @@ async function loadData(){
   try{
     const r=await window.storage.get('sales-coach-v2',true);
     if(r&&r.value){
-      const d=JSON.parse(r.value);contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;ownersInit=!!d.ownersInit;loaded=true;
-      if(initOwners()){await persist();showToast('Contactos existentes asignados a Jael');}
+      const d=JSON.parse(r.value);contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;loaded=true;
+      const cambioOwners=initOwners();
+      const cambioRafa=initRafa();
+      if(cambioOwners||cambioRafa){await persist();if(cambioRafa)showToast('✅ Contactos de Rafa cargados');else showToast('Contactos existentes asignados a Jael');}
       return;
     }
   }catch(e){/* aún no existe */}
   // 2) migración desde datos personales (versión anterior)
   try{
     const p=await window.storage.get('sales-coach-v2');
-    if(p&&p.value){const d=JSON.parse(p.value);contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;loaded=true;initOwners();await persist();showToast('Pipeline migrado a modo compartido');return;}
+    if(p&&p.value){const d=JSON.parse(p.value);contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;loaded=true;initOwners();initRafa();await persist();showToast('Pipeline migrado a modo compartido');return;}
   }catch(e){/* no hay datos personales */}
   // 3) seed inicial
   contacts=SEED.map(normalize);nextId=60;loaded=true;
   initOwners();
+  initRafa();
   persist();
 }
 function anyModalOpen(){return ['add-overlay','detail-overlay','import-overlay'].some(id=>document.getElementById(id).classList.contains('open'));}
@@ -585,7 +607,7 @@ function renderContacts(){
   const rows=sorted.map(c=>{
     const u=urg(c),d=getDias(c),t=timing(c);
     return '<tr onclick="openDetail('+c.id+')">'+
-      '<td><div class="td-emp">'+esc(c.emp)+(c.owner?' <span style="font-size:9px;font-weight:600;color:#94a3b8;background:#f1f5f9;border-radius:4px;padding:1px 5px;vertical-align:1px">'+c.owner[0]+'</span>':'')+'</div><div class="td-cont">'+esc(c.cont&&c.cont!=='-'?c.cont+(c.cargo&&c.cargo!=='-'?' · '+c.cargo:''):'')+'</div></td>'+
+      '<td><div class="td-emp">'+esc(c.emp)+'</div><div class="td-cont">'+esc(c.cont&&c.cont!=='-'?c.cont+(c.cargo&&c.cargo!=='-'?' · '+c.cargo:''):'')+'</div></td>'+
       '<td><span class="badge '+bc(c.status)+'">'+c.status+'</span></td>'+
       '<td>'+(t?'<span class="timing-txt" style="color:'+t.color+'">'+t.txt+'</span>':'<span style="color:#e2e8f0;font-size:10px">—</span>')+'</td>'+
       '<td style="text-align:center"><span class="td-dias'+(u==='h'?' hot':'')+'">'+(d===0?'hoy':d+'d')+'</span></td>'+
@@ -768,7 +790,7 @@ function saveAdd(){
 
 // ---------- EXPORT / IMPORT ----------
 function exportData(){
-  const json=JSON.stringify({contacts,nextId,ownersInit},null,1);
+  const json=JSON.stringify({contacts,nextId,ownersInit,rafaInit},null,1);
   navigator.clipboard.writeText(json).then(()=>showToast('✅ Pipeline copiado al portapapeles (JSON)')).catch(()=>{
     const blob=new Blob([json],{type:'application/json'});
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sales-coach-backup.json';a.click();
@@ -788,6 +810,7 @@ function doImport(){
     }else{
       contacts=d.contacts.map(normalize);nextId=d.nextId||Math.max(...contacts.map(c=>c.id))+1;
       if(typeof d.ownersInit!=='undefined')ownersInit=!!d.ownersInit;
+      if(typeof d.rafaInit!=='undefined')rafaInit=!!d.rafaInit;
       persist();closeImport();renderAll();showToast('✅ Pipeline reemplazado: '+contacts.length+' contactos');
     }
   }catch(e){showToast('JSON inválido — revisa el formato');}
