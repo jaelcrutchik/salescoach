@@ -22,6 +22,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .hbtn{font-size:11px;padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer}
 .hbtn:hover{background:var(--blue-l);color:var(--blue)}
 .main{max-width:1080px;margin:0 auto;padding:1rem}
+.tabs{display:flex;gap:6px;margin-bottom:0.85rem}
+.tab{font-size:12px;padding:6px 16px;border-radius:99px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer;font-weight:500}
+.tab.on{background:var(--ink);color:white;border-color:var(--ink)}
+.bita-total{font-size:13px;color:#475569;line-height:1.7}
+.bita-total strong{color:var(--ink)}
 
 .tips-box{background:white;border:1px solid var(--border);border-radius:12px;padding:0.9rem 1rem;margin-bottom:0.85rem}
 .tips-title{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between}
@@ -145,10 +150,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 </div>
 
 <div class="main">
+  <div class="tabs">
+    <button class="tab on" id="tab-pipeline" onclick="setView('pipeline')">📊 Pipeline</button>
+    <button class="tab" id="tab-bitacora" onclick="setView('bitacora')">📓 Bitácora</button>
+  </div>
+  <div id="view-pipeline">
   <div class="tips-box">
     <div class="tips-title">
       <span>💡 Insights del coach</span>
-      <button class="tips-refresh" onclick="renderTips()">↻ Actualizar</button>
+      <button class="tips-refresh" onclick="renderTips();showToast('✅ Insights actualizados')">↻ Actualizar</button>
     </div>
     <div class="tips-grid" id="tips-grid"></div>
   </div>
@@ -167,6 +177,28 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
   </div>
 
   <div class="table-wrap"><table class="ctable" id="clist"></table></div>
+  </div><!-- /view-pipeline -->
+
+  <div id="view-bitacora" style="display:none">
+    <div class="section-hdr"><div class="section-title">Bitácora de trabajo con clientes</div></div>
+    <div class="filter-btns" id="bita-clients" style="margin-bottom:7px"></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:9px;flex-wrap:wrap" id="bita-period"></div>
+    <div class="tips-box"><div class="bita-total" id="bita-summary"></div></div>
+    <div class="tips-box" style="background:#fffbeb;border-color:#fde68a"><div class="bita-total" id="bita-resumen-interno"></div></div>
+    <div class="table-wrap"><table class="ctable" id="bita-table"></table></div>
+    <div class="tips-box">
+      <div class="tips-title"><span id="b-form-title">+ Nueva entrada</span></div>
+      <div class="field-row3">
+        <div class="field"><label>Fecha</label><input id="b-fecha" type="date"></div>
+        <div class="field"><label>Duración (min)</label><input id="b-min" type="number" step="15" placeholder="ej: 120"></div>
+        <div class="field"><label>Lugar</label><input id="b-lugar" type="text" placeholder="ej: Oficinas cliente"></div>
+      </div>
+      <div class="field"><label>Reunión / Tema *</label><input id="b-tema" type="text" placeholder="ej: Taller de indicadores"></div>
+      <div class="field"><label>Comentarios / Acuerdos</label><textarea id="b-com" placeholder="Qué se revisó, acuerdos, pendientes..."></textarea></div>
+      <div class="field"><label>Participantes</label><input id="b-part" type="text" placeholder="ej: Roberto, Andrea"></div>
+      <div style="display:flex;gap:8px;align-items:center"><button class="btn-s" id="b-save" onclick="addBita()">Guardar entrada</button><button class="btn-c" id="b-cancel" style="display:none" onclick="cancelBitaEdit()">Cancelar edición</button><span id="b-edit-hint" style="display:none;font-size:11px;color:var(--amber)">✏️ Editando entrada existente</span></div>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL NUEVO CONTACTO (quick add) -->
@@ -284,7 +316,7 @@ const SEED=[
 {id:49,emp:'Alemán Experto',cont:'(vía Sofi)',cargo:'Dueño',status:'Por contactar',canal:'Referido',accion:'Contactar por Sofi/Berna',notas:'Sofi es esposa del dueño'},
 {id:50,emp:'Ferreterías Lonza',cont:'Simón Lonza',cargo:'Ejecutivo',status:'Contactado',canal:'Email',accion:'Seguimiento en 5 días',notas:'Referido de Luzma. Perfil emprendedor, ecoturismo.',fechaContacto:'2026-06-06',historial:[{fecha:'2026-06-06',tipo:'Email',texto:'Correo personalizado enviado vía Luzma.'}]}
 ];
-function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,accion:'',notas:'',com:15,email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:'',fechaTermino:'',franJugada:''},c);}
+function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,accion:'',notas:'',com:15,email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:'',fechaTermino:'',franJugada:'',bitacora:[]},c);}
 
 let contacts=[],nextId=60,activeFilter='todos',ownerFilter='todos',detailId=null,sortCol='default',sortDesc=true,loaded=false;
 
@@ -310,6 +342,24 @@ function initRafa(){
 // ---------- PERSISTENCIA (almacenamiento COMPARTIDO: Jael y Rafa ven el mismo pipeline) ----------
 let ownersInit=false;
 let fixInit=false,fixJustRan=false;
+let bitaInit=false;
+const BITA_SEED={'My Scrubs':[
+{fecha:'2026-05-19',tema:'Visita a Bodega',comentarios:'Entrevista a Katherine + Revisión de Bodega',participantes:'Roberto',lugar:'Bodega My Scrubs',minutos:0},
+{fecha:'2026-05-27',tema:'Visita a Tiendas Santiago',comentarios:'Se revisan las tiendas y bodega de Providencia',participantes:'Roberto',lugar:'Tiendas Santiago',minutos:0},
+{fecha:'2026-06-10',tema:'Presentación de plan de trabajo en base a diagnóstico de visita en bodega, tiendas y entrevista con Roberto',comentarios:'Presentación de QW + Áreas a trabajar',participantes:'Roberto',lugar:'Oficinas My Scrubs',minutos:0},
+{fecha:'2026-06-25',tema:'Kick Off de Plan de trabajo + Presentación de Misión, Visión y Valores corporativos',comentarios:'Aparte se explica al equipo qué es Lean (puntos principales)',participantes:'Roberto, Marisol, Andrea, Caro',lugar:'Oficinas My Scrubs',minutos:0},
+{fecha:'2026-07-01',tema:'Taller de Misión y Visión (feedback de lo creado) + Taller de Indicadores + Reunión de Desempeño',comentarios:'Se revisa la importancia de entender la cadena completa; interés de Roberto por comenzar con bodega + ejemplos de flujo (Bontempo). Roberto quiere comenzar trabajando con la bodega. Bonos de cyber: lo reclamó una persona, no está claro ni escrito. Medir devoluciones y carritos que no se cierran en internet.',participantes:'Roberto',lugar:'Oficinas My Scrubs',minutos:120},
+{fecha:'2026-07-07',tema:'Taller de Misión y Visión + Taller de Indicadores + Reunión de Desempeño',comentarios:'',participantes:'Andrea, Carol, Katherine',lugar:'Bodega My Scrubs',minutos:120}
+]};
+function initBita(){
+  if(bitaInit)return false;
+  Object.keys(BITA_SEED).forEach(emp=>{
+    const c=contacts.find(x=>(x.emp||'').toLowerCase()===emp.toLowerCase());
+    if(c&&(!c.bitacora||!c.bitacora.length))c.bitacora=BITA_SEED[emp].slice();
+  });
+  bitaInit=true;
+  return true;
+}
 function initFix(){
   if(fixInit)return false;
   const dm=contacts.find(c=>(c.emp||'').toLowerCase()==='dmerco');
@@ -329,7 +379,7 @@ let sharedOk=null;
 let lastLoadedAt=null; // null=sin probar, true/false=resultado del último intento
 async function persist(){
   const ts=new Date().toISOString();
-  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,updatedAt:ts});
+  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,updatedAt:ts});
   lastLoadedAt=ts;
   try{const r=await window.storage.set('sales-coach-v2',payload,true);sharedOk=!!r;}
   catch(e){sharedOk=false;console.error('shared storage error',e);}
@@ -351,13 +401,13 @@ async function loadData(){
   else d=dS||dL;
   if(d){
     contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;
-    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;
+    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;
     lastLoadedAt=d.updatedAt||null;if(dS)sharedOk=true;
   }else{
     contacts=SEED.map(normalize);nextId=60;
   }
   loaded=true;
-  const cambios=[initOwners(),initRafa(),initFix()].filter(Boolean).length;
+  const cambios=[initOwners(),initRafa(),initFix(),initBita()].filter(Boolean).length;
   if(cambios||!d){await persist();if(fixJustRan)showToast('✅ Datos recuperados y pipeline actualizado');}
 }
 function anyModalOpen(){return ['add-overlay','detail-overlay','import-overlay'].some(id=>document.getElementById(id).classList.contains('open'));}
@@ -372,8 +422,12 @@ async function refreshShared(manual){
       if(typeof d.ownersInit!=='undefined')ownersInit=!!d.ownersInit;
       if(typeof d.rafaInit!=='undefined')rafaInit=!!d.rafaInit;
       if(typeof d.fixInit!=='undefined')fixInit=!!d.fixInit;
+      if(typeof d.bitaInit!=='undefined')bitaInit=!!d.bitaInit;
       lastLoadedAt=d.updatedAt||new Date().toISOString();
       renderAll();if(manual)showToast('✅ Pipeline sincronizado');
+    }else{
+      await persist();
+      if(manual)showToast(sharedOk?'✅ Tu pipeline se publicó en el espacio compartido':'⚠️ Espacio compartido no disponible — trabajando con copia local');
     }
   }catch(e){
     // El espacio compartido no respondió o aún no existe: publica tu versión
@@ -531,14 +585,21 @@ async function generarCoach(c,force){
   if(msgEl)msgEl.textContent='';
   const canal=c.canal||'Email';const dias=getDias(c);
   const nombre=c.cont&&c.cont!=='-'?c.cont.split(' ')[0]:'el contacto';
-  const hist=(c.historial||[]).slice(-3).map(h=>h.fecha+' ('+h.tipo+'): '+h.texto).join(' | ')||'sin historial';
+  const hist=(c.historial||[]).slice(-8).map(h=>h.fecha+' ('+h.tipo+'): '+h.texto).join(' | ')||'sin historial';
+  const bita=(c.bitacora||[]).slice(-3).map(b=>b.fecha+': '+b.tema+(b.comentarios?' — '+b.comentarios.slice(0,150):'')).join(' | ');
   const tono=canal==='WhatsApp'?'Tono WhatsApp: muy corto, máximo 3 líneas, sin formalismos, como persona real, sin firma.':canal==='LinkedIn'?'Tono LinkedIn: profesional pero cercano, máximo 4 líneas, sin firma.':'Tono email: habla al dolor específico, termina con una pregunta concreta, firma "Jael Crutchik — Rave & Crutchik".';
-  const prompt='Eres el sales coach de Jael Crutchik, cofundadora de Rave & Crutchik, consultora de operaciones y supply chain en Chile (Lean, excelencia operacional, 3 UF/hora). Su estilo de venta sigue los principios de Francisco Pereira (NEGOCIAR O PERDER): hablar al dolor del otro, nunca sonar desesperada, preguntas genuinas sin script de vendedor, el poder lo dan las alternativas del otro, toda concesión con condición.\n\nREGLA CRÍTICA: el mensaje DEBE corresponder exactamente a la etapa del prospecto. Guía por etapa:\n- Por contactar: primer contacto, pregunta genuina al dolor, sin vender.\n- Contactado: seguimiento sin repetir el pitch; si lleva 14+ días, último toque con cierre digno del loop.\n- Respondió: segundo toque, ángulo nuevo, corto.\n- Reunión: retomar lo conversado y encaminar la propuesta o el siguiente paso concreto.\n- Propuesta: seguimiento de la propuesta YA ENVIADA — preguntar si la revisaron, qué dudas hay, qué falta para decidir. JAMÁS preguntas de dolor de primer contacto ni presentarse de nuevo.\n- En proceso: definir si hay dolor real, dar salida digna.\n- On hold: check-in ligero, sin presión.\n- Ganado: relación y siguiente oportunidad, no venta.\n- Terminado: proyecto cerrado exitosamente — check-in de relación, pedir testimonio o referidos. Jamás venta fría.\n\nProspecto:\n- Empresa: '+c.emp+' ('+(c.ciudad||'Chile')+')'+(c.analisis?'\n- Análisis previo: '+c.analisis:'')+'\n- Contacto: '+nombre+' — '+(c.cargo||'sin cargo')+'\n- ETAPA ACTUAL: '+c.status+' — '+dias+' días desde el último contacto\n- Canal: '+canal+'\n- Notas: '+(c.notas||'sin notas')+(c.contexto?'\n- Contexto del contacto: '+c.contexto:'')+(c.diagDolor?'\n- Dolor documentado: '+c.diagDolor:'')+'\n- Historial reciente: '+hist+'\n\nResponde SOLO con JSON válido, sin backticks ni texto adicional: {"empresa":"si no hay análisis previo: 2 oraciones sobre qué hace esta empresa y sus desafíos operacionales típicos; si ya hay análisis, string vacío","recomendacion":"en 2 oraciones máximo: qué hacer HOY con este contacto dada su etapa ('+c.status+') y los días transcurridos, y por qué. Directo, sin relleno.","mensaje":"mensaje listo para enviar por '+canal+', coherente con la etapa '+c.status+' según la guía. '+tono+' Usa el nombre '+nombre+'. Específico a ESTA empresa, no genérico. Nunca desesperado."}';
+  const prompt='Eres el sales coach de Jael Crutchik, cofundadora de Rave & Crutchik, consultora de operaciones y supply chain en Chile (Lean, excelencia operacional, 3 UF/hora). Su estilo de venta sigue los principios de Francisco Pereira (NEGOCIAR O PERDER): hablar al dolor del otro, nunca sonar desesperada, preguntas genuinas sin script de vendedor, el poder lo dan las alternativas del otro, toda concesión con condición.\n\nREGLA CRÍTICA: el mensaje DEBE corresponder exactamente a la etapa del prospecto. Guía por etapa:\n- Por contactar: primer contacto, pregunta genuina al dolor, sin vender.\n- Contactado: seguimiento sin repetir el pitch; si lleva 14+ días, último toque con cierre digno del loop.\n- Respondió: segundo toque, ángulo nuevo, corto.\n- Reunión: retomar lo conversado y encaminar la propuesta o el siguiente paso concreto.\n- Propuesta: seguimiento de la propuesta YA ENVIADA — preguntar si la revisaron, qué dudas hay, qué falta para decidir. JAMÁS preguntas de dolor de primer contacto ni presentarse de nuevo.\n- En proceso: definir si hay dolor real, dar salida digna.\n- On hold: check-in ligero, sin presión.\n- Ganado: relación y siguiente oportunidad, no venta.\n- Terminado: proyecto cerrado exitosamente — check-in de relación, pedir testimonio o referidos. Jamás venta fría.\n\nProspecto:\n- Empresa: '+c.emp+' ('+(c.ciudad||'Chile')+')'+(c.analisis?'\n- Análisis previo: '+c.analisis:'')+'\n- Contacto: '+nombre+' — '+(c.cargo||'sin cargo')+'\n- ETAPA ACTUAL: '+c.status+' — '+dias+' días desde el último contacto\n- Canal: '+canal+'\n- Notas: '+(c.notas||'sin notas')+(c.contexto?'\n- Contexto del contacto: '+c.contexto:'')+(c.diagDolor?'\n- Dolor documentado: '+c.diagDolor:'')+'\n- Historial reciente: '+hist+(bita?'\n- Bitácora de trabajo (sesiones realizadas): '+bita:'')+'\n\nIMPORTANTE: usa el historial y la bitácora como fuente principal — el mensaje y la recomendación deben referirse a lo que realmente ha pasado con este contacto, no a supuestos.\n\nResponde SOLO con JSON válido, sin backticks ni texto adicional: {"empresa":"si no hay análisis previo: 2 oraciones sobre qué hace esta empresa y sus desafíos operacionales típicos; si ya hay análisis, string vacío","recomendacion":"en 2 oraciones máximo: qué hacer HOY con este contacto dada su etapa ('+c.status+') y los días transcurridos, y por qué. Directo, sin relleno.","mensaje":"mensaje listo para enviar por '+canal+', coherente con la etapa '+c.status+' según la guía. '+tono+' Usa el nombre '+nombre+'. Específico a ESTA empresa, no genérico. Nunca desesperado."}';
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     const data=await res.json();
     const text=data.content.map(i=>i.text||'').join('');
-    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
+    let parsed;
+    try{parsed=JSON.parse(text.replace(/```json|```/g,'').trim());}
+    catch(pe){
+      const pick=k=>{const m=text.match(new RegExp('"'+k+'"\\s*:\\s*"([\\s\\S]*?)"\\s*(?:,\\s*"|\\})'));return m?m[1].replace(/\\n/g,'\n').replace(/\\"/g,'"'):'';};
+      parsed={empresa:pick('empresa'),recomendacion:pick('recomendacion'),mensaje:pick('mensaje')};
+      if(!parsed.mensaje&&!parsed.recomendacion)throw pe;
+    }
     if(parsed.empresa&&parsed.empresa.length>10&&(!c.analisis||c.analisis.length<20))c.analisis=parsed.empresa;
     c.diagReal=parsed.recomendacion||getRecoLocal(c);
     c.diagAccion=parsed.mensaje||getMensajeLocal(c);
@@ -557,13 +618,13 @@ async function generarCoach(c,force){
 async function genFrancisco(){
   const c=contacts.find(x=>x.id===detailId);if(!c)return;
   const load=document.getElementById('fr-loading');if(load)load.style.display='inline';
-  const prompt='Eres coach de negociación con el estilo de Francisco Pereira (NEGOCIAR O PERDER): poder según las alternativas del otro, regla CC (toda concesión con condición), anclar el valor antes del precio, incentivos individuales del decisor, desprendimiento real, nunca desesperado. Asesoras a Jael Crutchik de Rave & Crutchik (consultora de operaciones, 3 UF/hora).\n\nCaso:\n- Empresa: '+c.emp+(c.ciudad?' ('+c.ciudad+')':'')+'\n- Contacto: '+(c.cont||'?')+' — '+(c.cargo||'sin cargo')+'\n- Etapa: '+c.status+' — '+getDias(c)+' días desde último contacto\n- Notas: '+(c.notas||'sin notas')+(c.diagDolor?'\n- Dolor: '+c.diagDolor:'')+(c.contexto?'\n- Contexto: '+c.contexto:'')+(c.analisis?'\n- Análisis: '+c.analisis:'')+'\n- Historial: '+((c.historial||[]).slice(-3).map(h=>h.tipo+': '+h.texto).join(' | ')||'sin historial')+'\n\nDame LA jugada de negociación específica para este caso en este momento: qué mover, qué decir, qué NO hacer, y la trampa a evitar. Concreto y accionable, nada genérico. Responde SOLO JSON sin backticks: {"jugada":"4-6 líneas, puede usar saltos de línea"}';
+  const prompt='Eres coach de negociación con el estilo de Francisco Pereira (NEGOCIAR O PERDER): poder según las alternativas del otro, regla CC (toda concesión con condición), anclar el valor antes del precio, incentivos individuales del decisor, desprendimiento real, nunca desesperado. Asesoras a Jael Crutchik de Rave & Crutchik (consultora de operaciones, 3 UF/hora).\n\nCaso:\n- Empresa: '+c.emp+(c.ciudad?' ('+c.ciudad+')':'')+'\n- Contacto: '+(c.cont||'?')+' — '+(c.cargo||'sin cargo')+'\n- Etapa: '+c.status+' — '+getDias(c)+' días desde último contacto\n- Notas: '+(c.notas||'sin notas')+(c.diagDolor?'\n- Dolor: '+c.diagDolor:'')+(c.contexto?'\n- Contexto: '+c.contexto:'')+(c.analisis?'\n- Análisis: '+c.analisis:'')+'\n- Historial: '+((c.historial||[]).slice(-3).map(h=>h.tipo+': '+h.texto).join(' | ')||'sin historial')+'\n\nDame LA jugada de negociación específica para este caso en este momento: qué mover, qué decir, qué NO hacer, y la trampa a evitar. Concreto y accionable, nada genérico, 4-6 líneas. Responde SOLO con el texto de la jugada — sin JSON, sin títulos, sin markdown, sin comillas.';
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:600,messages:[{role:'user',content:prompt}]})});
     const data=await res.json();
-    const text=data.content.map(i=>i.text||'').join('');
-    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
-    c.franJugada=parsed.jugada||'';
+    const text=data.content.map(i=>i.text||'').join('').replace(/```/g,'').trim();
+    if(!text)throw new Error('vacío');
+    c.franJugada=text;
     persist();
     const box=document.getElementById('fr-ai');
     if(box&&c.franJugada)box.innerHTML='<div class="fr-card" style="border-left-color:#7c3aed;background:#f5f3ff"><div class="ft" style="color:#7c3aed">⚡ Jugada para '+esc(c.emp)+'</div><div class="fi" style="white-space:pre-wrap">'+esc(c.franJugada)+'</div></div>';
@@ -700,7 +761,134 @@ function renderTips(){
   box.innerHTML=tips.map(t=>'<div class="tip-item'+(t.id?' clickable" onclick="openDetail('+t.id+')':'"')+'"><div class="tip-ico">'+t.icono+'</div><div><div class="tip-label">'+t.label+'</div><div class="tip-text">'+t.texto+'</div></div></div>').join('');
 }
 
-function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderTips();}
+function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderTips();renderBitacora();}
+let currentView='pipeline',bitaClient=null,bitaMes='todos',bitaSem='todos',bitaShowTerm=false,bitaEditIdx=null;
+function setView(v){
+  currentView=v;
+  document.getElementById('view-pipeline').style.display=v==='pipeline'?'block':'none';
+  document.getElementById('view-bitacora').style.display=v==='bitacora'?'block':'none';
+  document.getElementById('tab-pipeline').classList.toggle('on',v==='pipeline');
+  document.getElementById('tab-bitacora').classList.toggle('on',v==='bitacora');
+  if(v==='bitacora')renderBitacora();
+}
+function isoWeek(dstr){
+  const d=new Date(dstr+'T00:00:00');if(isNaN(d))return '';
+  const t=new Date(d.valueOf());const dayn=(d.getDay()+6)%7;
+  t.setDate(t.getDate()-dayn+3);const firstThu=t.valueOf();
+  t.setMonth(0,1);if(t.getDay()!==4)t.setMonth(0,1+((4-t.getDay())+7)%7);
+  return 'W'+(1+Math.round((firstThu-t)/604800000));
+}
+const MESES_L={'01':'Enero','02':'Febrero','03':'Marzo','04':'Abril','05':'Mayo','06':'Junio','07':'Julio','08':'Agosto','09':'Septiembre','10':'Octubre','11':'Noviembre','12':'Diciembre'};
+function mesLabel(ym){return ym==='todos'?'Total':(MESES_L[ym.slice(5,7)]||ym)+' '+ym.slice(0,4);}
+function bitaClientList(){
+  return contacts.filter(c=>{
+    const tiene=['Ganado','Terminado'].includes(c.status)||(c.bitacora&&c.bitacora.length);
+    if(!tiene)return false;
+    if(!bitaShowTerm&&c.status==='Terminado'&&c.id!==bitaClient)return false;
+    return true;
+  }).sort((a,b)=>a.emp.localeCompare(b.emp));
+}
+function setBitaClient(id){bitaClient=id;bitaMes='todos';bitaSem='todos';bitaEditIdx=null;renderBitacora();}
+function setBitaMes(v){bitaMes=v;bitaSem='todos';renderBitacora();}
+function setBitaSem(v){bitaSem=v;renderBitacora();}
+function toggleBitaTerm(){bitaShowTerm=!bitaShowTerm;renderBitacora();}
+function bitaFiltered(list){
+  let e=list;
+  if(bitaMes!=='todos')e=e.filter(x=>(x.fecha||'').startsWith(bitaMes));
+  if(bitaSem!=='todos')e=e.filter(x=>isoWeek(x.fecha)===bitaSem);
+  return e;
+}
+function renderBitacora(){
+  const chipsEl=document.getElementById('bita-clients');if(!chipsEl)return;
+  const clientes=bitaClientList();
+  const termToggle='<button class="fb" style="'+(bitaShowTerm?'background:#0369a1;color:white;border-color:#0369a1':'color:#94a3b8')+'" onclick="toggleBitaTerm()">'+(bitaShowTerm?'✓ ':'')+'Incluir terminados</button>';
+  if(!clientes.length){chipsEl.innerHTML=termToggle;document.getElementById('bita-summary').textContent='Aún no hay clientes activos con bitácora. Se activa cuando ganas un cliente.';document.getElementById('bita-resumen-interno').textContent='';document.getElementById('bita-table').innerHTML='';document.getElementById('bita-period').innerHTML='';return;}
+  if(!bitaClient||!clientes.some(c=>c.id===bitaClient))bitaClient=clientes[0].id;
+  chipsEl.innerHTML=clientes.map(c=>'<button class="fb'+(c.id===bitaClient?' on':'')+'" onclick="setBitaClient('+c.id+')">'+esc(c.emp)+(c.bitacora&&c.bitacora.length?' ('+c.bitacora.length+')':'')+(c.status==='Terminado'?' ✔':'')+'</button>').join('')+'<span style="width:1px;height:16px;background:var(--border);margin:0 3px;align-self:center"></span>'+termToggle;
+  const c=contacts.find(x=>x.id===bitaClient);if(!c)return;
+  const all=(c.bitacora||[]).slice();
+  // selects de periodo
+  const meses=[...new Set(all.map(e=>(e.fecha||'').slice(0,7)).filter(Boolean))].sort();
+  const semanas=[...new Set(all.filter(e=>bitaMes==='todos'||(e.fecha||'').startsWith(bitaMes)).map(e=>isoWeek(e.fecha)).filter(Boolean))].sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
+  document.getElementById('bita-period').innerHTML=
+    '<span style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px">Periodo</span>'+
+    '<select class="hist-sel" onchange="setBitaMes(this.value)"><option value="todos"'+(bitaMes==='todos'?' selected':'')+'>Todos los meses</option>'+meses.map(m=>'<option value="'+m+'"'+(bitaMes===m?' selected':'')+'>'+mesLabel(m)+'</option>').join('')+'</select>'+
+    '<select class="hist-sel" onchange="setBitaSem(this.value)"><option value="todos"'+(bitaSem==='todos'?' selected':'')+'>Todas las semanas</option>'+semanas.map(w=>'<option value="'+w+'"'+(bitaSem===w?' selected':'')+'>'+w+'</option>').join('')+'</select>';
+  // entradas filtradas del cliente seleccionado
+  const entries=bitaFiltered(all).sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
+  const totalMin=entries.reduce((s,e)=>s+(parseFloat(e.minutos)||0),0);
+  const hh=m=>{const h=m/60;return (h%1===0?h:h.toFixed(1))+' h';};
+  const periodoTxt=(bitaMes==='todos'?'total':mesLabel(bitaMes))+(bitaSem!=='todos'?' · '+bitaSem:'');
+  document.getElementById('bita-summary').innerHTML=
+    '<strong>'+esc(c.emp)+'</strong> · '+entries.length+' sesiones ('+periodoTxt+') · <strong>'+hh(totalMin)+'</strong>'+
+    (c.uf&&totalMin?' · a '+c.uf+' UF/h ≈ <strong>'+(totalMin/60*c.uf).toFixed(1)+' UF</strong>':'')+
+    ' <span style="color:#94a3b8;font-size:11px">(sesiones sin duración no suman horas)</span>';
+  // resumen interno: horas por cliente en el periodo (todos los clientes con bitácora)
+  const conBita=contacts.filter(x=>x.bitacora&&x.bitacora.length);
+  const partes=conBita.map(x=>{
+    const min=bitaFiltered(x.bitacora).reduce((s,e)=>s+(parseFloat(e.minutos)||0),0);
+    return {emp:x.emp,min,uf:x.uf};
+  }).filter(p=>p.min>0||bitaMes==='todos');
+  const totMin=partes.reduce((s,p)=>s+p.min,0);
+  const totUF=partes.reduce((s,p)=>s+(p.uf?p.min/60*p.uf:0),0);
+  document.getElementById('bita-resumen-interno').innerHTML=
+    '<span style="font-size:10px;font-weight:600;color:#b45309;text-transform:uppercase;letter-spacing:0.5px">🔒 Resumen interno ('+periodoTxt+') — no mostrar al cliente</span><br>'+
+    (partes.length?partes.map(p=>'<strong>'+esc(p.emp)+'</strong> '+hh(p.min)+(p.uf&&p.min?' ('+(p.min/60*p.uf).toFixed(1)+' UF)':'')).join(' · ')+
+    ' &nbsp;→&nbsp; <strong>Total: '+hh(totMin)+(totUF?' · '+totUF.toFixed(1)+' UF':'')+'</strong>':'Sin horas registradas en este periodo.');
+  // tabla
+  const rows=entries.map(e=>{
+    const idx=(c.bitacora||[]).indexOf(e);
+    return '<tr'+(bitaEditIdx===idx?' style="background:#fffbeb"':'')+'><td style="white-space:nowrap;vertical-align:top">'+esc(e.fecha||'—')+'<div style="font-size:10px;color:#94a3b8">'+isoWeek(e.fecha)+'</div></td>'+
+      '<td style="white-space:normal;vertical-align:top"><div style="font-weight:600;font-size:12px">'+esc(e.tema||'—')+'</div>'+(e.comentarios?'<div style="font-size:11px;color:#64748b;margin-top:2px;line-height:1.45">'+esc(e.comentarios)+'</div>':'')+'</td>'+
+      '<td style="white-space:normal;vertical-align:top;font-size:11px;color:#64748b">'+esc(e.participantes||'—')+'</td>'+
+      '<td style="white-space:normal;vertical-align:top;font-size:11px;color:#64748b">'+esc(e.lugar||'—')+'</td>'+
+      '<td style="text-align:center;vertical-align:top">'+(e.minutos?e.minutos+' min':'—')+'</td>'+
+      '<td style="text-align:center;vertical-align:top;white-space:nowrap"><button onclick="event.stopPropagation();editBita('+c.id+','+idx+')" style="border:none;background:none;cursor:pointer;font-size:12px" title="Editar">✏️</button><button onclick="event.stopPropagation();delBita('+c.id+','+idx+')" style="border:none;background:none;cursor:pointer;color:#cbd5e1" title="Eliminar">✕</button></td></tr>';
+  }).join('');
+  document.getElementById('bita-table').innerHTML='<thead><tr><th>Fecha</th><th>Reunión / Comentarios</th><th>Participantes</th><th>Lugar</th><th style="text-align:center">Duración</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:1.2rem">Sin entradas en este periodo.</td></tr>')+'</tbody>';
+  // estado del formulario
+  const editing=bitaEditIdx!=null;
+  document.getElementById('b-form-title').textContent=editing?'✏️ Editar entrada':'+ Nueva entrada';
+  document.getElementById('b-save').textContent=editing?'Actualizar entrada':'Guardar entrada';
+  document.getElementById('b-cancel').style.display=editing?'inline-block':'none';
+  document.getElementById('b-edit-hint').style.display=editing?'inline':'none';
+  const bf=document.getElementById('b-fecha');if(bf&&!bf.value&&!editing)bf.value=new Date().toISOString().split('T')[0];
+}
+function editBita(cid,idx){
+  const c=contacts.find(x=>x.id===cid);if(!c||!c.bitacora||!c.bitacora[idx])return;
+  bitaClient=cid;bitaEditIdx=idx;
+  const e=c.bitacora[idx];
+  const sv=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+  sv('b-fecha',e.fecha);sv('b-min',e.minutos||'');sv('b-lugar',e.lugar);sv('b-tema',e.tema);sv('b-com',e.comentarios);sv('b-part',e.participantes);
+  renderBitacora();
+  document.getElementById('b-tema').focus();
+}
+function cancelBitaEdit(){
+  bitaEditIdx=null;
+  ['b-tema','b-com','b-part','b-lugar','b-min','b-fecha'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  renderBitacora();
+}
+function addBita(){
+  const c=contacts.find(x=>x.id===bitaClient);
+  if(!c){showToast('Selecciona un cliente primero');return;}
+  const gv=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
+  const tema=gv('b-tema');
+  if(!tema){showToast('Ingresa el tema de la reunión');return;}
+  const entry={fecha:gv('b-fecha')||new Date().toISOString().split('T')[0],tema,comentarios:gv('b-com'),participantes:gv('b-part'),lugar:gv('b-lugar'),minutos:parseFloat(gv('b-min'))||0};
+  if(!c.bitacora)c.bitacora=[];
+  const editing=bitaEditIdx!=null&&c.bitacora[bitaEditIdx];
+  if(editing)c.bitacora[bitaEditIdx]=entry;else c.bitacora.push(entry);
+  bitaEditIdx=null;
+  ['b-tema','b-com','b-part','b-lugar','b-min','b-fecha'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  persist();renderBitacora();showToast(editing?'✅ Entrada actualizada':'✅ Entrada guardada');
+}
+function delBita(cid,idx){
+  const c=contacts.find(x=>x.id===cid);if(!c||!c.bitacora)return;
+  if(!confirm('¿Eliminar esta entrada de la bitácora?'))return;
+  c.bitacora.splice(idx,1);
+  if(bitaEditIdx===idx)bitaEditIdx=null;
+  persist();renderBitacora();showToast('Entrada eliminada');
+}
 
 // ---------- DETALLE (todo en uno) ----------
 function openDetail(id){
@@ -850,7 +1038,7 @@ function saveAdd(){
 
 // ---------- EXPORT / IMPORT ----------
 function exportData(){
-  const json=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit},null,1);
+  const json=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit},null,1);
   navigator.clipboard.writeText(json).then(()=>showToast('✅ Pipeline copiado al portapapeles (JSON)')).catch(()=>{
     const blob=new Blob([json],{type:'application/json'});
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sales-coach-backup.json';a.click();
