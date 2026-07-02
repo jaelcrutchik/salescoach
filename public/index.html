@@ -384,6 +384,16 @@ function initRestore0702(){
   restore0702=true;
   return true;
 }
+// Restauración B (02/07/2026): owners según prints + 4 contactos Instantly de vuelta a Contactado
+let restoreB=false;
+function initRestoreB(){
+  if(restoreB)return false;
+  const set=(emp,fn)=>{const c=contacts.find(x=>(x.emp||'').toLowerCase()===emp.toLowerCase());if(c)fn(c);};
+  ['My Scrubs','P&E','Time of Interiors'].forEach(e=>set(e,c=>{c.owner='Rafa';}));
+  ['Antofagasta Terminal','Puerto San Antonio','Almar Water','Implementos Chile'].forEach(e=>set(e,c=>{if(c.status==='Respondió'){c.status='Contactado';c.diagReal='';c.diagAccion='';}}));
+  restoreB=true;
+  return true;
+}
 function initFix(){
   if(fixInit)return false;
   const dm=contacts.find(c=>(c.emp||'').toLowerCase()==='dmerco');
@@ -401,7 +411,7 @@ function initFix(){
 }
 const STORE_KEY='ryc_salescoach_v2';
 function persist(){
-  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,updatedAt:new Date().toISOString()});
+  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,updatedAt:new Date().toISOString()});
   try{localStorage.setItem(STORE_KEY,payload);}
   catch(e){console.error('storage error',e);showToast('⚠️ No se pudo guardar — exporta un respaldo');}
 }
@@ -416,12 +426,12 @@ function loadData(){
   try{const p=localStorage.getItem(STORE_KEY);if(p)d=JSON.parse(p);}catch(e){console.error('load error',e);}
   if(d){
     contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;
-    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;
+    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;
   }else{
     contacts=SEED.map(normalize);nextId=60;
   }
   loaded=true;
-  const cambios=[initOwners(),initRafa(),initFix(),initBita(),initRestore0702()].filter(Boolean).length;
+  const cambios=[initOwners(),initRafa(),initFix(),initBita(),initRestore0702(),initRestoreB()].filter(Boolean).length;
   if(cambios||!d){persist();if(fixJustRan||cambios)showToast('✅ Pipeline actualizado');}
 }
 
