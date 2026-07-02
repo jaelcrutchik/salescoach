@@ -42,7 +42,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .stat-sub{font-size:10px;color:#94a3b8;margin-top:1px}
 
 .funnel{background:white;border:1px solid var(--border);border-radius:12px;padding:0.85rem;margin-bottom:0.85rem}
-.funnel-stages{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.funnel-stages{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .stage{border-radius:8px;padding:8px 5px;text-align:center;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s}
 .stage:hover{border-color:#cbd5e1}
 .stage.active{border-color:var(--blue);background:var(--blue-l)}
@@ -77,7 +77,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .b-re{background:#fef9c3;color:#854d0e}.b-ru{background:#f5f3ff;color:#6d28d9}
 .b-pr{background:#fff7ed;color:#c2410c}.b-ga{background:#dcfce7;color:#166534}
 .b-oh{background:#f3f4f6;color:#374151}.b-no{background:#fee2e2;color:#991b1b}
-.b-ep{background:#dbeafe;color:#1e40af}
+.b-ep{background:#dbeafe;color:#1e40af}.b-tm{background:#e0f2fe;color:#0369a1}
 .timing-txt{font-size:10px;white-space:nowrap}
 
 .overlay{display:none;position:fixed;inset:0;background:rgba(26,26,46,0.45);z-index:100;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto}
@@ -130,7 +130,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .score-pill{font-size:12px;font-weight:600;padding:3px 12px;border-radius:99px;margin-left:auto}
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:8px 16px;border-radius:8px;font-size:12px;opacity:0;transition:opacity 0.3s;z-index:300;pointer-events:none}
 .toast.show{opacity:1}
-@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.funnel-stages{grid-template-columns:repeat(3,1fr);row-gap:6px}#search-input{width:140px}}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.funnel-stages{grid-template-columns:repeat(4,1fr);row-gap:6px}#search-input{width:140px}}
 </style>
 </head>
 <body>
@@ -177,7 +177,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
     <div class="field"><label>Empresa *</label><input id="a-emp" type="text" placeholder="Nombre empresa"></div>
     <div class="field-row">
       <div class="field"><label>Etapa</label>
-        <select id="a-status"><option>Por contactar</option><option>Contactado</option><option>Respondió</option><option>Reunión</option><option>Propuesta</option><option>Ganado</option><option>On hold</option><option>No</option></select>
+        <select id="a-status"><option>Por contactar</option><option>Contactado</option><option>Respondió</option><option>Reunión</option><option>Propuesta</option><option>Ganado</option><option>Terminado</option><option>On hold</option><option>No</option></select>
       </div>
       <div class="field"><label>Canal</label>
         <select id="a-canal"><option value="">-</option><option>Email</option><option>LinkedIn</option><option>WhatsApp</option><option>Llamada</option><option>Referido</option><option>Reunión</option></select>
@@ -227,9 +227,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 <script>
 const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 const UF=38500;
-const STAGES=['Por contactar','Contactado','Respondió','Reunión','Propuesta','Ganado'];
-const ORD={'Reunión':0,'Respondió':1,'Propuesta':2,'En proceso':3,'Contactado':4,'Por contactar':5,'On hold':6,'Ganado':7,'No':8};
-function bc(s){return {'Por contactar':'b-pc','Contactado':'b-co','Respondió':'b-re','Reunión':'b-ru','Propuesta':'b-pr','Ganado':'b-ga','On hold':'b-oh','No':'b-no','En proceso':'b-ep'}[s]||'b-pc';}
+const STAGES=['Por contactar','Contactado','Respondió','Reunión','Propuesta','Ganado','Terminado'];
+const ORD={'Reunión':0,'Respondió':1,'Propuesta':2,'En proceso':3,'Contactado':4,'Por contactar':5,'On hold':6,'Ganado':7,'Terminado':8,'No':9};
+function bc(s){return {'Por contactar':'b-pc','Contactado':'b-co','Respondió':'b-re','Reunión':'b-ru','Propuesta':'b-pr','Ganado':'b-ga','Terminado':'b-tm','On hold':'b-oh','No':'b-no','En proceso':'b-ep'}[s]||'b-pc';}
 
 // ---------- SEED: pipeline original ----------
 const SEED=[
@@ -284,7 +284,7 @@ const SEED=[
 {id:49,emp:'Alemán Experto',cont:'(vía Sofi)',cargo:'Dueño',status:'Por contactar',canal:'Referido',accion:'Contactar por Sofi/Berna',notas:'Sofi es esposa del dueño'},
 {id:50,emp:'Ferreterías Lonza',cont:'Simón Lonza',cargo:'Ejecutivo',status:'Contactado',canal:'Email',accion:'Seguimiento en 5 días',notas:'Referido de Luzma. Perfil emprendedor, ecoturismo.',fechaContacto:'2026-06-06',historial:[{fecha:'2026-06-06',tipo:'Email',texto:'Correo personalizado enviado vía Luzma.'}]}
 ];
-function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,accion:'',notas:'',com:15,email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:''},c);}
+function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,accion:'',notas:'',com:15,email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:'',fechaTermino:'',franJugada:''},c);}
 
 let contacts=[],nextId=60,activeFilter='todos',ownerFilter='todos',detailId=null,sortCol='default',sortDesc=true,loaded=false;
 
@@ -309,9 +309,32 @@ function initRafa(){
 }
 // ---------- PERSISTENCIA (almacenamiento COMPARTIDO: Jael y Rafa ven el mismo pipeline) ----------
 let ownersInit=false;
+let fixInit=false,fixJustRan=false;
+function initFix(){
+  if(fixInit)return false;
+  const dm=contacts.find(c=>(c.emp||'').toLowerCase()==='dmerco');
+  if(dm&&dm.status!=='Propuesta'){dm.status='Propuesta';dm.fechaContacto='2026-06-30';if(!dm.historial)dm.historial=[];dm.historial.push({fecha:'2026-06-30',tipo:'Nota',texto:'Propuesta enviada.'});dm.diagReal='';dm.diagAccion='';dm.accion='Esperar respuesta a la propuesta';}
+  const dl=contacts.find(c=>(c.emp||'')==='Transportes Dliverys');
+  if(dl&&dl.status==='En proceso')dl.status='Respondió';
+  const nuevos=[
+    {emp:'P&E',cont:'Matias Pilasi',cargo:'Dueño',status:'Ganado',owner:'Jael',notas:'Proyecto activo.'},
+    {emp:'My Scrubs',cont:'Roberto Olguin',cargo:'Dueño',status:'Ganado',owner:'Jael',notas:'Proyecto activo, mes 3 de 4.'},
+    {emp:'Time of Interiors',cont:'Tuti Casali',cargo:'Dueño',status:'Terminado',owner:'Jael',fechaTermino:'2026-06-15',notas:'Proyecto cerrado a mediados de junio.'}
+  ];
+  nuevos.forEach(r=>{if(!contacts.some(c=>(c.emp||'').toLowerCase()===r.emp.toLowerCase())){const n=normalize(r);n.id=nextId++;contacts.push(n);}});
+  fixInit=true;fixJustRan=true;
+  return true;
+}
+let sharedOk=null;
+let lastLoadedAt=null; // null=sin probar, true/false=resultado del último intento
 async function persist(){
-  try{await window.storage.set('sales-coach-v2',JSON.stringify({contacts,nextId,ownersInit,rafaInit,updatedAt:new Date().toISOString()}),true);}
-  catch(e){console.error('storage error',e);}
+  const ts=new Date().toISOString();
+  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,updatedAt:ts});
+  lastLoadedAt=ts;
+  try{const r=await window.storage.set('sales-coach-v2',payload,true);sharedOk=!!r;}
+  catch(e){sharedOk=false;console.error('shared storage error',e);}
+  try{await window.storage.set('sales-coach-v2',payload);}
+  catch(e){console.error('local storage error',e);}
 }
 function initOwners(){
   if(ownersInit)return false;
@@ -320,35 +343,43 @@ function initOwners(){
   return true;
 }
 async function loadData(){
-  // 1) datos compartidos
-  try{
-    const r=await window.storage.get('sales-coach-v2',true);
-    if(r&&r.value){
-      const d=JSON.parse(r.value);contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;loaded=true;
-      const cambioOwners=initOwners();
-      const cambioRafa=initRafa();
-      if(cambioOwners||cambioRafa){await persist();if(cambioRafa)showToast('✅ Contactos de Rafa cargados');else showToast('Contactos existentes asignados a Jael');}
-      return;
-    }
-  }catch(e){/* aún no existe */}
-  // 2) migración desde datos personales (versión anterior)
-  try{
-    const p=await window.storage.get('sales-coach-v2');
-    if(p&&p.value){const d=JSON.parse(p.value);contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;loaded=true;initOwners();initRafa();await persist();showToast('Pipeline migrado a modo compartido');return;}
-  }catch(e){/* no hay datos personales */}
-  // 3) seed inicial
-  contacts=SEED.map(normalize);nextId=60;loaded=true;
-  initOwners();
-  initRafa();
-  persist();
+  let dS=null,dL=null;
+  try{const r=await window.storage.get('sales-coach-v2',true);if(r&&r.value)dS=JSON.parse(r.value);}catch(e){}
+  try{const p=await window.storage.get('sales-coach-v2');if(p&&p.value)dL=JSON.parse(p.value);}catch(e){}
+  let d=null;
+  if(dS&&dL)d=((dS.updatedAt||'')>=(dL.updatedAt||''))?dS:dL;
+  else d=dS||dL;
+  if(d){
+    contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;
+    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;
+    lastLoadedAt=d.updatedAt||null;if(dS)sharedOk=true;
+  }else{
+    contacts=SEED.map(normalize);nextId=60;
+  }
+  loaded=true;
+  const cambios=[initOwners(),initRafa(),initFix()].filter(Boolean).length;
+  if(cambios||!d){await persist();if(fixJustRan)showToast('✅ Datos recuperados y pipeline actualizado');}
 }
 function anyModalOpen(){return ['add-overlay','detail-overlay','import-overlay'].some(id=>document.getElementById(id).classList.contains('open'));}
 async function refreshShared(manual){
   if(anyModalOpen()){if(manual)showToast('Cierra la ficha abierta antes de sincronizar');return;}
   try{
     const r=await window.storage.get('sales-coach-v2',true);
-    if(r&&r.value){const d=JSON.parse(r.value);contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||nextId;renderAll();if(manual)showToast('✅ Pipeline sincronizado');}
-  }catch(e){if(manual)showToast('No se pudo sincronizar');}
+    if(r&&r.value){
+      const d=JSON.parse(r.value);
+      if(d.updatedAt&&lastLoadedAt&&d.updatedAt<=lastLoadedAt){if(manual)showToast('✅ Ya estás al día');return;}
+      contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||nextId;
+      if(typeof d.ownersInit!=='undefined')ownersInit=!!d.ownersInit;
+      if(typeof d.rafaInit!=='undefined')rafaInit=!!d.rafaInit;
+      if(typeof d.fixInit!=='undefined')fixInit=!!d.fixInit;
+      lastLoadedAt=d.updatedAt||new Date().toISOString();
+      renderAll();if(manual)showToast('✅ Pipeline sincronizado');
+    }
+  }catch(e){
+    // El espacio compartido no respondió o aún no existe: publica tu versión
+    await persist();
+    if(manual)showToast(sharedOk?'✅ Tu pipeline se publicó en el espacio compartido':'⚠️ Espacio compartido no disponible — trabajando con copia local (tus datos están a salvo)');
+  }
 }
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&loaded)refreshShared(false);});
 
@@ -367,7 +398,7 @@ function timing(c){
 }
 function urg(c){
   const d=getDias(c);
-  if(['No','Ganado'].includes(c.status))return 'l';
+  if(['No','Ganado','Terminado'].includes(c.status))return 'l';
   if(c.status==='Reunión'&&d>5)return 'h';
   if(c.status==='Respondió'&&d>3)return 'h';
   if(c.status==='En proceso'&&d>7)return 'h';
@@ -461,6 +492,7 @@ function getMensajeLocal(c){
   if(c.status==='Propuesta'&&d>=7)return 'Hola '+nombre+', ¿qué necesitarías ver para tomar la decisión sobre la propuesta? Si hay algo que no quedó claro o que valga la pena ajustar, lo conversamos.'+(wa?'':firma);
   if(c.status==='Propuesta')return 'Hola '+nombre+', ¿pudiste revisar la propuesta? ¿Hay algo que genere dudas o que valga la pena conversar?'+(wa?'':firma);
   if(c.status==='En proceso')return 'Hola '+nombre+', '+pregunta+' Si no es prioridad ahora, dime sin problema y lo retomamos cuando tenga sentido.'+(wa?'':firma);
+  if(c.status==='Terminado')return 'Hola '+nombre+', ¿cómo han estado desde que cerramos el proyecto? Me encantaría saber cómo han evolucionado los cambios que implementamos. Si en algo los podemos seguir apoyando, acá estamos.'+(wa?'':firma);
   if(c.status==='On hold')return 'Hola '+nombre+', sé que esto quedó en pausa. ¿Sigue teniendo sentido retomarlo, o prefieres que lo veamos más adelante?'+(wa?'':firma);
   if(c.status==='Por contactar'&&c.canal==='Referido')return 'Hola '+nombre+', me pasó tu contacto alguien en quien confío mucho. '+pregunta+' Si resuena, vale 20 minutos.'+(wa?'':firma);
   if(c.status==='Por contactar')return 'Hola '+nombre+', soy Jael de Rave & Crutchik. '+pregunta+' Si algo resuena, vale 20 minutos esta semana.'+(wa?'':firma);
@@ -478,6 +510,7 @@ function getRecoLocal(c){
   if(c.status==='Contactado')return 'Contactado hace '+d+' día(s). Todavía es pronto para insistir — soporta la ansiedad de la incertidumbre.';
   if(c.status==='Por contactar')return 'El único bloqueador eres tú: falta enviar el primer mensaje. '+(c.canal==='Referido'?'Es referido — la confianza ya está instalada, escríbele esta semana.':'Arranca con pregunta genuina, sin vender en el primer mensaje.');
   if(c.status==='En proceso')return 'Sin avance claro en '+d+' días. Define si hay dolor real antes de seguir invirtiendo energía.';
+  if(c.status==='Terminado')return 'Proyecto terminado. Cliente ideal para pedir testimonio y referidos — y para un check-in a los 2-3 meses que mantenga viva la relación.';
   if(c.status==='On hold')return 'En pausa. Ponle fecha límite de revisión — que el on hold no se convierta en descarte silencioso.';
   const bloq=calcBloqueador(c);
   return (bloq?bloq+'. ':'')+(urg(c)==='h'?'Prioridad alta: actúa hoy.':'Timing razonable — sigue el plan de la próxima acción.');
@@ -500,7 +533,7 @@ async function generarCoach(c,force){
   const nombre=c.cont&&c.cont!=='-'?c.cont.split(' ')[0]:'el contacto';
   const hist=(c.historial||[]).slice(-3).map(h=>h.fecha+' ('+h.tipo+'): '+h.texto).join(' | ')||'sin historial';
   const tono=canal==='WhatsApp'?'Tono WhatsApp: muy corto, máximo 3 líneas, sin formalismos, como persona real, sin firma.':canal==='LinkedIn'?'Tono LinkedIn: profesional pero cercano, máximo 4 líneas, sin firma.':'Tono email: habla al dolor específico, termina con una pregunta concreta, firma "Jael Crutchik — Rave & Crutchik".';
-  const prompt='Eres el sales coach de Jael Crutchik, cofundadora de Rave & Crutchik, consultora de operaciones y supply chain en Chile (Lean, excelencia operacional, 3 UF/hora). Su estilo de venta sigue los principios de Francisco Pereira (NEGOCIAR O PERDER): hablar al dolor del otro, nunca sonar desesperada, preguntas genuinas sin script de vendedor, el poder lo dan las alternativas del otro, toda concesión con condición.\n\nREGLA CRÍTICA: el mensaje DEBE corresponder exactamente a la etapa del prospecto. Guía por etapa:\n- Por contactar: primer contacto, pregunta genuina al dolor, sin vender.\n- Contactado: seguimiento sin repetir el pitch; si lleva 14+ días, último toque con cierre digno del loop.\n- Respondió: segundo toque, ángulo nuevo, corto.\n- Reunión: retomar lo conversado y encaminar la propuesta o el siguiente paso concreto.\n- Propuesta: seguimiento de la propuesta YA ENVIADA — preguntar si la revisaron, qué dudas hay, qué falta para decidir. JAMÁS preguntas de dolor de primer contacto ni presentarse de nuevo.\n- En proceso: definir si hay dolor real, dar salida digna.\n- On hold: check-in ligero, sin presión.\n- Ganado: relación y siguiente oportunidad, no venta.\n\nProspecto:\n- Empresa: '+c.emp+' ('+(c.ciudad||'Chile')+')'+(c.analisis?'\n- Análisis previo: '+c.analisis:'')+'\n- Contacto: '+nombre+' — '+(c.cargo||'sin cargo')+'\n- ETAPA ACTUAL: '+c.status+' — '+dias+' días desde el último contacto\n- Canal: '+canal+'\n- Notas: '+(c.notas||'sin notas')+(c.contexto?'\n- Contexto del contacto: '+c.contexto:'')+(c.diagDolor?'\n- Dolor documentado: '+c.diagDolor:'')+'\n- Historial reciente: '+hist+'\n\nResponde SOLO con JSON válido, sin backticks ni texto adicional: {"empresa":"si no hay análisis previo: 2 oraciones sobre qué hace esta empresa y sus desafíos operacionales típicos; si ya hay análisis, string vacío","recomendacion":"en 2 oraciones máximo: qué hacer HOY con este contacto dada su etapa ('+c.status+') y los días transcurridos, y por qué. Directo, sin relleno.","mensaje":"mensaje listo para enviar por '+canal+', coherente con la etapa '+c.status+' según la guía. '+tono+' Usa el nombre '+nombre+'. Específico a ESTA empresa, no genérico. Nunca desesperado."}';
+  const prompt='Eres el sales coach de Jael Crutchik, cofundadora de Rave & Crutchik, consultora de operaciones y supply chain en Chile (Lean, excelencia operacional, 3 UF/hora). Su estilo de venta sigue los principios de Francisco Pereira (NEGOCIAR O PERDER): hablar al dolor del otro, nunca sonar desesperada, preguntas genuinas sin script de vendedor, el poder lo dan las alternativas del otro, toda concesión con condición.\n\nREGLA CRÍTICA: el mensaje DEBE corresponder exactamente a la etapa del prospecto. Guía por etapa:\n- Por contactar: primer contacto, pregunta genuina al dolor, sin vender.\n- Contactado: seguimiento sin repetir el pitch; si lleva 14+ días, último toque con cierre digno del loop.\n- Respondió: segundo toque, ángulo nuevo, corto.\n- Reunión: retomar lo conversado y encaminar la propuesta o el siguiente paso concreto.\n- Propuesta: seguimiento de la propuesta YA ENVIADA — preguntar si la revisaron, qué dudas hay, qué falta para decidir. JAMÁS preguntas de dolor de primer contacto ni presentarse de nuevo.\n- En proceso: definir si hay dolor real, dar salida digna.\n- On hold: check-in ligero, sin presión.\n- Ganado: relación y siguiente oportunidad, no venta.\n- Terminado: proyecto cerrado exitosamente — check-in de relación, pedir testimonio o referidos. Jamás venta fría.\n\nProspecto:\n- Empresa: '+c.emp+' ('+(c.ciudad||'Chile')+')'+(c.analisis?'\n- Análisis previo: '+c.analisis:'')+'\n- Contacto: '+nombre+' — '+(c.cargo||'sin cargo')+'\n- ETAPA ACTUAL: '+c.status+' — '+dias+' días desde el último contacto\n- Canal: '+canal+'\n- Notas: '+(c.notas||'sin notas')+(c.contexto?'\n- Contexto del contacto: '+c.contexto:'')+(c.diagDolor?'\n- Dolor documentado: '+c.diagDolor:'')+'\n- Historial reciente: '+hist+'\n\nResponde SOLO con JSON válido, sin backticks ni texto adicional: {"empresa":"si no hay análisis previo: 2 oraciones sobre qué hace esta empresa y sus desafíos operacionales típicos; si ya hay análisis, string vacío","recomendacion":"en 2 oraciones máximo: qué hacer HOY con este contacto dada su etapa ('+c.status+') y los días transcurridos, y por qué. Directo, sin relleno.","mensaje":"mensaje listo para enviar por '+canal+', coherente con la etapa '+c.status+' según la guía. '+tono+' Usa el nombre '+nombre+'. Específico a ESTA empresa, no genérico. Nunca desesperado."}';
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     const data=await res.json();
@@ -521,6 +554,22 @@ async function generarCoach(c,force){
 }
 
 // ---------- FRANCISCO MODE ----------
+async function genFrancisco(){
+  const c=contacts.find(x=>x.id===detailId);if(!c)return;
+  const load=document.getElementById('fr-loading');if(load)load.style.display='inline';
+  const prompt='Eres coach de negociación con el estilo de Francisco Pereira (NEGOCIAR O PERDER): poder según las alternativas del otro, regla CC (toda concesión con condición), anclar el valor antes del precio, incentivos individuales del decisor, desprendimiento real, nunca desesperado. Asesoras a Jael Crutchik de Rave & Crutchik (consultora de operaciones, 3 UF/hora).\n\nCaso:\n- Empresa: '+c.emp+(c.ciudad?' ('+c.ciudad+')':'')+'\n- Contacto: '+(c.cont||'?')+' — '+(c.cargo||'sin cargo')+'\n- Etapa: '+c.status+' — '+getDias(c)+' días desde último contacto\n- Notas: '+(c.notas||'sin notas')+(c.diagDolor?'\n- Dolor: '+c.diagDolor:'')+(c.contexto?'\n- Contexto: '+c.contexto:'')+(c.analisis?'\n- Análisis: '+c.analisis:'')+'\n- Historial: '+((c.historial||[]).slice(-3).map(h=>h.tipo+': '+h.texto).join(' | ')||'sin historial')+'\n\nDame LA jugada de negociación específica para este caso en este momento: qué mover, qué decir, qué NO hacer, y la trampa a evitar. Concreto y accionable, nada genérico. Responde SOLO JSON sin backticks: {"jugada":"4-6 líneas, puede usar saltos de línea"}';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:600,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    const text=data.content.map(i=>i.text||'').join('');
+    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
+    c.franJugada=parsed.jugada||'';
+    persist();
+    const box=document.getElementById('fr-ai');
+    if(box&&c.franJugada)box.innerHTML='<div class="fr-card" style="border-left-color:#7c3aed;background:#f5f3ff"><div class="ft" style="color:#7c3aed">⚡ Jugada para '+esc(c.emp)+'</div><div class="fi" style="white-space:pre-wrap">'+esc(c.franJugada)+'</div></div>';
+  }catch(e){showToast('No se pudo generar la jugada — intenta de nuevo');}
+  if(load)load.style.display='none';
+}
 function franciscoCards(c){
   const nombre=c.cont&&c.cont!=='-'?c.cont.split(' ')[0]:'el contacto';
   const pregunta=getPreguntaDolor(c);
@@ -563,7 +612,7 @@ function franciscoCards(c){
 // ---------- RENDER ----------
 function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function renderStats(){
-  const act=contacts.filter(c=>c.status!=='No');
+  const act=contacts.filter(c=>!['No','Terminado'].includes(c.status));
   const urg_n=contacts.filter(c=>urg(c)==='h').length;
   const cierre=contacts.filter(c=>['Reunión','Propuesta'].includes(c.status)).length;
   document.getElementById('stats').innerHTML=
@@ -619,7 +668,7 @@ function renderContacts(){
 // ---------- INSIGHTS ----------
 function renderTips(){
   const box=document.getElementById('tips-grid');
-  const activos=contacts.filter(c=>c.status!=='No'&&c.status!=='Ganado');
+  const activos=contacts.filter(c=>!['No','Ganado','Terminado'].includes(c.status));
   const dia=new Date().getDay();const tips=[];
   const tipsDia={1:{i:'📅',l:'Lunes: activa el pipeline',x:'Los decisores revisan su semana y están más receptivos. Prioriza referidos y quienes abrieron tu email.'},2:{i:'🔥',l:'Martes: mejor día para escribir',x:'Martes y miércoles tienen la tasa de respuesta más alta en B2B. Haz seguimientos a quienes llevan más de 5 días.'},3:{i:'🔥',l:'Miércoles: día peak de respuesta',x:'Mayor tasa de apertura B2B de la semana. Escríbele a los que abrieron tu email y aún no responden.'},4:{i:'📞',l:'Jueves: cierra reuniones',x:'Ideal para confirmar reuniones de la próxima semana. Si tienes contactos en Reunión sin fecha, hoy es el día.'},5:{i:'⚡',l:'Viernes: seguimiento express',x:'Mensajes cortos y directos. Guarda las propuestas largas para la próxima semana.'},6:{i:'😴',l:'Sábado: planifica el lunes',x:'Revisa el pipeline, actualiza estados y prepara los mensajes del lunes.'},0:{i:'🗓️',l:'Domingo: prepara tu semana',x:'Revisa quién lleva más de 7 días sin contacto y prepara 3 mensajes para el lunes.'}};
   tips.push({icono:tipsDia[dia].i,label:tipsDia[dia].l,texto:tipsDia[dia].x});
@@ -662,9 +711,10 @@ function openDetail(id){
     '<h3>'+esc(c.emp)+'</h3>'+
     '<div style="font-size:12px;color:#64748b;margin-bottom:10px">'+esc(c.cont&&c.cont!=='-'?c.cont:'Sin contacto')+(c.cargo&&c.cargo!=='-'?' · '+esc(c.cargo):'')+(c.ciudad?' · '+esc(c.ciudad):'')+'</div>'+
     '<div class="detail-top">'+
-      '<select id="d-status" onchange="changeStatus()">'+['Por contactar','Contactado','Respondió','Reunión','Propuesta','Ganado','En proceso','On hold','No'].map(s=>'<option'+(c.status===s?' selected':'')+'>'+s+'</option>').join('')+'</select>'+
+      '<select id="d-status" onchange="changeStatus()">'+['Por contactar','Contactado','Respondió','Reunión','Propuesta','Ganado','Terminado','En proceso','On hold','No'].map(s=>'<option'+(c.status===s?' selected':'')+'>'+s+'</option>').join('')+'</select>'+
       '<input type="date" id="d-fecha-top" value="'+esc(c.fechaContacto)+'" onchange="changeFecha()" title="Fecha del último contacto">'+
       '<span style="font-size:11px;color:#94a3b8" id="d-dias-txt">'+getDias(c)+' días · '+(c.canal||'sin canal')+'</span>'+
+      '<span id="d-termino-wrap" style="display:'+(c.status==='Terminado'?'inline-flex':'none')+';align-items:center;gap:5px"><span style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px">Término</span><input type="date" id="d-termino" value="'+esc(c.fechaTermino||'')+'" onchange="changeTermino()"></span>'+
     '</div>'+
     '<div class="coach-block">'+
       '<div class="coach-hdr"><span class="t">🎯 Coach</span><button class="mini-btn" onclick="regenCoach()">↻ Regenerar</button></div>'+
@@ -691,7 +741,7 @@ function openDetail(id){
       '<button class="mini-btn primary" onclick="saveDetail()">Guardar datos</button>'+
     '</div></div>'+
     '<div class="modal-btns"><button class="btn-del" onclick="deleteContact()">Eliminar</button><button class="btn-c" onclick="closeDetail()">Cerrar</button></div>';
-  document.getElementById('fr-body').innerHTML=franciscoCards(c).map(card=>'<div class="fr-card" style="border-left-color:'+card.color+'"><div class="ft" style="color:'+card.color+'">'+card.t+'</div>'+card.items.map(i=>'<div class="fi">— '+i+'</div>').join('')+'</div>').join('');
+  document.getElementById('fr-body').innerHTML='<div style="margin-bottom:8px;display:flex;align-items:center;gap:8px"><button class="mini-btn" onclick="genFrancisco()">⚡ '+(c.franJugada?'Regenerar jugada para este caso':'Jugada específica para este caso')+'</button><span id="fr-loading" style="display:none;font-size:11px;color:#94a3b8"><span class="spinner"></span>pensando la jugada...</span></div><div id="fr-ai">'+(c.franJugada?'<div class="fr-card" style="border-left-color:#7c3aed;background:#f5f3ff"><div class="ft" style="color:#7c3aed">⚡ Jugada para '+esc(c.emp)+'</div><div class="fi" style="white-space:pre-wrap">'+esc(c.franJugada)+'</div></div>':'')+'</div>'+franciscoCards(c).map(card=>'<div class="fr-card" style="border-left-color:'+card.color+'"><div class="ft" style="color:'+card.color+'">'+card.t+'</div>'+card.items.map(i=>'<div class="fi">— '+i+'</div>').join('')+'</div>').join('');
   renderHistEntries(c);
   document.getElementById('detail-overlay').classList.add('open');
   generarCoach(c,false);
@@ -710,12 +760,22 @@ function changeStatus(){
   if(nuevo!==c.status){
     c.status=nuevo;
     c.diagReal='';c.diagAccion='';
+    const tw=document.getElementById('d-termino-wrap');
+    if(nuevo==='Terminado'){
+      if(!c.fechaTermino){c.fechaTermino=new Date().toISOString().split('T')[0];const ti=document.getElementById('d-termino');if(ti)ti.value=c.fechaTermino;}
+      if(tw)tw.style.display='inline-flex';
+    }else if(tw)tw.style.display='none';
     if(!c.historial)c.historial=[];
     c.historial.push({fecha:new Date().toISOString().split('T')[0],tipo:'Nota',texto:'Cambio de etapa a: '+nuevo});
     persist();
     showToast('Etapa actualizada');
     generarCoach(c,true);
   }
+}
+function changeTermino(){
+  const c=contacts.find(x=>x.id===detailId);if(!c)return;
+  c.fechaTermino=document.getElementById('d-termino').value;
+  persist();showToast('Fecha de término guardada');
 }
 function changeFecha(){
   const c=contacts.find(x=>x.id===detailId);if(!c)return;
@@ -790,7 +850,7 @@ function saveAdd(){
 
 // ---------- EXPORT / IMPORT ----------
 function exportData(){
-  const json=JSON.stringify({contacts,nextId,ownersInit,rafaInit},null,1);
+  const json=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit},null,1);
   navigator.clipboard.writeText(json).then(()=>showToast('✅ Pipeline copiado al portapapeles (JSON)')).catch(()=>{
     const blob=new Blob([json],{type:'application/json'});
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sales-coach-backup.json';a.click();
@@ -811,6 +871,7 @@ function doImport(){
       contacts=d.contacts.map(normalize);nextId=d.nextId||Math.max(...contacts.map(c=>c.id))+1;
       if(typeof d.ownersInit!=='undefined')ownersInit=!!d.ownersInit;
       if(typeof d.rafaInit!=='undefined')rafaInit=!!d.rafaInit;
+      if(typeof d.fixInit!=='undefined')fixInit=!!d.fixInit;
       persist();closeImport();renderAll();showToast('✅ Pipeline reemplazado: '+contacts.length+' contactos');
     }
   }catch(e){showToast('JSON inválido — revisa el formato');}
