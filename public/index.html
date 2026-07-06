@@ -358,7 +358,10 @@ const BITA_SEED={'My Scrubs':[
 {fecha:'2026-07-01',tema:'Taller de Misión y Visión (feedback de lo creado) + Taller de Indicadores + Reunión de Desempeño',comentarios:'Se revisa la importancia de entender la cadena completa; interés de Roberto por comenzar con bodega + ejemplos de flujo (Bontempo). Roberto quiere comenzar trabajando con la bodega. Bonos de cyber: lo reclamó una persona, no está claro ni escrito. Medir devoluciones y carritos que no se cierran en internet.',participantes:'Roberto',lugar:'Oficinas My Scrubs',minutos:120},
 {fecha:'2026-07-07',tema:'Taller de Misión y Visión + Taller de Indicadores + Reunión de Desempeño',comentarios:'',participantes:'Andrea, Carol, Katherine',lugar:'Bodega My Scrubs',minutos:120}
 ],'P&E':[
-{fecha:'2026-07-01',tema:'Análisis de entrevistas',comentarios:'11:00 a 13:00 hrs',participantes:'R&C',lugar:'Trabajo interno',minutos:120}
+{fecha:'2026-07-01',tema:'Análisis de entrevistas',comentarios:'11:00 a 13:30 hrs',participantes:'R&C',lugar:'Trabajo interno',minutos:150},
+{fecha:'2026-07-02',tema:'Análisis de entrevistas',comentarios:'11:00 a 13:30 hrs',participantes:'R&C',lugar:'Trabajo interno',minutos:150},
+{fecha:'2026-07-02',tema:'Análisis de entrevistas',comentarios:'16:00 a 17:00',participantes:'R&C',lugar:'Trabajo interno',minutos:60},
+{fecha:'2026-07-06',tema:'Análisis de entrevistas',comentarios:'11:30 a 13:30',participantes:'R&C',lugar:'Trabajo interno',minutos:120}
 ]};
 function initBita(){
   if(bitaInit)return false;
@@ -801,22 +804,34 @@ function bitaFiltered(list){
 }
 function renderResumenHoras(){
   const box=document.getElementById('bita-resumen-interno');if(!box)return;
-  const conBita=contacts.filter(x=>x.bitacora&&x.bitacora.length);
-  const weeks=[...new Set(conBita.flatMap(x=>x.bitacora.filter(e=>(parseFloat(e.minutos)||0)>0).map(e=>isoWeek(e.fecha)).filter(Boolean)))].sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
+  // Aplica los mismos filtros de mes/semana que la tabla de sesiones
+  const conBita=contacts.map(x=>({c:x,ent:bitaFiltered((x.bitacora||[]).filter(e=>(parseFloat(e.minutos)||0)>0))})).filter(r=>r.ent.length);
+  const periodo=(bitaMes==='todos'?'Total':mesLabel(bitaMes))+(bitaSem!=='todos'?' · '+bitaSem:'');
+  const weeks=[...new Set(conBita.flatMap(r=>r.ent.map(e=>isoWeek(e.fecha)).filter(Boolean)))].sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
   const fh=m=>(m/60).toFixed(1).replace('.',',');
-  const rows=conBita.map(x=>{
-    const perW=weeks.map(w=>(x.bitacora||[]).filter(e=>isoWeek(e.fecha)===w).reduce((s,e)=>s+(parseFloat(e.minutos)||0),0));
-    return {emp:x.emp,perW,tot:perW.reduce((s,v)=>s+v,0)};
+  const fuf=v=>v.toFixed(1).replace('.',',');
+  if(!conBita.length||!weeks.length){
+    if(bitaMes==='todos'&&bitaSem==='todos'){box.style.display='none';return;}
+    box.style.display='block';
+    box.innerHTML='<div class="hrs-title">Horas por cliente · '+periodo+'</div><div style="color:#94a3b8;font-size:12px;padding:0.4rem 0">Sin horas registradas en este periodo.</div>';
+    return;
+  }
+  const rows=conBita.map(r=>{
+    const perW=weeks.map(w=>r.ent.filter(e=>isoWeek(e.fecha)===w).reduce((s,e)=>s+(parseFloat(e.minutos)||0),0));
+    const tot=perW.reduce((s,v)=>s+v,0);
+    const uf=parseFloat(r.c.uf)||0;
+    return {emp:r.c.emp,perW,tot,ufTot:uf?tot/60*uf:null};
   }).sort((a,b)=>a.emp.localeCompare(b.emp));
-  if(!rows.length||!weeks.length){box.style.display='none';return;}
   box.style.display='block';
   const totW=weeks.map((w,i)=>rows.reduce((s,r)=>s+r.perW[i],0));
   const grand=totW.reduce((s,v)=>s+v,0);
-  box.innerHTML='<div class="hrs-title">Horas por cliente</div><div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
-    weeks.map(w=>'<th>'+w+'</th>').join('')+'<th class="hrs-tot">HH</th></tr></thead><tbody>'+
-    rows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perW.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(r.tot)+'</td></tr>').join('')+
-    '<tr class="hrs-total-row"><td class="hl">Total</td>'+totW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(grand)+'</td></tr>'+
-    '</tbody></table></div>';
+  const ufGrand=rows.reduce((s,r)=>s+(r.ufTot||0),0);
+  box.innerHTML='<div class="hrs-title">Horas por cliente · '+periodo+'</div><div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
+    weeks.map(w=>'<th>'+w+'</th>').join('')+'<th class="hrs-tot">HH</th><th class="hrs-tot" title="Horas × tarifa UF/hora de la ficha del cliente">UF</th></tr></thead><tbody>'+
+    rows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perW.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(r.tot)+'</td><td class="hrs-tot">'+(r.ufTot!=null?fuf(r.ufTot):'<span title="Define UF/hora en la ficha del cliente" style="color:#cbd5e1">—</span>')+'</td></tr>').join('')+
+    '<tr class="hrs-total-row"><td class="hl">Total</td>'+totW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(grand)+'</td><td class="hrs-tot">'+fuf(ufGrand)+'</td></tr>'+
+    '</tbody></table></div>'+
+    '<div style="margin-top:6px;font-size:12px;color:#475569">Facturación estimada del periodo: <strong>'+fuf(ufGrand)+' UF</strong> <span style="color:#94a3b8;font-size:11px">(horas × UF/hora de cada ficha; clientes sin tarifa definida no suman)</span></div>';
 }
 function renderBitacora(){
   const chipsEl=document.getElementById('bita-clients');if(!chipsEl)return;
