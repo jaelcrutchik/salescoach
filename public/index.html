@@ -104,6 +104,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .field textarea{height:56px;resize:vertical}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .field-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.field-row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:9px}
+.cal-table{border-collapse:collapse;font-size:11px;width:max-content}
+.cal-table th{font-size:10px;font-weight:600;color:#64748b;padding:4px 6px;border:1px solid var(--border);background:#f8f9fc;text-align:center;white-space:nowrap}
+.cal-table td{padding:3px 6px;border:1px solid #f1f5f9;text-align:center;white-space:nowrap;height:20px}
+.cal-nav{display:flex;gap:6px;align-items:center;margin-left:auto}
 .modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem}
 .btn-c{font-size:13px;padding:7px 15px;border-radius:7px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer}
 .btn-s{font-size:13px;padding:7px 15px;border-radius:7px;border:none;background:var(--blue);color:white;cursor:pointer;font-weight:500}
@@ -160,6 +165,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
   <div class="tabs">
     <button class="tab on" id="tab-pipeline" onclick="setView('pipeline')">📊 Pipeline</button>
     <button class="tab" id="tab-bitacora" onclick="setView('bitacora')">📓 Bitácora</button>
+    <button class="tab" id="tab-calendario" onclick="setView('calendario')">🗓️ Calendario</button>
   </div>
   <div id="view-pipeline">
   <div class="tips-box">
@@ -195,8 +201,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
     <div class="table-wrap"><table class="ctable" id="bita-table"></table></div>
     <div class="tips-box">
       <div class="tips-title"><span id="b-form-title">+ Nueva entrada</span></div>
-      <div class="field-row3">
+      <div class="field-row4">
         <div class="field"><label>Fecha</label><input id="b-fecha" type="date"></div>
+        <div class="field"><label>Hora inicio</label><input id="b-hora" type="time"></div>
         <div class="field"><label>Duración (min)</label><input id="b-min" type="number" step="15" placeholder="ej: 120"></div>
         <div class="field"><label>Lugar</label><input id="b-lugar" type="text" placeholder="ej: Oficinas cliente"></div>
       </div>
@@ -205,6 +212,24 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
       <div class="field"><label>Participantes</label><input id="b-part" type="text" placeholder="ej: Roberto, Andrea"></div>
       <div style="display:flex;gap:8px;align-items:center"><button class="btn-s" id="b-save" onclick="addBita()">Guardar entrada</button><button class="btn-c" id="b-cancel" style="display:none" onclick="cancelBitaEdit()">Cancelar edición</button><span id="b-edit-hint" style="display:none;font-size:11px;color:var(--amber)">✏️ Editando entrada existente</span></div>
     </div>
+  </div>
+
+  <div id="view-calendario" style="display:none">
+    <div class="section-hdr">
+      <div class="section-title">Calendario de reuniones (según bitácora)</div>
+      <div class="cal-nav">
+        <button class="hbtn" onclick="calShift(-1)">◀ Semana</button>
+        <button class="hbtn" onclick="calSetOffset(0)">Hoy</button>
+        <button class="hbtn" onclick="calShift(1)">Semana ▶</button>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#94a3b8;margin-bottom:6px" id="cal-range"></div>
+    <div class="table-wrap" style="overflow-x:auto;padding:2px"><table class="cal-table" id="cal-table"></table></div>
+    <div class="tips-box" style="margin-top:0.85rem">
+      <div class="tips-title"><span>Leyenda de clientes</span></div>
+      <div id="cal-legend"></div>
+    </div>
+    <p style="font-size:11px;color:#94a3b8;margin-top:8px">Se muestran las entradas de la bitácora que tienen <strong>hora de inicio</strong> registrada. Agrégala al guardar una entrada en la pestaña Bitácora para que aparezca aquí.</p>
   </div>
 </div>
 
@@ -765,15 +790,18 @@ function renderTips(){
   box.innerHTML=tips.map(t=>'<div class="tip-item'+(t.id?' clickable" onclick="openDetail('+t.id+')':'"')+'"><div class="tip-ico">'+t.icono+'</div><div><div class="tip-label">'+t.label+'</div><div class="tip-text">'+t.texto+'</div></div></div>').join('');
 }
 
-function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderTips();renderBitacora();}
+function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderTips();renderBitacora();renderCalendario();}
 let currentView='pipeline',bitaClient=null,bitaMes='todos',bitaSem='todos',bitaShowTerm=false,bitaEditIdx=null;
 function setView(v){
   currentView=v;
   document.getElementById('view-pipeline').style.display=v==='pipeline'?'block':'none';
   document.getElementById('view-bitacora').style.display=v==='bitacora'?'block':'none';
+  document.getElementById('view-calendario').style.display=v==='calendario'?'block':'none';
   document.getElementById('tab-pipeline').classList.toggle('on',v==='pipeline');
   document.getElementById('tab-bitacora').classList.toggle('on',v==='bitacora');
+  document.getElementById('tab-calendario').classList.toggle('on',v==='calendario');
   if(v==='bitacora')renderBitacora();
+  if(v==='calendario')renderCalendario();
 }
 function isoWeek(dstr){
   const d=new Date(dstr+'T00:00:00');if(isNaN(d))return '';
@@ -862,7 +890,7 @@ function renderBitacora(){
   // tabla
   const rows=entries.map(e=>{
     const idx=(c.bitacora||[]).indexOf(e);
-    return '<tr'+(bitaEditIdx===idx?' style="background:#fffbeb"':'')+'><td style="white-space:nowrap;vertical-align:top">'+esc(e.fecha||'—')+'<div style="font-size:10px;color:#94a3b8">'+isoWeek(e.fecha)+'</div></td>'+
+    return '<tr'+(bitaEditIdx===idx?' style="background:#fffbeb"':'')+'><td style="white-space:nowrap;vertical-align:top">'+esc(e.fecha||'—')+(e.hora?' <span style="color:#94a3b8">'+esc(e.hora)+'</span>':'')+'<div style="font-size:10px;color:#94a3b8">'+isoWeek(e.fecha)+'</div></td>'+
       '<td style="white-space:normal;vertical-align:top"><div style="font-weight:600;font-size:12px">'+esc(e.tema||'—')+'</div>'+(e.comentarios?'<div style="font-size:11px;color:#64748b;margin-top:2px;line-height:1.45">'+esc(e.comentarios)+'</div>':'')+'</td>'+
       '<td style="white-space:normal;vertical-align:top;font-size:11px;color:#64748b">'+esc(e.participantes||'—')+'</td>'+
       '<td style="white-space:normal;vertical-align:top;font-size:11px;color:#64748b">'+esc(e.lugar||'—')+'</td>'+
@@ -883,13 +911,13 @@ function editBita(cid,idx){
   bitaClient=cid;bitaEditIdx=idx;
   const e=c.bitacora[idx];
   const sv=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
-  sv('b-fecha',e.fecha);sv('b-min',e.minutos||'');sv('b-lugar',e.lugar);sv('b-tema',e.tema);sv('b-com',e.comentarios);sv('b-part',e.participantes);
+  sv('b-fecha',e.fecha);sv('b-hora',e.hora);sv('b-min',e.minutos||'');sv('b-lugar',e.lugar);sv('b-tema',e.tema);sv('b-com',e.comentarios);sv('b-part',e.participantes);
   renderBitacora();
   document.getElementById('b-tema').focus();
 }
 function cancelBitaEdit(){
   bitaEditIdx=null;
-  ['b-tema','b-com','b-part','b-lugar','b-min','b-fecha'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['b-tema','b-com','b-part','b-lugar','b-min','b-fecha','b-hora'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   renderBitacora();
 }
 function addBita(){
@@ -898,20 +926,99 @@ function addBita(){
   const gv=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
   const tema=gv('b-tema');
   if(!tema){showToast('Ingresa el tema de la reunión');return;}
-  const entry={fecha:gv('b-fecha')||new Date().toISOString().split('T')[0],tema,comentarios:gv('b-com'),participantes:gv('b-part'),lugar:gv('b-lugar'),minutos:parseFloat(gv('b-min'))||0};
+  const entry={fecha:gv('b-fecha')||new Date().toISOString().split('T')[0],hora:gv('b-hora'),tema,comentarios:gv('b-com'),participantes:gv('b-part'),lugar:gv('b-lugar'),minutos:parseFloat(gv('b-min'))||0};
   if(!c.bitacora)c.bitacora=[];
   const editing=bitaEditIdx!=null&&c.bitacora[bitaEditIdx];
   if(editing)c.bitacora[bitaEditIdx]=entry;else c.bitacora.push(entry);
   bitaEditIdx=null;
-  ['b-tema','b-com','b-part','b-lugar','b-min','b-fecha'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-  persist();renderBitacora();showToast(editing?'✅ Entrada actualizada':'✅ Entrada guardada');
+  ['b-tema','b-com','b-part','b-lugar','b-min','b-fecha','b-hora'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  persist();renderBitacora();renderCalendario();showToast(editing?'✅ Entrada actualizada':'✅ Entrada guardada');
 }
 function delBita(cid,idx){
   const c=contacts.find(x=>x.id===cid);if(!c||!c.bitacora)return;
   if(!confirm('¿Eliminar esta entrada de la bitácora?'))return;
   c.bitacora.splice(idx,1);
   if(bitaEditIdx===idx)bitaEditIdx=null;
-  persist();renderBitacora();showToast('Entrada eliminada');
+  persist();renderBitacora();renderCalendario();showToast('Entrada eliminada');
+}
+
+// ---------- CALENDARIO (grilla semanal desde bitácora) ----------
+const CAL_WEEKS=5,CAL_ROWS=28,CAL_START_H=9;
+const DIA_L=['L','M','M','J','V','S','D'];
+const CAL_PALETTE=['#2563eb','#16a34a','#d97706','#7c3aed','#dc2626','#0891b2','#be185d','#65a30d','#ea580c','#4338ca','#0d9488','#9333ea'];
+let calWeekOffset=0;
+function pad2(n){return n<10?'0'+n:''+n;}
+function mondayOf(d){const dt=new Date(d);const day=(dt.getDay()+6)%7;dt.setDate(dt.getDate()-day);dt.setHours(0,0,0,0);return dt;}
+function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function isoDate(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+function calShift(delta){calWeekOffset+=delta;renderCalendario();}
+function calSetOffset(n){calWeekOffset=n;renderCalendario();}
+function empAbbrev(emp){
+  const words=(emp||'').split(/[^a-zA-ZÀ-ÿ0-9]+/).filter(Boolean);
+  if(!words.length)return '??';
+  if(words.length===1)return words[0].slice(0,2).toUpperCase();
+  return (words[0][0]+words[1][0]).toUpperCase();
+}
+function empColor(emp){
+  const s=(emp||'').toLowerCase();
+  let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;
+  return CAL_PALETTE[h%CAL_PALETTE.length];
+}
+function calSlotIndex(hora){
+  const m=(hora||'').match(/^(\d{1,2}):(\d{2})/);if(!m)return null;
+  const h=parseInt(m[1],10),mi=parseInt(m[2],10);
+  const idx=(h-CAL_START_H)*2+(mi>=30?1:0);
+  if(idx<0||idx>=CAL_ROWS)return null;
+  return idx;
+}
+function calRowLabel(i){const h=CAL_START_H+Math.floor(i/2),m=i%2===0?'00':'30';return pad2(h)+':'+m;}
+function calBuildIndex(){
+  const idx={};
+  contacts.forEach(c=>{
+    (c.bitacora||[]).forEach(e=>{
+      if(!e.fecha||!e.hora)return;
+      const start=calSlotIndex(e.hora);if(start==null)return;
+      const span=Math.max(1,Math.round((parseFloat(e.minutos)||30)/30));
+      if(!idx[e.fecha])idx[e.fecha]=new Array(CAL_ROWS).fill(null);
+      const title=c.emp+' — '+e.tema+(e.comentarios?' — '+e.comentarios:'')+' ('+e.hora+', '+(e.minutos||0)+' min)';
+      for(let k=start;k<Math.min(CAL_ROWS,start+span);k++)idx[e.fecha][k]={emp:c.emp,abbr:empAbbrev(c.emp),color:empColor(c.emp),title};
+    });
+  });
+  return idx;
+}
+function renderCalendario(){
+  const table=document.getElementById('cal-table');if(!table)return;
+  const idx=calBuildIndex();
+  const today=new Date();today.setHours(0,0,0,0);
+  const todayStr=isoDate(today);
+  const baseMonday=addDays(mondayOf(today),calWeekOffset*7);
+  const weeks=[];
+  for(let w=0;w<CAL_WEEKS;w++){
+    const monday=addDays(baseMonday,w*7);
+    const days=[];for(let d=0;d<7;d++)days.push(addDays(monday,d));
+    weeks.push({monday,days});
+  }
+  document.getElementById('cal-range').textContent='Semanas del '+isoDate(weeks[0].monday)+' al '+isoDate(addDays(weeks[CAL_WEEKS-1].monday,6));
+  const thead='<thead><tr><th rowspan="2" style="min-width:64px">Hora/Día</th>'+
+    weeks.map(w=>'<th colspan="7">'+isoWeek(isoDate(w.monday))+'</th>').join('')+'</tr><tr>'+
+    weeks.map(w=>w.days.map(d=>{
+      const ds=isoDate(d),isToday=ds===todayStr,isWknd=d.getDay()===0||d.getDay()===6;
+      return '<th style="min-width:30px;'+(isToday?'background:#fef3c7':isWknd?'background:#f1f5f9':'')+'">'+DIA_L[(d.getDay()+6)%7]+'<div style="font-weight:400;color:#94a3b8">'+d.getDate()+'</div></th>';
+    }).join('')).join('')+'</tr></thead>';
+  let rows='';
+  for(let r=0;r<CAL_ROWS;r++){
+    rows+='<tr><td style="font-size:10px;color:#94a3b8">'+calRowLabel(r)+'</td>';
+    weeks.forEach(w=>w.days.forEach(d=>{
+      const ds=isoDate(d),isWknd=d.getDay()===0||d.getDay()===6;
+      const cell=idx[ds]?idx[ds][r]:null;
+      if(cell)rows+='<td title="'+esc(cell.title)+'" style="background:'+cell.color+'22;color:'+cell.color+';font-weight:700">'+esc(cell.abbr)+'</td>';
+      else rows+='<td style="'+(isWknd?'background:#fafbfd':'')+'"></td>';
+    }));
+    rows+='</tr>';
+  }
+  table.innerHTML=thead+'<tbody>'+rows+'</tbody>';
+  const emps=[...new Set(contacts.filter(c=>(c.bitacora||[]).some(e=>e.hora)).map(c=>c.emp))].sort();
+  document.getElementById('cal-legend').innerHTML=emps.length?emps.map(e=>'<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#475569;margin-right:14px;margin-bottom:4px"><span style="width:10px;height:10px;border-radius:3px;background:'+empColor(e)+';display:inline-block"></span>'+esc(empAbbrev(e))+' — '+esc(e)+'</span>').join(''):'<span style="font-size:12px;color:#94a3b8">Aún no hay sesiones con hora registrada.</span>';
 }
 
 // ---------- DETALLE (todo en uno) ----------
