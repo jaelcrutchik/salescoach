@@ -107,8 +107,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .field-row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:9px}
 .cal-table{border-collapse:collapse;font-size:11px;width:max-content}
 .cal-table th{font-size:10px;font-weight:600;color:#64748b;padding:4px 6px;border:1px solid var(--border);background:#f8f9fc;text-align:center;white-space:nowrap}
-.cal-table td{padding:3px 6px;border:1px solid #f1f5f9;text-align:center;white-space:nowrap;height:20px}
+.cal-table td{padding:3px 6px;border:1px solid #f1f5f9;text-align:center;white-space:nowrap;height:20px;background:white}
 .cal-nav{display:flex;gap:6px;align-items:center;margin-left:auto}
+#cal-scroll{overflow:auto;max-height:65vh;position:relative}
+.cal-table thead th{position:sticky;top:0;z-index:2}
+.cal-table .cal-corner{position:sticky;left:0;z-index:4}
+.cal-table td.cal-hcol{position:sticky;z-index:1}
 .modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem}
 .btn-c{font-size:13px;padding:7px 15px;border-radius:7px;border:1px solid var(--border);background:white;color:#64748b;cursor:pointer}
 .btn-s{font-size:13px;padding:7px 15px;border-radius:7px;border:none;background:var(--blue);color:white;cursor:pointer;font-weight:500}
@@ -224,7 +228,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
       </div>
     </div>
     <div style="font-size:11px;color:#94a3b8;margin-bottom:6px" id="cal-range"></div>
-    <div class="table-wrap" style="overflow-x:auto;padding:2px"><table class="cal-table" id="cal-table"></table></div>
+    <div class="table-wrap" id="cal-scroll" style="padding:2px"><table class="cal-table" id="cal-table"></table></div>
     <div class="tips-box" style="margin-top:0.85rem">
       <div class="tips-title"><span>Leyenda de clientes</span></div>
       <div id="cal-legend"></div>
@@ -1016,7 +1020,7 @@ function renderCalendario(){
     weeks.push({monday,days});
   }
   document.getElementById('cal-range').textContent='Semanas del '+isoDate(weeks[0].monday)+' al '+isoDate(addDays(weeks[CAL_WEEKS-1].monday,6));
-  const thead='<thead><tr><th colspan="2" rowspan="2" style="min-width:80px">Hora/Día</th>'+
+  const thead='<thead><tr><th class="cal-corner" colspan="2" rowspan="2" style="min-width:80px">Hora/Día</th>'+
     weeks.map(w=>'<th colspan="7">'+isoWeek(isoDate(w.monday))+'</th>').join('')+'</tr><tr>'+
     weeks.map(w=>w.days.map(d=>{
       const ds=isoDate(d),isToday=ds===todayStr,isWknd=d.getDay()===0||d.getDay()===6;
@@ -1024,7 +1028,7 @@ function renderCalendario(){
     }).join('')).join('')+'</tr></thead>';
   let rows='';
   for(let r=0;r<CAL_ROWS;r++){
-    rows+='<tr><td style="font-size:10px;color:#94a3b8">'+calRowLabel(r)+'</td><td style="font-size:10px;color:#94a3b8">'+calRowEnd(r)+'</td>';
+    rows+='<tr><td class="cal-hcol cal-hcol1" style="font-size:10px;color:#94a3b8">'+calRowLabel(r)+'</td><td class="cal-hcol cal-hcol2" style="font-size:10px;color:#94a3b8">'+calRowEnd(r)+'</td>';
     weeks.forEach(w=>w.days.forEach(d=>{
       const ds=isoDate(d),isWknd=d.getDay()===0||d.getDay()===6;
       const cell=idx[ds]?idx[ds][r]:null;
@@ -1036,7 +1040,23 @@ function renderCalendario(){
   table.innerHTML=thead+'<tbody>'+rows+'</tbody>';
   const emps=[...new Set(contacts.filter(c=>(c.bitacora||[]).some(e=>e.hora)).map(c=>c.emp))].sort();
   document.getElementById('cal-legend').innerHTML=emps.length?emps.map(e=>'<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#475569;margin-right:14px;margin-bottom:4px"><span style="width:10px;height:10px;border-radius:3px;background:'+empColor(e)+';display:inline-block"></span>'+esc(empAbbrev(e))+' — '+esc(e)+'</span>').join(''):'<span style="font-size:12px;color:#94a3b8">Aún no hay sesiones con hora registrada.</span>';
+  calSyncSticky();
 }
+function calSyncSticky(){
+  const table=document.getElementById('cal-table');if(!table)return;
+  const headRows=table.querySelectorAll('thead tr');
+  if(headRows.length<2)return;
+  const h1=headRows[0].getBoundingClientRect().height;
+  headRows[1].querySelectorAll('th').forEach(th=>{th.style.top=h1+'px';});
+  const firstBodyRow=table.querySelector('tbody tr');
+  const w1=firstBodyRow?firstBodyRow.children[0].getBoundingClientRect().width:44;
+  const w2=firstBodyRow?firstBodyRow.children[1].getBoundingClientRect().width:44;
+  table.querySelectorAll('td.cal-hcol1').forEach(td=>{td.style.left='0px';});
+  table.querySelectorAll('td.cal-hcol2').forEach(td=>{td.style.left=w1+'px';});
+  const corner=table.querySelector('.cal-corner');
+  if(corner){corner.style.left='0px';corner.style.width=(w1+w2)+'px';}
+}
+window.addEventListener('resize',()=>{if(currentView==='calendario')calSyncSticky();});
 
 // ---------- DETALLE (todo en uno) ----------
 function openDetail(id){
