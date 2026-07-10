@@ -203,7 +203,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
       <div class="tips-title"><span id="b-form-title">+ Nueva entrada</span></div>
       <div class="field-row4">
         <div class="field"><label>Fecha</label><input id="b-fecha" type="date"></div>
-        <div class="field"><label>Hora inicio</label><input id="b-hora" type="time"></div>
+        <div class="field"><label>Hora inicio (24 hrs)</label><input id="b-hora" type="text" inputmode="numeric" maxlength="5" placeholder="ej: 14:30" oninput="horaInput(this)"></div>
         <div class="field"><label>Duración (min)</label><input id="b-min" type="number" step="15" placeholder="ej: 120"></div>
         <div class="field"><label>Lugar</label><input id="b-lugar" type="text" placeholder="ej: Oficinas cliente"></div>
       </div>
@@ -890,7 +890,10 @@ function renderBitacora(){
   // tabla
   const rows=entries.map(e=>{
     const idx=(c.bitacora||[]).indexOf(e);
-    return '<tr'+(bitaEditIdx===idx?' style="background:#fffbeb"':'')+'><td style="white-space:nowrap;vertical-align:top">'+esc(e.fecha||'—')+(e.hora?' <span style="color:#94a3b8">'+esc(e.hora)+'</span>':'')+'<div style="font-size:10px;color:#94a3b8">'+isoWeek(e.fecha)+'</div></td>'+
+    return '<tr'+(bitaEditIdx===idx?' style="background:#fffbeb"':'')+'><td style="white-space:nowrap;vertical-align:top">'+
+      '<div style="font-weight:600;font-size:12px">'+esc(e.fecha||'—')+'</div>'+
+      (e.hora?'<div style="font-size:11px;color:#64748b;margin-top:2px">🕐 '+esc(e.hora)+' hrs</div>':'')+
+      '<div style="font-size:10px;color:#94a3b8;margin-top:2px">'+isoWeek(e.fecha)+'</div></td>'+
       '<td style="white-space:normal;vertical-align:top"><div style="font-weight:600;font-size:12px">'+esc(e.tema||'—')+'</div>'+(e.comentarios?'<div style="font-size:11px;color:#64748b;margin-top:2px;line-height:1.45">'+esc(e.comentarios)+'</div>':'')+'</td>'+
       '<td style="white-space:normal;vertical-align:top;font-size:11px;color:#64748b">'+esc(e.participantes||'—')+'</td>'+
       '<td style="white-space:normal;vertical-align:top;font-size:11px;color:#64748b">'+esc(e.lugar||'—')+'</td>'+
@@ -920,13 +923,26 @@ function cancelBitaEdit(){
   ['b-tema','b-com','b-part','b-lugar','b-min','b-fecha','b-hora'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   renderBitacora();
 }
+function horaInput(el){
+  let v=el.value.replace(/[^0-9]/g,'');
+  if(v.length>4)v=v.slice(0,4);
+  if(v.length>=3)v=v.slice(0,2)+':'+v.slice(2);
+  el.value=v;
+}
+function normalizeHora(v){
+  const m=(v||'').trim().match(/^([0-9]{1,2}):([0-9]{2})$/);
+  if(!m)return '';
+  const h=parseInt(m[1],10),mi=parseInt(m[2],10);
+  if(h<0||h>23||mi<0||mi>59)return '';
+  return pad2(h)+':'+pad2(mi);
+}
 function addBita(){
   const c=contacts.find(x=>x.id===bitaClient);
   if(!c){showToast('Selecciona un cliente primero');return;}
   const gv=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
   const tema=gv('b-tema');
   if(!tema){showToast('Ingresa el tema de la reunión');return;}
-  const entry={fecha:gv('b-fecha')||new Date().toISOString().split('T')[0],hora:gv('b-hora'),tema,comentarios:gv('b-com'),participantes:gv('b-part'),lugar:gv('b-lugar'),minutos:parseFloat(gv('b-min'))||0};
+  const entry={fecha:gv('b-fecha')||new Date().toISOString().split('T')[0],hora:normalizeHora(gv('b-hora')),tema,comentarios:gv('b-com'),participantes:gv('b-part'),lugar:gv('b-lugar'),minutos:parseFloat(gv('b-min'))||0};
   if(!c.bitacora)c.bitacora=[];
   const editing=bitaEditIdx!=null&&c.bitacora[bitaEditIdx];
   if(editing)c.bitacora[bitaEditIdx]=entry;else c.bitacora.push(entry);
@@ -972,6 +988,7 @@ function calSlotIndex(hora){
   return idx;
 }
 function calRowLabel(i){const h=CAL_START_H+Math.floor(i/2),m=i%2===0?'00':'30';return pad2(h)+':'+m;}
+function calRowEnd(i){return calRowLabel(i+1);}
 function calBuildIndex(){
   const idx={};
   contacts.forEach(c=>{
@@ -999,7 +1016,7 @@ function renderCalendario(){
     weeks.push({monday,days});
   }
   document.getElementById('cal-range').textContent='Semanas del '+isoDate(weeks[0].monday)+' al '+isoDate(addDays(weeks[CAL_WEEKS-1].monday,6));
-  const thead='<thead><tr><th rowspan="2" style="min-width:64px">Hora/Día</th>'+
+  const thead='<thead><tr><th colspan="2" rowspan="2" style="min-width:80px">Hora/Día</th>'+
     weeks.map(w=>'<th colspan="7">'+isoWeek(isoDate(w.monday))+'</th>').join('')+'</tr><tr>'+
     weeks.map(w=>w.days.map(d=>{
       const ds=isoDate(d),isToday=ds===todayStr,isWknd=d.getDay()===0||d.getDay()===6;
@@ -1007,7 +1024,7 @@ function renderCalendario(){
     }).join('')).join('')+'</tr></thead>';
   let rows='';
   for(let r=0;r<CAL_ROWS;r++){
-    rows+='<tr><td style="font-size:10px;color:#94a3b8">'+calRowLabel(r)+'</td>';
+    rows+='<tr><td style="font-size:10px;color:#94a3b8">'+calRowLabel(r)+'</td><td style="font-size:10px;color:#94a3b8">'+calRowEnd(r)+'</td>';
     weeks.forEach(w=>w.days.forEach(d=>{
       const ds=isoDate(d),isWknd=d.getDay()===0||d.getDay()===6;
       const cell=idx[ds]?idx[ds][r]:null;
