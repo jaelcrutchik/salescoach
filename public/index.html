@@ -55,7 +55,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .stat-sub{font-size:10px;color:#94a3b8;margin-top:1px}
 
 .funnel{background:white;border:1px solid var(--border);border-radius:12px;padding:0.85rem;margin-bottom:0.85rem}
-.funnel-stages{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.funnel-stages{display:grid;grid-template-columns:repeat(9,1fr);gap:5px}
 .stage{border-radius:8px;padding:8px 5px;text-align:center;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s}
 .stage:hover{border-color:#cbd5e1}
 .stage.active{border-color:var(--blue);background:var(--blue-l)}
@@ -88,9 +88,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500;white-space:nowrap}
 .b-pc{background:#f1f5f9;color:#475569}.b-co{background:#dbeafe;color:#1e40af}
 .b-re{background:#fef9c3;color:#854d0e}.b-ru{background:#f5f3ff;color:#6d28d9}
-.b-pr{background:#fff7ed;color:#c2410c}.b-ga{background:#dcfce7;color:#166534}
+.b-pe{background:#fff7ed;color:#c2410c}.b-ga{background:#dcfce7;color:#166534}
 .b-oh{background:#f3f4f6;color:#374151}.b-no{background:#fee2e2;color:#991b1b}
-.b-ep{background:#dbeafe;color:#1e40af}.b-tm{background:#e0f2fe;color:#0369a1}
+.b-tm{background:#e0f2fe;color:#0369a1}
+.b-pv{background:#fce7f3;color:#9d174c}.b-pa{background:#ecfccb;color:#3f6212}
 .timing-txt{font-size:10px;white-space:nowrap}
 
 .overlay{display:none;position:fixed;inset:0;background:rgba(26,26,46,0.45);z-index:100;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto}
@@ -152,7 +153,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .score-pill{font-size:12px;font-weight:600;padding:3px 12px;border-radius:99px;margin-left:auto}
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:8px 16px;border-radius:8px;font-size:12px;opacity:0;transition:opacity 0.3s;z-index:300;pointer-events:none}
 .toast.show{opacity:1}
-@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.funnel-stages{grid-template-columns:repeat(4,1fr);row-gap:6px}#search-input{width:140px}}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.funnel-stages{grid-template-columns:repeat(3,1fr);row-gap:6px}#search-input{width:140px}}
 </style>
 </head>
 <body>
@@ -245,7 +246,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
     <div class="field"><label>Empresa *</label><input id="a-emp" type="text" placeholder="Nombre empresa"></div>
     <div class="field-row">
       <div class="field"><label>Etapa</label>
-        <select id="a-status"><option>Por contactar</option><option>Contactado</option><option>Respondió</option><option>Reunión</option><option>Propuesta</option><option>Ganado</option><option>Terminado</option><option>On hold</option><option>No</option></select>
+        <select id="a-status"><option>Por contactar</option><option>Contactado</option><option>Respondió</option><option>Reunión</option><option>Propuesta enviada</option><option>Propuesta en conversación</option><option>Propuesta aceptada, inicio pendiente</option><option>Ganado</option><option>Terminado</option><option>On hold</option><option>No</option></select>
       </div>
       <div class="field"><label>Canal</label>
         <select id="a-canal"><option value="">-</option><option>Email</option><option>LinkedIn</option><option>WhatsApp</option><option>Llamada</option><option>Referido</option><option>Reunión</option></select>
@@ -295,9 +296,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 <script>
 const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 const UF=38500;
-const STAGES=['Por contactar','Contactado','Respondió','Reunión','Propuesta','Ganado','Terminado'];
-const ORD={'Reunión':0,'Respondió':1,'Propuesta':2,'En proceso':3,'Contactado':4,'Por contactar':5,'On hold':6,'Ganado':7,'Terminado':8,'No':9};
-function bc(s){return {'Por contactar':'b-pc','Contactado':'b-co','Respondió':'b-re','Reunión':'b-ru','Propuesta':'b-pr','Ganado':'b-ga','Terminado':'b-tm','On hold':'b-oh','No':'b-no','En proceso':'b-ep'}[s]||'b-pc';}
+const STAGES=['Por contactar','Contactado','Respondió','Reunión','Propuesta enviada','Propuesta en conversación','Propuesta aceptada, inicio pendiente','Ganado','Terminado'];
+const ORD={'Reunión':0,'Respondió':1,'Propuesta en conversación':2,'Propuesta enviada':3,'Propuesta aceptada, inicio pendiente':4,'Contactado':5,'Por contactar':6,'On hold':7,'Ganado':8,'Terminado':9,'No':10};
+function bc(s){return {'Por contactar':'b-pc','Contactado':'b-co','Respondió':'b-re','Reunión':'b-ru','Propuesta enviada':'b-pe','Propuesta en conversación':'b-pv','Propuesta aceptada, inicio pendiente':'b-pa','Ganado':'b-ga','Terminado':'b-tm','On hold':'b-oh','No':'b-no'}[s]||'b-pc';}
+const STAGE_SHORT={'Propuesta enviada':'Prop. enviada','Propuesta en conversación':'Prop. en conversación','Propuesta aceptada, inicio pendiente':'Prop. aceptada'};
+function stageLabel(s){return STAGE_SHORT[s]||s;}
 
 // ---------- SEED: pipeline original ----------
 const SEED=[
@@ -313,7 +316,7 @@ const SEED=[
 {id:10,emp:'Neumaérica',cont:'Gabriela Rodriguez',cargo:'Gerente Comercial',status:'Contactado',canal:'Email',accion:'Mail seguimiento',fechaContacto:'2026-05-14',historial:[{fecha:'2026-05-14',tipo:'Email',texto:'Email inicial enviado.'}]},
 {id:11,emp:'Transportes Jofre Hidalgo',cont:'-',cargo:'-',status:'Contactado',canal:'',accion:'Seguimiento',fechaContacto:'2026-05-21'},
 {id:12,emp:'Transportes Sahid',cont:'Enrique Peña / Felipe Armijo',cargo:'Dueño',status:'Contactado',canal:'WhatsApp',accion:'Seguimiento WhatsApp',fechaContacto:'2026-05-21',historial:[{fecha:'2026-05-21',tipo:'WhatsApp',texto:'Primer contacto.'}]},
-{id:13,emp:'Transportes Dliverys',cont:'Cristopher Olguin',cargo:'Dueño',status:'En proceso',canal:'WhatsApp',uf:2.5,horas:16,accion:'Insistir - dejó en visto',notas:'No llegó a reunión acordada',fechaContacto:'2026-05-28',historial:[{fecha:'2026-05-28',tipo:'WhatsApp',texto:'Acordaron reunión pero no llegó.'}]},
+{id:13,emp:'Transportes Dliverys',cont:'Cristopher Olguin',cargo:'Dueño',status:'Respondió',canal:'WhatsApp',uf:2.5,horas:16,accion:'Insistir - dejó en visto',notas:'No llegó a reunión acordada',fechaContacto:'2026-05-28',historial:[{fecha:'2026-05-28',tipo:'WhatsApp',texto:'Acordaron reunión pero no llegó.'}]},
 {id:14,emp:'Transportes Concha',cont:'Victor Muñoz',cargo:'-',status:'Contactado',canal:'WhatsApp',accion:'Seguimiento WhatsApp',fechaContacto:'2026-05-25'},
 {id:15,emp:'Wild Foods',cont:'Javier Castro',cargo:'Co Founder & CEO',status:'Por contactar',canal:'LinkedIn',accion:'Enviar mail',notas:'Invitación LinkedIn'},
 {id:16,emp:'Transportes Nazar',cont:'José Miguel Gelvez',cargo:'Gerente General',status:'Por contactar',canal:'LinkedIn',accion:'Enviar mail',notas:'Invitación LinkedIn'},
@@ -358,12 +361,12 @@ let contacts=[],nextId=60,activeFilter='todos',ownerFilter='todos',detailId=null
 
 // ---------- CONTACTOS DE RAFA (carga automática de una sola vez) ----------
 const RAFA_SEED=[
-{emp:'Smart Fluid',cont:'Paulo Ojeda',status:'Propuesta',owner:'Rafa',fechaContacto:'2026-07-01',accion:'Esperar respuesta a la propuesta',notas:'Propuesta enviada, pendiente respuesta.',historial:[{fecha:'2026-07-01',tipo:'Nota',texto:'Seguimiento: se les preguntó si vieron la propuesta.'}]},
+{emp:'Smart Fluid',cont:'Paulo Ojeda',status:'Propuesta enviada',owner:'Rafa',fechaContacto:'2026-07-01',accion:'Esperar respuesta a la propuesta',notas:'Propuesta enviada, pendiente respuesta.',historial:[{fecha:'2026-07-01',tipo:'Nota',texto:'Seguimiento: se les preguntó si vieron la propuesta.'}]},
 {emp:'FCAB',cont:'Bernardo Márquez',status:'Reunión',owner:'Rafa',fechaContacto:'2026-07-01',accion:'Agendar reunión para levantar proyectos',notas:'Pendiente reunión para que expliquen en qué están y armar una propuesta que les sirva. Luego terminar de armar la propuesta y enviarla.'},
 {emp:'Claro',cont:'Cristóbal Claro',status:'Reunión',owner:'Rafa',accion:'Seguimiento post reunión',notas:'Tuvieron reunión con Rafa, sin novedades desde entonces.',historial:[{fecha:'2026-07-01',tipo:'Nota',texto:'Reunión realizada con Rafa (fecha exacta por confirmar). Sin respuesta posterior.'}]},
-{emp:'Araco Business',cont:'Melanie Vaide',status:'Propuesta',owner:'Rafa',ciudad:'Guatemala',fechaContacto:'2026-07-01',accion:'Esperar respuesta a la propuesta',notas:'Propuesta enviada hoy.',historial:[{fecha:'2026-07-01',tipo:'Email',texto:'Propuesta enviada.'}]},
+{emp:'Araco Business',cont:'Melanie Vaide',status:'Propuesta enviada',owner:'Rafa',ciudad:'Guatemala',fechaContacto:'2026-07-01',accion:'Esperar respuesta a la propuesta',notas:'Propuesta enviada hoy.',historial:[{fecha:'2026-07-01',tipo:'Email',texto:'Propuesta enviada.'}]},
 {emp:'Metcorp',cont:'Alejandra Cuesta',status:'Reunión',owner:'Rafa',fechaContacto:'2026-07-01',accion:'Primera reunión lunes 06/07',notas:'Venta empresa. Primera reunión agendada para el lunes 06 de julio.',historial:[{fecha:'2026-07-01',tipo:'Nota',texto:'Primera reunión agendada para el 06/07.'}]},
-{emp:'Jannsen',cont:'Juan Smith',status:'Propuesta',owner:'Rafa',fechaContacto:'2026-07-01',accion:'Esperar respuesta al recontacto',notas:'Propuesta enviada hace tiempo; respondieron que estaban en reestructuración.',historial:[{fecha:'2026-07-01',tipo:'Nota',texto:'Rafa volvió a contactar a Juan tras la pausa por reestructuración.'}]}
+{emp:'Jannsen',cont:'Juan Smith',status:'Propuesta enviada',owner:'Rafa',fechaContacto:'2026-07-01',accion:'Esperar respuesta al recontacto',notas:'Propuesta enviada hace tiempo; respondieron que estaban en reestructuración.',historial:[{fecha:'2026-07-01',tipo:'Nota',texto:'Rafa volvió a contactar a Juan tras la pausa por reestructuración.'}]}
 ];
 let rafaInit=false;
 function initRafa(){
@@ -429,9 +432,7 @@ function initRestoreB(){
 function initFix(){
   if(fixInit)return false;
   const dm=contacts.find(c=>(c.emp||'').toLowerCase()==='dmerco');
-  if(dm&&dm.status!=='Propuesta'){dm.status='Propuesta';dm.fechaContacto='2026-06-30';if(!dm.historial)dm.historial=[];dm.historial.push({fecha:'2026-06-30',tipo:'Nota',texto:'Propuesta enviada.'});dm.diagReal='';dm.diagAccion='';dm.accion='Esperar respuesta a la propuesta';}
-  const dl=contacts.find(c=>(c.emp||'')==='Transportes Dliverys');
-  if(dl&&dl.status==='En proceso')dl.status='Respondió';
+  if(dm&&dm.status!=='Propuesta enviada'){dm.status='Propuesta enviada';dm.fechaContacto='2026-06-30';if(!dm.historial)dm.historial=[];dm.historial.push({fecha:'2026-06-30',tipo:'Nota',texto:'Propuesta enviada.'});dm.diagReal='';dm.diagAccion='';dm.accion='Esperar respuesta a la propuesta';}
   const nuevos=[
     {emp:'P&E',cont:'Matias Pilasi',cargo:'Dueño',status:'Ganado',owner:'Jael',notas:'Proyecto activo.'},
     {emp:'My Scrubs',cont:'Roberto Olguin',cargo:'Dueño',status:'Ganado',owner:'Jael',notas:'Proyecto activo, mes 3 de 4.'},
@@ -441,9 +442,20 @@ function initFix(){
   fixInit=true;fixJustRan=true;
   return true;
 }
+// Migración única (10/07/2026): "Propuesta" se separa en 3 etapas y se elimina "En proceso"
+let migStages2026=false;
+function initMigStages2026(){
+  if(migStages2026)return false;
+  contacts.forEach(c=>{
+    if(c.status==='Propuesta')c.status='Propuesta enviada';
+    else if(c.status==='En proceso')c.status='Respondió';
+  });
+  migStages2026=true;
+  return true;
+}
 const STORE_KEY='ryc_salescoach_v2';
 function persist(){
-  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,updatedAt:new Date().toISOString()});
+  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,migStages2026,updatedAt:new Date().toISOString()});
   try{localStorage.setItem(STORE_KEY,payload);}
   catch(e){console.error('storage error',e);showToast('⚠️ No se pudo guardar — exporta un respaldo');}
 }
@@ -458,12 +470,12 @@ function loadData(){
   try{const p=localStorage.getItem(STORE_KEY);if(p)d=JSON.parse(p);}catch(e){console.error('load error',e);}
   if(d){
     contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;
-    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;
+    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;migStages2026=!!d.migStages2026;
   }else{
     contacts=SEED.map(normalize);nextId=60;
   }
   loaded=true;
-  const cambios=[initOwners(),initRafa(),initFix(),initBita(),initRestore0702(),initRestoreB()].filter(Boolean).length;
+  const cambios=[initOwners(),initRafa(),initFix(),initBita(),initRestore0702(),initRestoreB(),initMigStages2026()].filter(Boolean).length;
   if(cambios||!d){persist();if(fixJustRan||cambios)showToast('✅ Pipeline actualizado');}
 }
 
@@ -477,7 +489,9 @@ function timing(c){
   if(c.status==='Respondió'){if(d<3)return{txt:'Espera '+(3-d)+'d más',color:'#22c55e'};if(d<=6)return{txt:'Momento ideal',color:'#f59e0b'};return{txt:'Urgente: escríbele',color:'#ef4444'};}
   if(c.status==='Contactado'){if(d<5)return{txt:'Seguimiento en '+(5-d)+'d',color:'#22c55e'};if(d<=8)return{txt:'Momento ideal',color:'#f59e0b'};return{txt:'Sin contacto hace mucho',color:'#ef4444'};}
   if(c.status==='Reunión'){if(d<=3)return{txt:'Reunión reciente',color:'#22c55e'};if(d<=7)return{txt:'Confirma siguientes pasos',color:'#f59e0b'};return{txt:'Urgente: confirma avance',color:'#ef4444'};}
-  if(c.status==='Propuesta'){if(d<=5)return{txt:'Esperando decisión',color:'#f59e0b'};return{txt:'Pregunta qué falta',color:'#ef4444'};}
+  if(c.status==='Propuesta enviada'){if(d<=5)return{txt:'Esperando decisión',color:'#f59e0b'};return{txt:'Pregunta qué falta',color:'#ef4444'};}
+  if(c.status==='Propuesta en conversación'){if(d<=3)return{txt:'Conversación activa',color:'#22c55e'};if(d<=7)return{txt:'Dale seguimiento',color:'#f59e0b'};return{txt:'Urgente: retoma la conversación',color:'#ef4444'};}
+  if(c.status==='Propuesta aceptada, inicio pendiente'){if(d<=5)return{txt:'Coordina el inicio',color:'#22c55e'};return{txt:'Urgente: define fecha de inicio',color:'#ef4444'};}
   return null;
 }
 function urg(c){
@@ -485,7 +499,7 @@ function urg(c){
   if(['No','Ganado','Terminado'].includes(c.status))return 'l';
   if(c.status==='Reunión'&&d>5)return 'h';
   if(c.status==='Respondió'&&d>3)return 'h';
-  if(c.status==='En proceso'&&d>7)return 'h';
+  if(c.status==='Propuesta en conversación'&&d>7)return 'h';
   if(['Contactado','Por contactar'].includes(c.status)&&d>14)return 'h';
   if(d>7)return 'm';return 'l';
 }
@@ -512,8 +526,9 @@ function inferRubro(emp){
 }
 function calcScore(c){
   let score=0;const d=getDias(c);const cargo=(c.cargo||'').toLowerCase();const emp=(c.emp||'').toLowerCase();const notas=(c.notas||'').toLowerCase();
-  if(c.status==='Respondió')score+=30;if(c.status==='Reunión')score+=28;if(c.status==='Propuesta')score+=32;
-  if(c.status==='En proceso')score+=15;if(c.status==='Contactado')score+=5;if(c.status==='Por contactar')score+=3;
+  if(c.status==='Respondió')score+=30;if(c.status==='Reunión')score+=28;
+  if(c.status==='Propuesta enviada')score+=32;if(c.status==='Propuesta en conversación')score+=34;if(c.status==='Propuesta aceptada, inicio pendiente')score+=36;
+  if(c.status==='Contactado')score+=5;if(c.status==='Por contactar')score+=3;
   if(c.canal==='Referido')score+=25;else if(c.canal==='Reunión')score+=10;else if(c.canal==='WhatsApp')score+=6;else if(c.canal==='LinkedIn'||c.canal==='Email')score+=3;
   const n=nivelCargo(c);
   if(n==='dueño')score+=18;else if(n==='gg')score+=15;else if(n==='gerente')score+=10;else if(n==='jefe')score+=5;
@@ -539,8 +554,9 @@ function calcBloqueador(c){
   if(c.status==='Respondió')return 'Falta el segundo toque';
   if(c.status==='Reunión'&&d>7)return 'Sin propuesta enviada';
   if(c.status==='Reunión')return 'Falta propuesta';
-  if(c.status==='En proceso')return 'Definir si hay dolor real';
-  if(c.status==='Propuesta')return 'Esperando decisión';
+  if(c.status==='Propuesta enviada')return 'Esperando decisión';
+  if(c.status==='Propuesta en conversación')return 'Cerrar la conversación con una decisión';
+  if(c.status==='Propuesta aceptada, inicio pendiente')return 'Coordinar fecha de inicio';
   return '';
 }
 
@@ -573,9 +589,10 @@ function getMensajeLocal(c){
   if(c.status==='Contactado'&&d>=5)return 'Hola '+nombre+', retomo con algo concreto: '+pregunta+' Si resuena, vale una conversación de 20 minutos.'+(wa?'':firma);
   if(c.status==='Contactado')return 'Hola '+nombre+', ¿pudiste revisar mi mensaje? ¿Vale 20 minutos esta semana?'+(wa?'':firma);
   if(c.status==='Reunión')return 'Hola '+nombre+', quedé pensando en lo que conversamos. Esta semana te envío una propuesta concreta con un primer paso sin compromiso largo. ¿Te parece?'+(wa?'':firma);
-  if(c.status==='Propuesta'&&d>=7)return 'Hola '+nombre+', ¿qué necesitarías ver para tomar la decisión sobre la propuesta? Si hay algo que no quedó claro o que valga la pena ajustar, lo conversamos.'+(wa?'':firma);
-  if(c.status==='Propuesta')return 'Hola '+nombre+', ¿pudiste revisar la propuesta? ¿Hay algo que genere dudas o que valga la pena conversar?'+(wa?'':firma);
-  if(c.status==='En proceso')return 'Hola '+nombre+', '+pregunta+' Si no es prioridad ahora, dime sin problema y lo retomamos cuando tenga sentido.'+(wa?'':firma);
+  if(c.status==='Propuesta enviada'&&d>=7)return 'Hola '+nombre+', ¿qué necesitarías ver para tomar la decisión sobre la propuesta? Si hay algo que no quedó claro o que valga la pena ajustar, lo conversamos.'+(wa?'':firma);
+  if(c.status==='Propuesta enviada')return 'Hola '+nombre+', ¿pudiste revisar la propuesta? ¿Hay algo que genere dudas o que valga la pena conversar?'+(wa?'':firma);
+  if(c.status==='Propuesta en conversación')return 'Hola '+nombre+', seguimos conversando la propuesta — ¿qué necesitarías para tomar la decisión? Si hay algo pendiente de mi lado, dímelo.'+(wa?'':firma);
+  if(c.status==='Propuesta aceptada, inicio pendiente')return 'Hola '+nombre+', quedamos en partir — ¿coordinamos la fecha de inicio esta semana?'+(wa?'':firma);
   if(c.status==='Terminado')return 'Hola '+nombre+', ¿cómo han estado desde que cerramos el proyecto? Me encantaría saber cómo han evolucionado los cambios que implementamos. Si en algo los podemos seguir apoyando, acá estamos.'+(wa?'':firma);
   if(c.status==='On hold')return 'Hola '+nombre+', sé que esto quedó en pausa. ¿Sigue teniendo sentido retomarlo, o prefieres que lo veamos más adelante?'+(wa?'':firma);
   if(c.status==='Por contactar'&&c.canal==='Referido')return 'Hola '+nombre+', me pasó tu contacto alguien en quien confío mucho. '+pregunta+' Si resuena, vale 20 minutos.'+(wa?'':firma);
@@ -584,8 +601,12 @@ function getMensajeLocal(c){
 }
 function getRecoLocal(c){
   const d=getDias(c);
-  if(c.status==='Propuesta'&&d>=7)return 'Propuesta enviada hace '+d+' días sin decisión. El "lo estamos pensando" suele ser una objeción disfrazada: pregunta directamente qué falta para decidir.';
-  if(c.status==='Propuesta')return 'Propuesta enviada hace '+d+' día(s). Seguimiento suave: confirma que la revisaron y abre espacio para dudas, sin presionar.';
+  if(c.status==='Propuesta enviada'&&d>=7)return 'Propuesta enviada hace '+d+' días sin decisión. El "lo estamos pensando" suele ser una objeción disfrazada: pregunta directamente qué falta para decidir.';
+  if(c.status==='Propuesta enviada')return 'Propuesta enviada hace '+d+' día(s). Seguimiento suave: confirma que la revisaron y abre espacio para dudas, sin presionar.';
+  if(c.status==='Propuesta en conversación'&&d>7)return d+' días conversando sin cerrar. Lleva la conversación a una decisión concreta: pregunta qué falta para avanzar.';
+  if(c.status==='Propuesta en conversación')return 'Conversación activa hace '+d+' día(s). Mantén el ritmo y guía hacia el cierre.';
+  if(c.status==='Propuesta aceptada, inicio pendiente'&&d>5)return d+' días desde que aceptaron y aún sin fecha de inicio. Coordina el kickoff antes de que se enfríe.';
+  if(c.status==='Propuesta aceptada, inicio pendiente')return 'Ya aceptaron la propuesta — coordina la fecha de inicio y los siguientes pasos.';
   if(c.status==='Reunión'&&d>5)return d+' días desde la reunión sin propuesta enviada. Cada día baja la probabilidad de cierre — envíala hoy con el valor anclado al costo del problema.';
   if(c.status==='Reunión')return 'Reunión reciente, momentum activo. La propuesta debe llegar antes de 48 horas.';
   if(c.status==='Respondió')return 'Mostró interés (leyó/respondió) hace '+d+' días. Segundo toque con pregunta genuina al dolor — corto, sin volver a vender.';
@@ -593,7 +614,6 @@ function getRecoLocal(c){
   if(c.status==='Contactado'&&d>=5)return d+' días desde el primer contacto. Momento ideal para el segundo toque con un ángulo nuevo.';
   if(c.status==='Contactado')return 'Contactado hace '+d+' día(s). Todavía es pronto para insistir — soporta la ansiedad de la incertidumbre.';
   if(c.status==='Por contactar')return 'El único bloqueador eres tú: falta enviar el primer mensaje. '+(c.canal==='Referido'?'Es referido — la confianza ya está instalada, escríbele esta semana.':'Arranca con pregunta genuina, sin vender en el primer mensaje.');
-  if(c.status==='En proceso')return 'Sin avance claro en '+d+' días. Define si hay dolor real antes de seguir invirtiendo energía.';
   if(c.status==='Terminado')return 'Proyecto terminado. Cliente ideal para pedir testimonio y referidos — y para un check-in a los 2-3 meses que mantenga viva la relación.';
   if(c.status==='On hold')return 'En pausa. Ponle fecha límite de revisión — que el on hold no se convierta en descarte silencioso.';
   const bloq=calcBloqueador(c);
@@ -618,7 +638,7 @@ async function generarCoach(c,force){
   const hist=(c.historial||[]).slice(-8).map(h=>h.fecha+' ('+h.tipo+'): '+h.texto).join(' | ')||'sin historial';
   const bita=(c.bitacora||[]).slice(-3).map(b=>b.fecha+': '+b.tema+(b.comentarios?' — '+b.comentarios.slice(0,150):'')).join(' | ');
   const tono=canal==='WhatsApp'?'Tono WhatsApp: muy corto, máximo 3 líneas, sin formalismos, como persona real, sin firma.':canal==='LinkedIn'?'Tono LinkedIn: profesional pero cercano, máximo 4 líneas, sin firma.':'Tono email: habla al dolor específico, termina con una pregunta concreta, firma "Jael Crutchik — Rave & Crutchik".';
-  const prompt='Eres el sales coach de Jael Crutchik, cofundadora de Rave & Crutchik, consultora de operaciones y supply chain en Chile (Lean, excelencia operacional, 3 UF/hora). Su estilo de venta sigue los principios de Francisco Pereira (NEGOCIAR O PERDER): hablar al dolor del otro, nunca sonar desesperada, preguntas genuinas sin script de vendedor, el poder lo dan las alternativas del otro, toda concesión con condición.\n\nREGLA CRÍTICA: el mensaje DEBE corresponder exactamente a la etapa del prospecto. Guía por etapa:\n- Por contactar: primer contacto, pregunta genuina al dolor, sin vender.\n- Contactado: seguimiento sin repetir el pitch; si lleva 14+ días, último toque con cierre digno del loop.\n- Respondió: segundo toque, ángulo nuevo, corto.\n- Reunión: retomar lo conversado y encaminar la propuesta o el siguiente paso concreto.\n- Propuesta: seguimiento de la propuesta YA ENVIADA — preguntar si la revisaron, qué dudas hay, qué falta para decidir. JAMÁS preguntas de dolor de primer contacto ni presentarse de nuevo.\n- En proceso: definir si hay dolor real, dar salida digna.\n- On hold: check-in ligero, sin presión.\n- Ganado: relación y siguiente oportunidad, no venta.\n- Terminado: proyecto cerrado exitosamente — check-in de relación, pedir testimonio o referidos. Jamás venta fría.\n\nProspecto:\n- Empresa: '+c.emp+' ('+(c.ciudad||'Chile')+')'+(c.analisis?'\n- Análisis previo: '+c.analisis:'')+'\n- Contacto: '+nombre+' — '+(c.cargo||'sin cargo')+'\n- ETAPA ACTUAL: '+c.status+' — '+dias+' días desde el último contacto\n- Canal: '+canal+'\n- Notas: '+(c.notas||'sin notas')+(c.contexto?'\n- Contexto del contacto: '+c.contexto:'')+(c.diagDolor?'\n- Dolor documentado: '+c.diagDolor:'')+'\n- Historial reciente: '+hist+(bita?'\n- Bitácora de trabajo (sesiones realizadas): '+bita:'')+'\n\nIMPORTANTE: usa el historial y la bitácora como fuente principal — el mensaje y la recomendación deben referirse a lo que realmente ha pasado con este contacto, no a supuestos.\n\nResponde SOLO con JSON válido, sin backticks ni texto adicional: {"empresa":"si no hay análisis previo: 2 oraciones sobre qué hace esta empresa y sus desafíos operacionales típicos; si ya hay análisis, string vacío","recomendacion":"en 2 oraciones máximo: qué hacer HOY con este contacto dada su etapa ('+c.status+') y los días transcurridos, y por qué. Directo, sin relleno.","mensaje":"mensaje listo para enviar por '+canal+', coherente con la etapa '+c.status+' según la guía. '+tono+' Usa el nombre '+nombre+'. Específico a ESTA empresa, no genérico. Nunca desesperado."}';
+  const prompt='Eres el sales coach de Jael Crutchik, cofundadora de Rave & Crutchik, consultora de operaciones y supply chain en Chile (Lean, excelencia operacional, 3 UF/hora). Su estilo de venta sigue los principios de Francisco Pereira (NEGOCIAR O PERDER): hablar al dolor del otro, nunca sonar desesperada, preguntas genuinas sin script de vendedor, el poder lo dan las alternativas del otro, toda concesión con condición.\n\nREGLA CRÍTICA: el mensaje DEBE corresponder exactamente a la etapa del prospecto. Guía por etapa:\n- Por contactar: primer contacto, pregunta genuina al dolor, sin vender.\n- Contactado: seguimiento sin repetir el pitch; si lleva 14+ días, último toque con cierre digno del loop.\n- Respondió: segundo toque, ángulo nuevo, corto.\n- Reunión: retomar lo conversado y encaminar la propuesta o el siguiente paso concreto.\n- Propuesta enviada: seguimiento de la propuesta YA ENVIADA — preguntar si la revisaron, qué dudas hay, qué falta para decidir. JAMÁS preguntas de dolor de primer contacto ni presentarse de nuevo.\n- Propuesta en conversación: hay diálogo activo sobre la propuesta — ayuda a resolver dudas y guía hacia una decisión concreta, sin volver a vender desde cero.\n- Propuesta aceptada, inicio pendiente: ya dijeron que sí — el foco es coordinar fecha de inicio y logística, no vender más.\n- On hold: check-in ligero, sin presión.\n- Ganado: relación y siguiente oportunidad, no venta.\n- Terminado: proyecto cerrado exitosamente — check-in de relación, pedir testimonio o referidos. Jamás venta fría.\n\nProspecto:\n- Empresa: '+c.emp+' ('+(c.ciudad||'Chile')+')'+(c.analisis?'\n- Análisis previo: '+c.analisis:'')+'\n- Contacto: '+nombre+' — '+(c.cargo||'sin cargo')+'\n- ETAPA ACTUAL: '+c.status+' — '+dias+' días desde el último contacto\n- Canal: '+canal+'\n- Notas: '+(c.notas||'sin notas')+(c.contexto?'\n- Contexto del contacto: '+c.contexto:'')+(c.diagDolor?'\n- Dolor documentado: '+c.diagDolor:'')+'\n- Historial reciente: '+hist+(bita?'\n- Bitácora de trabajo (sesiones realizadas): '+bita:'')+'\n\nIMPORTANTE: usa el historial y la bitácora como fuente principal — el mensaje y la recomendación deben referirse a lo que realmente ha pasado con este contacto, no a supuestos.\n\nResponde SOLO con JSON válido, sin backticks ni texto adicional: {"empresa":"si no hay análisis previo: 2 oraciones sobre qué hace esta empresa y sus desafíos operacionales típicos; si ya hay análisis, string vacío","recomendacion":"en 2 oraciones máximo: qué hacer HOY con este contacto dada su etapa ('+c.status+') y los días transcurridos, y por qué. Directo, sin relleno.","mensaje":"mensaje listo para enviar por '+canal+', coherente con la etapa '+c.status+' según la guía. '+tono+' Usa el nombre '+nombre+'. Específico a ESTA empresa, no genérico. Nunca desesperado."}';
   try{
     const res=await fetch('/api/coach',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({systemPrompt:'Eres un sales coach experto. Sigue exactamente las instrucciones del usuario y respeta el formato de salida pedido.',messages:[{role:'user',content:prompt}]})});
     const data=await res.json();
@@ -708,7 +728,7 @@ function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replac
 function renderStats(){
   const act=contacts.filter(c=>!['No','Terminado'].includes(c.status));
   const urg_n=contacts.filter(c=>urg(c)==='h').length;
-  const cierre=contacts.filter(c=>['Reunión','Propuesta'].includes(c.status)).length;
+  const cierre=contacts.filter(c=>['Reunión','Propuesta enviada','Propuesta en conversación','Propuesta aceptada, inicio pendiente'].includes(c.status)).length;
   document.getElementById('stats').innerHTML=
     '<div class="stat"><div class="stat-label">Pipeline</div><div class="stat-val">'+act.length+'</div><div class="stat-sub">'+contacts.filter(c=>c.status==='No').length+' descartados</div></div>'+
     '<div class="stat"><div class="stat-label">Para escribir hoy</div><div class="stat-val" style="color:'+(urg_n?'var(--red)':'var(--green)')+'">'+urg_n+'</div><div class="stat-sub">según timing</div></div>'+
@@ -719,7 +739,7 @@ function renderFunnel(){
   const act=contacts.filter(c=>c.status!=='No'),tot=act.length||1;
   document.getElementById('funnel-stages').innerHTML=STAGES.map(s=>{
     const n=contacts.filter(c=>c.status===s).length,pct=Math.round(n/tot*100);
-    return '<div class="stage'+(activeFilter===s?' active':'')+'" onclick="setF(\''+s+'\')"><div class="s-name">'+s+'</div><div class="s-num">'+n+'</div><div class="s-pct">'+pct+'%</div></div>';
+    return '<div class="stage'+(activeFilter===s?' active':'')+'" onclick="setF(\''+s+'\')"><div class="s-name">'+esc(stageLabel(s))+'</div><div class="s-num">'+n+'</div><div class="s-pct">'+pct+'%</div></div>';
   }).join('');
 }
 function renderFilters(){
@@ -739,11 +759,11 @@ function renderContacts(){
   if(ownerFilter!=='todos')list=list.filter(c=>c.owner===ownerFilter);
   const sorted=[...list].sort((a,b)=>{
     if(sortCol==='emp')return sortDesc?a.emp.localeCompare(b.emp):b.emp.localeCompare(a.emp);
-    if(sortCol==='status')return sortDesc?(ORD[a.status]??9)-(ORD[b.status]??9):(ORD[b.status]??9)-(ORD[a.status]??9);
+    if(sortCol==='status')return sortDesc?(ORD[a.status]??10)-(ORD[b.status]??10):(ORD[b.status]??10)-(ORD[a.status]??10);
     if(sortCol==='timing'){const r=x=>{const t=timing(x);if(!t)return 3;return t.color==='#ef4444'?0:t.color==='#f59e0b'?1:2;};return sortDesc?r(a)-r(b):r(b)-r(a);}
     if(sortCol==='dias')return sortDesc?getDias(b)-getDias(a):getDias(a)-getDias(b);
     if(sortCol==='accion'){const va=(a.accion||'').toLowerCase(),vb=(b.accion||'').toLowerCase();if(!va&&!vb)return 0;if(!va)return 1;if(!vb)return -1;return sortDesc?va.localeCompare(vb):vb.localeCompare(va);}
-    return (ORD[a.status]??9)-(ORD[b.status]??9)||getDias(b)-getDias(a);
+    return (ORD[a.status]??10)-(ORD[b.status]??10)||getDias(b)-getDias(a);
   });
   const arrow=col=>sortCol===col?(sortDesc?' ↓':' ↑'):' ↕';
   const thead='<thead><tr><th onclick="toggleSort(\'emp\')">Empresa'+arrow('emp')+'</th><th onclick="toggleSort(\'status\')">Status'+arrow('status')+'</th><th onclick="toggleSort(\'timing\')">Timing'+arrow('timing')+'</th><th onclick="toggleSort(\'dias\')" style="text-align:center">Días'+arrow('dias')+'</th><th onclick="toggleSort(\'accion\')">Próxima acción'+arrow('accion')+'</th></tr></thead>';
@@ -783,7 +803,7 @@ function renderTips(){
     tips.push({icono:'⚠️',label:'Contacto estancado: '+c.emp,texto:getDias(c)+' días sin respuesta. Momento del segundo toque: corto, sin volver a explicar nada.',id:c.id});
   }
   const reuUrg=enReunion.filter(c=>getDias(c)>5);
-  const sinDolor=activos.filter(c=>(!c.diagDolor||!c.diagDolor.length)&&['Reunión','Respondió','En proceso'].includes(c.status));
+  const sinDolor=activos.filter(c=>(!c.diagDolor||!c.diagDolor.length)&&['Reunión','Respondió'].includes(c.status));
   if(reuUrg.length>0){
     tips.push({icono:'🚨',label:'Reunión(es) sin propuesta',texto:reuUrg.map(c=>c.emp).join(', ')+': tuviste reunión pero no has enviado propuesta. Sin propuesta no hay cierre.',id:reuUrg[0].id});
   }else if(sinDolor.length>0){
@@ -1067,7 +1087,7 @@ function openDetail(id){
     '<h3>'+esc(c.emp)+'</h3>'+
     '<div style="font-size:12px;color:#64748b;margin-bottom:10px">'+esc(c.cont&&c.cont!=='-'?c.cont:'Sin contacto')+(c.cargo&&c.cargo!=='-'?' · '+esc(c.cargo):'')+(c.ciudad?' · '+esc(c.ciudad):'')+'</div>'+
     '<div class="detail-top">'+
-      '<select id="d-status" onchange="changeStatus()">'+['Por contactar','Contactado','Respondió','Reunión','Propuesta','Ganado','Terminado','En proceso','On hold','No'].map(s=>'<option'+(c.status===s?' selected':'')+'>'+s+'</option>').join('')+'</select>'+
+      '<select id="d-status" onchange="changeStatus()">'+['Por contactar','Contactado','Respondió','Reunión','Propuesta enviada','Propuesta en conversación','Propuesta aceptada, inicio pendiente','Ganado','Terminado','On hold','No'].map(s=>'<option'+(c.status===s?' selected':'')+'>'+esc(s)+'</option>').join('')+'</select>'+
       '<input type="date" id="d-fecha-top" value="'+esc(c.fechaContacto)+'" onchange="changeFecha()" title="Fecha del último contacto">'+
       '<span style="font-size:11px;color:#94a3b8" id="d-dias-txt">'+getDias(c)+' días · '+(c.canal||'sin canal')+'</span>'+
       '<span id="d-termino-wrap" style="display:'+(c.status==='Terminado'?'inline-flex':'none')+';align-items:center;gap:5px"><span style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px">Término</span><input type="date" id="d-termino" value="'+esc(c.fechaTermino||'')+'" onchange="changeTermino()"></span>'+
