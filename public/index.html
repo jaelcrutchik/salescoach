@@ -203,7 +203,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
     <div class="filter-btns" id="bita-clients" style="margin-bottom:7px"></div>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:9px;flex-wrap:wrap" id="bita-period"></div>
     <div class="tips-box"><div class="bita-total" id="bita-summary"></div></div>
-    <div class="table-wrap"><table class="ctable" id="bita-table"></table></div>
     <div class="tips-box">
       <div class="tips-title"><span id="b-form-title">+ Nueva entrada</span></div>
       <div class="field-row4">
@@ -217,6 +216,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
       <div class="field"><label>Participantes</label><input id="b-part" type="text" placeholder="ej: Roberto, Andrea"></div>
       <div style="display:flex;gap:8px;align-items:center"><button class="btn-s" id="b-save" onclick="addBita()">Guardar entrada</button><button class="btn-c" id="b-cancel" style="display:none" onclick="cancelBitaEdit()">Cancelar edición</button><span id="b-edit-hint" style="display:none;font-size:11px;color:var(--amber)">✏️ Editando entrada existente</span></div>
     </div>
+    <div class="table-wrap"><table class="ctable" id="bita-table"></table></div>
   </div>
 
   <div id="view-calendario" style="display:none">
