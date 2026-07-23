@@ -295,7 +295,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 <div class="toast" id="toast"></div>
 <script>
 const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-const UF=38500;
 const STAGES=['Por contactar','Contactado','Respondió','Reunión','Propuesta enviada','Propuesta en conversación','Propuesta aceptada, inicio pendiente','Ganado','Terminado'];
 const ORD={'Reunión':0,'Respondió':1,'Propuesta en conversación':2,'Propuesta enviada':3,'Propuesta aceptada, inicio pendiente':4,'Contactado':5,'Por contactar':6,'On hold':7,'Ganado':8,'Terminado':9,'No':10};
 function bc(s){return {'Por contactar':'b-pc','Contactado':'b-co','Respondió':'b-re','Reunión':'b-ru','Propuesta enviada':'b-pe','Propuesta en conversación':'b-pv','Propuesta aceptada, inicio pendiente':'b-pa','Ganado':'b-ga','Terminado':'b-tm','On hold':'b-oh','No':'b-no'}[s]||'b-pc';}
@@ -358,6 +357,7 @@ const SEED=[
 function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,accion:'',notas:'',com:15,email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:'',fechaTermino:'',franJugada:'',bitacora:[]},c);}
 
 let contacts=[],nextId=60,activeFilter='todos',ownerFilter='todos',detailId=null,sortCol='default',sortDesc=true,loaded=false;
+let ufValorClp=40820.31;
 
 // ---------- CONTACTOS DE RAFA (carga automática de una sola vez) ----------
 const RAFA_SEED=[
@@ -455,7 +455,7 @@ function initMigStages2026(){
 }
 const STORE_KEY='ryc_salescoach_v2';
 function persist(){
-  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,migStages2026,updatedAt:new Date().toISOString()});
+  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,migStages2026,ufValorClp,updatedAt:new Date().toISOString()});
   try{localStorage.setItem(STORE_KEY,payload);}
   catch(e){console.error('storage error',e);showToast('⚠️ No se pudo guardar — exporta un respaldo');}
 }
@@ -470,7 +470,7 @@ function loadData(){
   try{const p=localStorage.getItem(STORE_KEY);if(p)d=JSON.parse(p);}catch(e){console.error('load error',e);}
   if(d){
     contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;
-    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;migStages2026=!!d.migStages2026;
+    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;migStages2026=!!d.migStages2026;ufValorClp=parseFloat(d.ufValorClp)||40820.31;
   }else{
     contacts=SEED.map(normalize);nextId=60;
   }
@@ -854,6 +854,17 @@ function bitaFiltered(list){
   if(bitaSem!=='todos')e=e.filter(x=>isoWeek(x.fecha)===bitaSem);
   return e;
 }
+function partnerSplit(c,clp){
+  const com=parseFloat(c.com)||0;
+  const ownerShare=50+com/2;
+  if(c.owner==='Jael')return{jael:clp*ownerShare/100,rafa:clp*(100-ownerShare)/100};
+  if(c.owner==='Rafa')return{jael:clp*(100-ownerShare)/100,rafa:clp*ownerShare/100};
+  return{jael:clp/2,rafa:clp/2};
+}
+function setUfValor(v){
+  const n=parseFloat(v);if(!n||n<=0)return;
+  ufValorClp=n;persist();renderResumenHoras();
+}
 function renderResumenHoras(){
   const box=document.getElementById('bita-resumen-interno');if(!box)return;
   // Aplica los mismos filtros de mes/semana que la tabla de sesiones
@@ -862,28 +873,36 @@ function renderResumenHoras(){
   const weeks=[...new Set(conBita.flatMap(r=>r.ent.map(e=>isoWeek(e.fecha)).filter(Boolean)))].sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
   const fh=m=>(m/60).toFixed(1).replace('.',',');
   const fuf=v=>v.toFixed(1).replace('.',',');
+  const fclp=v=>'$'+Math.round(v).toLocaleString('es-CL');
+  const ufInput='<span style="font-weight:400;text-transform:none;letter-spacing:0;display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#64748b">Valor UF <input type="number" step="0.01" value="'+ufValorClp+'" onchange="setUfValor(this.value)" style="width:90px;font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);background:white"> CLP</span>';
   if(!conBita.length||!weeks.length){
     if(bitaMes==='todos'&&bitaSem==='todos'){box.style.display='none';return;}
     box.style.display='block';
-    box.innerHTML='<div class="hrs-title">Horas por cliente · '+periodo+'</div><div style="color:#94a3b8;font-size:12px;padding:0.4rem 0">Sin horas registradas en este periodo.</div>';
+    box.innerHTML='<div class="hrs-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px"><span>Horas por cliente · '+periodo+'</span>'+ufInput+'</div><div style="color:#94a3b8;font-size:12px;padding:0.4rem 0">Sin horas registradas en este periodo.</div>';
     return;
   }
   const rows=conBita.map(r=>{
     const perW=weeks.map(w=>r.ent.filter(e=>isoWeek(e.fecha)===w).reduce((s,e)=>s+(parseFloat(e.minutos)||0),0));
     const tot=perW.reduce((s,v)=>s+v,0);
     const uf=parseFloat(r.c.uf)||0;
-    return {emp:r.c.emp,perW,tot,ufTot:uf?tot/60*uf:null};
+    const ufTot=uf?tot/60*uf:null;
+    const clpTot=ufTot!=null?ufTot*ufValorClp:null;
+    const split=clpTot!=null?partnerSplit(r.c,clpTot):null;
+    return {emp:r.c.emp,perW,tot,ufTot,clpTot,split};
   }).sort((a,b)=>a.emp.localeCompare(b.emp));
   box.style.display='block';
   const totW=weeks.map((w,i)=>rows.reduce((s,r)=>s+r.perW[i],0));
   const grand=totW.reduce((s,v)=>s+v,0);
   const ufGrand=rows.reduce((s,r)=>s+(r.ufTot||0),0);
-  box.innerHTML='<div class="hrs-title">Horas por cliente · '+periodo+'</div><div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
-    weeks.map(w=>'<th>'+w+'</th>').join('')+'<th class="hrs-tot">HH</th><th class="hrs-tot" title="Horas × tarifa UF/hora de la ficha del cliente">UF</th></tr></thead><tbody>'+
-    rows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perW.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(r.tot)+'</td><td class="hrs-tot">'+(r.ufTot!=null?fuf(r.ufTot):'<span title="Define UF/hora en la ficha del cliente" style="color:#cbd5e1">—</span>')+'</td></tr>').join('')+
-    '<tr class="hrs-total-row"><td class="hl">Total</td>'+totW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(grand)+'</td><td class="hrs-tot">'+fuf(ufGrand)+'</td></tr>'+
+  const clpGrand=rows.reduce((s,r)=>s+(r.clpTot||0),0);
+  const jaelGrand=rows.reduce((s,r)=>s+(r.split?r.split.jael:0),0);
+  const rafaGrand=rows.reduce((s,r)=>s+(r.split?r.split.rafa:0),0);
+  box.innerHTML='<div class="hrs-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px"><span>Horas por cliente · '+periodo+'</span>'+ufInput+'</div><div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
+    weeks.map(w=>'<th>'+w+'</th>').join('')+'<th class="hrs-tot">HH</th><th class="hrs-tot" title="Horas × tarifa UF/hora de la ficha del cliente">UF</th><th class="hrs-tot" title="UF × valor de la UF en pesos">CLP</th><th class="hrs-tot" title="Reparto según dueño del cliente y su comisión">Jael</th><th class="hrs-tot" title="Reparto según dueño del cliente y su comisión">Rafa</th></tr></thead><tbody>'+
+    rows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perW.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(r.tot)+'</td><td class="hrs-tot">'+(r.ufTot!=null?fuf(r.ufTot):'<span title="Define UF/hora en la ficha del cliente" style="color:#cbd5e1">—</span>')+'</td><td class="hrs-tot">'+(r.clpTot!=null?fclp(r.clpTot):'—')+'</td><td class="hrs-tot">'+(r.split?fclp(r.split.jael):'—')+'</td><td class="hrs-tot">'+(r.split?fclp(r.split.rafa):'—')+'</td></tr>').join('')+
+    '<tr class="hrs-total-row"><td class="hl">Total</td>'+totW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(grand)+'</td><td class="hrs-tot">'+fuf(ufGrand)+'</td><td class="hrs-tot">'+fclp(clpGrand)+'</td><td class="hrs-tot">'+fclp(jaelGrand)+'</td><td class="hrs-tot">'+fclp(rafaGrand)+'</td></tr>'+
     '</tbody></table></div>'+
-    '<div style="margin-top:6px;font-size:12px;color:#475569">Facturación estimada del periodo: <strong>'+fuf(ufGrand)+' UF</strong> <span style="color:#94a3b8;font-size:11px">(horas × UF/hora de cada ficha; clientes sin tarifa definida no suman)</span></div>';
+    '<div style="margin-top:6px;font-size:12px;color:#475569">Facturación estimada del periodo: <strong>'+fuf(ufGrand)+' UF</strong> ≈ <strong>'+fclp(clpGrand)+'</strong> <span style="color:#94a3b8;font-size:11px">(horas × UF/hora de cada ficha; clientes sin tarifa definida no suman) · Reparto: Jael '+fclp(jaelGrand)+' · Rafa '+fclp(rafaGrand)+'</span></div>';
 }
 function renderBitacora(){
   const chipsEl=document.getElementById('bita-clients');if(!chipsEl)return;
@@ -1108,7 +1127,7 @@ function openDetail(id){
       '<div class="field-row"><div class="field"><label>Contacto</label><input id="d-cont" value="'+esc(c.cont)+'"></div><div class="field"><label>Cargo</label><input id="d-cargo" value="'+esc(c.cargo)+'"></div></div>'+
       '<div class="field-row"><div class="field"><label>Canal</label><select id="d-canal">'+['','Email','LinkedIn','WhatsApp','Llamada','Referido','Reunión'].map(x=>'<option value="'+x+'"'+(c.canal===x?' selected':'')+'>'+(x||'-')+'</option>').join('')+'</select></div><div class="field"><label>Ciudad</label><input id="d-ciudad" value="'+esc(c.ciudad)+'"></div></div>'+
       '<div class="field"><label>Cliente de</label><select id="d-owner">'+['','Jael','Rafa'].map(x=>'<option value="'+x+'"'+(c.owner===x?' selected':'')+'>'+(x||'Sin asignar')+'</option>').join('')+'</select></div>'+
-      '<div class="field-row"><div class="field"><label>UF/hora</label><input id="d-uf" type="number" step="0.1" value="'+(c.uf||'')+'"></div><div class="field"><label>Horas est.</label><input id="d-horas" type="number" value="'+(c.horas||'')+'"></div></div>'+
+      '<div class="field-row3"><div class="field"><label>UF/hora</label><input id="d-uf" type="number" step="0.1" value="'+(c.uf||'')+'"></div><div class="field"><label>Horas est.</label><input id="d-horas" type="number" value="'+(c.horas||'')+'"></div><div class="field"><label>Comisión mensual (%)</label><input id="d-com" type="number" step="1" value="'+(c.com??'')+'" title="% extra que gana el dueño de este cliente sobre la base 50/50 entre Jael y Rafa"></div></div>'+
       '<div class="field"><label>Email</label><input id="d-email" value="'+esc(c.email)+'"></div>'+
       '<div class="field"><label>Próxima acción</label><input id="d-accion" value="'+esc(c.accion)+'"></div>'+
       '<div class="field"><label>Notas</label><textarea id="d-notas">'+esc(c.notas)+'</textarea></div>'+
@@ -1184,7 +1203,7 @@ function saveDetail(){
   const prevCanal=c.canal,prevCargo=c.cargo;
   c.cont=gv('d-cont');c.cargo=gv('d-cargo');c.canal=document.getElementById('d-canal').value;
   c.ciudad=gv('d-ciudad');c.owner=document.getElementById('d-owner').value;
-  c.uf=parseFloat(gv('d-uf'))||0;c.horas=parseInt(gv('d-horas'))||0;
+  c.uf=parseFloat(gv('d-uf'))||0;c.horas=parseInt(gv('d-horas'))||0;c.com=parseFloat(gv('d-com'))||0;
   c.email=gv('d-email');c.accion=gv('d-accion');c.notas=gv('d-notas');
   c.contexto=gv('d-contexto');c.diagDolor=gv('d-dolor');
   if(prevCanal!==c.canal||prevCargo!==c.cargo){c.diagReal='';c.diagAccion='';}
