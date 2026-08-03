@@ -240,14 +240,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 
   <div id="view-socios" style="display:none">
     <div class="section-hdr">
-      <div class="section-title">UF facturadas y reparto entre socios, por mes</div>
-      <div style="display:flex;align-items:center;gap:12px;margin-left:auto;flex-wrap:wrap">
-        <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#64748b">Valor UF <input id="soc-uf" type="number" step="0.01" style="width:90px;font-size:11px;padding:4px 7px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);background:white" onchange="setUfValor(this.value)"> CLP</span>
-        <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#64748b" title="% que gana el socio dueño del cliente, sobre la base 50/50">Comisión dueño <input id="soc-com" type="number" step="1" min="0" max="100" style="width:55px;font-size:11px;padding:4px 7px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);background:white" onchange="setComisionPct(this.value)"> %</span>
-      </div>
+      <div class="section-title">Horas trabajadas por cliente, por mes</div>
     </div>
-    <div class="table-wrap" style="padding:0.9rem" id="socios-table"></div>
-    <p style="font-size:11px;color:#94a3b8;margin-top:8px">Se calcula con las horas de la bitácora × UF/hora de cada ficha. Solo se listan clientes con UF/hora definida.</p>
+    <div class="table-wrap" style="padding:0.9rem;margin-bottom:1.5rem" id="socios-horas"></div>
+
+    <div class="section-hdr">
+      <div class="section-title">Conversión a CLP y reparto entre socios</div>
+    </div>
+    <div class="table-wrap" style="padding:0.9rem" id="socios-clp"></div>
+    <p style="font-size:11px;color:#94a3b8;margin-top:8px">La UF se edita mes a mes (fila "Valor UF") porque su valor en pesos varía. La comisión de cada cliente se define en su ficha (Pipeline → Datos del contacto). Solo se listan clientes con UF/hora definida.</p>
   </div>
 </div>
 
@@ -367,11 +368,11 @@ const SEED=[
 {id:49,emp:'Alemán Experto',cont:'(vía Sofi)',cargo:'Dueño',status:'Por contactar',canal:'Referido',accion:'Contactar por Sofi/Berna',notas:'Sofi es esposa del dueño'},
 {id:50,emp:'Ferreterías Lonza',cont:'Simón Lonza',cargo:'Ejecutivo',status:'Contactado',canal:'Email',accion:'Seguimiento en 5 días',notas:'Referido de Luzma. Perfil emprendedor, ecoturismo.',fechaContacto:'2026-06-06',historial:[{fecha:'2026-06-06',tipo:'Email',texto:'Correo personalizado enviado vía Luzma.'}]}
 ];
-function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,accion:'',notas:'',email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:'',fechaTermino:'',franJugada:'',bitacora:[]},c);}
+function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,com:20,accion:'',notas:'',email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:'',fechaTermino:'',franJugada:'',bitacora:[]},c);}
 
 let contacts=[],nextId=60,activeFilter='todos',ownerFilter='todos',detailId=null,sortCol='default',sortDesc=true,loaded=false;
 let ufValorClp=40820.31;
-let comisionPct=20;
+let ufPorMes={};
 
 // ---------- CONTACTOS DE RAFA (carga automática de una sola vez) ----------
 const RAFA_SEED=[
@@ -469,7 +470,7 @@ function initMigStages2026(){
 }
 const STORE_KEY='ryc_salescoach_v2';
 function persist(){
-  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,migStages2026,ufValorClp,comisionPct,updatedAt:new Date().toISOString()});
+  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,migStages2026,ufValorClp,ufPorMes,updatedAt:new Date().toISOString()});
   try{localStorage.setItem(STORE_KEY,payload);}
   catch(e){console.error('storage error',e);showToast('⚠️ No se pudo guardar — exporta un respaldo');}
 }
@@ -484,7 +485,7 @@ function loadData(){
   try{const p=localStorage.getItem(STORE_KEY);if(p)d=JSON.parse(p);}catch(e){console.error('load error',e);}
   if(d){
     contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;
-    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;migStages2026=!!d.migStages2026;ufValorClp=parseFloat(d.ufValorClp)||40820.31;comisionPct=parseFloat(d.comisionPct)||20;
+    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;migStages2026=!!d.migStages2026;ufValorClp=parseFloat(d.ufValorClp)||40820.31;ufPorMes=d.ufPorMes&&typeof d.ufPorMes==='object'?d.ufPorMes:{};
   }else{
     contacts=SEED.map(normalize);nextId=60;
   }
@@ -872,52 +873,66 @@ function bitaFiltered(list){
   return e;
 }
 function partnerSplit(c,clp){
-  const ownerShare=50+comisionPct/2;
+  const com=parseFloat(c.com)||0;
+  const ownerShare=50+com/2;
   if(c.owner==='Jael')return{jael:clp*ownerShare/100,rafa:clp*(100-ownerShare)/100};
   if(c.owner==='Rafa')return{jael:clp*(100-ownerShare)/100,rafa:clp*ownerShare/100};
   return{jael:clp/2,rafa:clp/2};
 }
-function setUfValor(v){
+function setUfMes(mes,v){
   const n=parseFloat(v);if(!n||n<=0)return;
-  ufValorClp=n;persist();renderSocios();
+  ufPorMes[mes]=n;persist();renderSocios();
 }
-function setComisionPct(v){
-  const n=parseFloat(v);if(isNaN(n)||n<0||n>100)return;
-  comisionPct=n;persist();renderSocios();
-}
-function renderSocios(){
-  const box=document.getElementById('socios-table');if(!box)return;
-  const ufIn=document.getElementById('soc-uf');if(ufIn)ufIn.value=ufValorClp;
-  const comIn=document.getElementById('soc-com');if(comIn)comIn.value=comisionPct;
-  const fuf=v=>v.toFixed(1).replace('.',',');
-  const fclp=v=>'$'+Math.round(v).toLocaleString('es-CL');
+function socClientesPorMes(){
   const conBita=contacts.map(x=>({c:x,ent:(x.bitacora||[]).filter(e=>(parseFloat(e.minutos)||0)>0&&e.fecha)})).filter(r=>r.ent.length&&(parseFloat(r.c.uf)||0)>0);
   const meses=[...new Set(conBita.flatMap(r=>r.ent.map(e=>e.fecha.slice(0,7))))].sort();
+  return {conBita,meses};
+}
+function renderSocios(){
+  const boxH=document.getElementById('socios-horas'),boxC=document.getElementById('socios-clp');
+  if(!boxH||!boxC)return;
+  const fh=m=>(m/60).toFixed(1).replace('.',',');
+  const fuf=v=>v.toFixed(1).replace('.',',');
+  const fclp=v=>'$'+Math.round(v).toLocaleString('es-CL');
+  const {conBita,meses}=socClientesPorMes();
   if(!conBita.length||!meses.length){
-    box.innerHTML='<div style="color:#94a3b8;font-size:12px;padding:0.4rem 0">Aún no hay sesiones de bitácora con fecha y UF/hora definida en la ficha del cliente.</div>';
+    const msg='<div style="color:#94a3b8;font-size:12px;padding:0.4rem 0">Aún no hay sesiones de bitácora con fecha y UF/hora definida en la ficha del cliente.</div>';
+    boxH.innerHTML=msg;boxC.innerHTML=msg;
     return;
   }
-  const rows=conBita.map(r=>{
-    const uf=parseFloat(r.c.uf)||0;
-    const perM=meses.map(m=>{
-      const min=r.ent.filter(e=>e.fecha.startsWith(m)).reduce((s,e)=>s+(parseFloat(e.minutos)||0),0);
-      return min/60*uf;
-    });
-    const ufTot=perM.reduce((s,v)=>s+v,0);
-    const clpTot=ufTot*ufValorClp;
-    const split=partnerSplit(r.c,clpTot);
-    return {emp:r.c.emp,perM,ufTot,clpTot,split};
+  // ---- Tabla 1: horas trabajadas por cliente, por mes ----
+  const hRows=conBita.map(r=>{
+    const perM=meses.map(m=>r.ent.filter(e=>e.fecha.startsWith(m)).reduce((s,e)=>s+(parseFloat(e.minutos)||0),0));
+    return {emp:r.c.emp,perM,tot:perM.reduce((s,v)=>s+v,0)};
   }).sort((a,b)=>a.emp.localeCompare(b.emp));
-  const totM=meses.map((m,i)=>rows.reduce((s,r)=>s+r.perM[i],0));
-  const ufGrand=rows.reduce((s,r)=>s+r.ufTot,0);
-  const clpGrand=rows.reduce((s,r)=>s+r.clpTot,0);
-  const jaelGrand=rows.reduce((s,r)=>s+r.split.jael,0);
-  const rafaGrand=rows.reduce((s,r)=>s+r.split.rafa,0);
-  box.innerHTML='<div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
+  const hTotM=meses.map((m,i)=>hRows.reduce((s,r)=>s+r.perM[i],0));
+  const hGrand=hTotM.reduce((s,v)=>s+v,0);
+  boxH.innerHTML='<div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
+    meses.map(m=>'<th>'+mesLabel(m)+'</th>').join('')+'<th class="hrs-tot">HH</th></tr></thead><tbody>'+
+    hRows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perM.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(r.tot)+'</td></tr>').join('')+
+    '<tr class="hrs-total-row"><td class="hl">Total</td>'+hTotM.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(hGrand)+'</td></tr>'+
+    '</tbody></table></div>';
+  // ---- Tabla 2: conversión a CLP (UF editable por mes) + reparto ----
+  const cRows=conBita.map(r=>{
+    const uf=parseFloat(r.c.uf)||0;
+    const perM=meses.map(m=>r.ent.filter(e=>e.fecha.startsWith(m)).reduce((s,e)=>s+(parseFloat(e.minutos)||0),0)/60*uf);
+    const perMClp=meses.map((m,i)=>perM[i]*(ufPorMes[m]||ufValorClp));
+    const ufTot=perM.reduce((s,v)=>s+v,0);
+    const clpTot=perMClp.reduce((s,v)=>s+v,0);
+    const split=partnerSplit(r.c,clpTot);
+    return {emp:r.c.emp,perMClp,ufTot,clpTot,split};
+  }).sort((a,b)=>a.emp.localeCompare(b.emp));
+  const ufRowInputs=meses.map(m=>'<td><input type="number" step="0.01" value="'+(ufPorMes[m]||ufValorClp)+'" onchange="setUfMes(\''+m+'\',this.value)" style="width:78px;font-size:11px;padding:3px 5px;border:1px solid var(--border);border-radius:5px;font-family:var(--sans);background:white"></td>').join('');
+  const ufGrand=cRows.reduce((s,r)=>s+r.ufTot,0);
+  const clpGrand=cRows.reduce((s,r)=>s+r.clpTot,0);
+  const jaelGrand=cRows.reduce((s,r)=>s+r.split.jael,0);
+  const rafaGrand=cRows.reduce((s,r)=>s+r.split.rafa,0);
+  boxC.innerHTML='<div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
     meses.map(m=>'<th>'+mesLabel(m)+'</th>').join('')+
-    '<th class="hrs-tot">UF total</th><th class="hrs-tot" title="UF × valor de la UF en pesos">CLP</th><th class="hrs-tot" title="Reparto según dueño del cliente y comisión">Jael</th><th class="hrs-tot" title="Reparto según dueño del cliente y comisión">Rafa</th></tr></thead><tbody>'+
-    rows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perM.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fuf(v)+'</td>').join('')+'<td class="hrs-tot">'+fuf(r.ufTot)+'</td><td class="hrs-tot">'+fclp(r.clpTot)+'</td><td class="hrs-tot">'+fclp(r.split.jael)+'</td><td class="hrs-tot">'+fclp(r.split.rafa)+'</td></tr>').join('')+
-    '<tr class="hrs-total-row"><td class="hl">Total</td>'+totM.map(v=>'<td>'+fuf(v)+'</td>').join('')+'<td class="hrs-tot">'+fuf(ufGrand)+'</td><td class="hrs-tot">'+fclp(clpGrand)+'</td><td class="hrs-tot">'+fclp(jaelGrand)+'</td><td class="hrs-tot">'+fclp(rafaGrand)+'</td></tr>'+
+    '<th class="hrs-tot">UF total</th><th class="hrs-tot" title="UF × valor de la UF de cada mes">CLP</th><th class="hrs-tot" title="Reparto según dueño del cliente y su comisión">Jael</th><th class="hrs-tot" title="Reparto según dueño del cliente y su comisión">Rafa</th></tr></thead><tbody>'+
+    '<tr><td class="hl" style="font-weight:600;color:#64748b">Valor UF (CLP)</td>'+ufRowInputs+'<td class="hrs-tot"></td><td class="hrs-tot"></td><td class="hrs-tot"></td><td class="hrs-tot"></td></tr>'+
+    cRows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perMClp.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+(v?fclp(v):'—')+'</td>').join('')+'<td class="hrs-tot">'+fuf(r.ufTot)+'</td><td class="hrs-tot">'+fclp(r.clpTot)+'</td><td class="hrs-tot">'+fclp(r.split.jael)+'</td><td class="hrs-tot">'+fclp(r.split.rafa)+'</td></tr>').join('')+
+    '<tr class="hrs-total-row"><td class="hl">Total</td>'+meses.map(()=>'<td></td>').join('')+'<td class="hrs-tot">'+fuf(ufGrand)+'</td><td class="hrs-tot">'+fclp(clpGrand)+'</td><td class="hrs-tot">'+fclp(jaelGrand)+'</td><td class="hrs-tot">'+fclp(rafaGrand)+'</td></tr>'+
     '</tbody></table></div>';
 }
 function renderResumenHoras(){
@@ -1174,7 +1189,7 @@ function openDetail(id){
       '<div class="field-row"><div class="field"><label>Contacto</label><input id="d-cont" value="'+esc(c.cont)+'"></div><div class="field"><label>Cargo</label><input id="d-cargo" value="'+esc(c.cargo)+'"></div></div>'+
       '<div class="field-row"><div class="field"><label>Canal</label><select id="d-canal">'+['','Email','LinkedIn','WhatsApp','Llamada','Referido','Reunión'].map(x=>'<option value="'+x+'"'+(c.canal===x?' selected':'')+'>'+(x||'-')+'</option>').join('')+'</select></div><div class="field"><label>Ciudad</label><input id="d-ciudad" value="'+esc(c.ciudad)+'"></div></div>'+
       '<div class="field"><label>Cliente de</label><select id="d-owner">'+['','Jael','Rafa'].map(x=>'<option value="'+x+'"'+(c.owner===x?' selected':'')+'>'+(x||'Sin asignar')+'</option>').join('')+'</select></div>'+
-      '<div class="field-row"><div class="field"><label>UF/hora</label><input id="d-uf" type="number" step="0.1" value="'+(c.uf||'')+'"></div><div class="field"><label>Horas est.</label><input id="d-horas" type="number" value="'+(c.horas||'')+'"></div></div>'+
+      '<div class="field-row3"><div class="field"><label>UF/hora</label><input id="d-uf" type="number" step="0.1" value="'+(c.uf||'')+'"></div><div class="field"><label>Horas est.</label><input id="d-horas" type="number" value="'+(c.horas||'')+'"></div><div class="field"><label>Comisión mensual (%)</label><input id="d-com" type="number" step="1" min="0" max="100" value="'+(c.com??20)+'" title="% que gana el dueño de este cliente sobre la base 50/50 entre Jael y Rafa"></div></div>'+
       '<div class="field"><label>Email</label><input id="d-email" value="'+esc(c.email)+'"></div>'+
       '<div class="field"><label>Próxima acción</label><input id="d-accion" value="'+esc(c.accion)+'"></div>'+
       '<div class="field"><label>Notas</label><textarea id="d-notas">'+esc(c.notas)+'</textarea></div>'+
@@ -1250,7 +1265,7 @@ function saveDetail(){
   const prevCanal=c.canal,prevCargo=c.cargo;
   c.cont=gv('d-cont');c.cargo=gv('d-cargo');c.canal=document.getElementById('d-canal').value;
   c.ciudad=gv('d-ciudad');c.owner=document.getElementById('d-owner').value;
-  c.uf=parseFloat(gv('d-uf'))||0;c.horas=parseInt(gv('d-horas'))||0;
+  c.uf=parseFloat(gv('d-uf'))||0;c.horas=parseInt(gv('d-horas'))||0;c.com=parseFloat(gv('d-com'))||0;
   c.email=gv('d-email');c.accion=gv('d-accion');c.notas=gv('d-notas');
   c.contexto=gv('d-contexto');c.diagDolor=gv('d-dolor');
   if(prevCanal!==c.canal||prevCargo!==c.cargo){c.diagReal='';c.diagAccion='';}
