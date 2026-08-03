@@ -171,6 +171,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
     <button class="tab on" id="tab-pipeline" onclick="setView('pipeline')">📊 Pipeline</button>
     <button class="tab" id="tab-bitacora" onclick="setView('bitacora')">📓 Bitácora</button>
     <button class="tab" id="tab-calendario" onclick="setView('calendario')">🗓️ Calendario</button>
+    <button class="tab" id="tab-socios" onclick="setView('socios')">🤝 Socios</button>
   </div>
   <div id="view-pipeline">
   <div class="tips-box">
@@ -235,6 +236,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
       <div id="cal-legend"></div>
     </div>
     <p style="font-size:11px;color:#94a3b8;margin-top:8px">Se muestran las entradas de la bitácora que tienen <strong>hora de inicio</strong> registrada. Agrégala al guardar una entrada en la pestaña Bitácora para que aparezca aquí.</p>
+  </div>
+
+  <div id="view-socios" style="display:none">
+    <div class="section-hdr">
+      <div class="section-title">UF facturadas y reparto entre socios, por mes</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-left:auto;flex-wrap:wrap">
+        <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#64748b">Valor UF <input id="soc-uf" type="number" step="0.01" style="width:90px;font-size:11px;padding:4px 7px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);background:white" onchange="setUfValor(this.value)"> CLP</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#64748b" title="% que gana el socio dueño del cliente, sobre la base 50/50">Comisión dueño <input id="soc-com" type="number" step="1" min="0" max="100" style="width:55px;font-size:11px;padding:4px 7px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);background:white" onchange="setComisionPct(this.value)"> %</span>
+      </div>
+    </div>
+    <div class="table-wrap" style="padding:0.9rem" id="socios-table"></div>
+    <p style="font-size:11px;color:#94a3b8;margin-top:8px">Se calcula con las horas de la bitácora × UF/hora de cada ficha. Solo se listan clientes con UF/hora definida.</p>
   </div>
 </div>
 
@@ -815,18 +828,21 @@ function renderTips(){
   box.innerHTML=tips.map(t=>'<div class="tip-item'+(t.id?' clickable" onclick="openDetail('+t.id+')':'"')+'"><div class="tip-ico">'+t.icono+'</div><div><div class="tip-label">'+t.label+'</div><div class="tip-text">'+t.texto+'</div></div></div>').join('');
 }
 
-function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderTips();renderBitacora();renderCalendario();}
+function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderTips();renderBitacora();renderCalendario();renderSocios();}
 let currentView='pipeline',bitaClient=null,bitaMes='todos',bitaSem='todos',bitaShowTerm=false,bitaEditIdx=null;
 function setView(v){
   currentView=v;
   document.getElementById('view-pipeline').style.display=v==='pipeline'?'block':'none';
   document.getElementById('view-bitacora').style.display=v==='bitacora'?'block':'none';
   document.getElementById('view-calendario').style.display=v==='calendario'?'block':'none';
+  document.getElementById('view-socios').style.display=v==='socios'?'block':'none';
   document.getElementById('tab-pipeline').classList.toggle('on',v==='pipeline');
   document.getElementById('tab-bitacora').classList.toggle('on',v==='bitacora');
   document.getElementById('tab-calendario').classList.toggle('on',v==='calendario');
+  document.getElementById('tab-socios').classList.toggle('on',v==='socios');
   if(v==='bitacora')renderBitacora();
   if(v==='calendario')renderCalendario();
+  if(v==='socios')renderSocios();
 }
 function isoWeek(dstr){
   const d=new Date(dstr+'T00:00:00');if(isNaN(d))return '';
@@ -863,11 +879,46 @@ function partnerSplit(c,clp){
 }
 function setUfValor(v){
   const n=parseFloat(v);if(!n||n<=0)return;
-  ufValorClp=n;persist();renderResumenHoras();
+  ufValorClp=n;persist();renderSocios();
 }
 function setComisionPct(v){
   const n=parseFloat(v);if(isNaN(n)||n<0||n>100)return;
-  comisionPct=n;persist();renderResumenHoras();
+  comisionPct=n;persist();renderSocios();
+}
+function renderSocios(){
+  const box=document.getElementById('socios-table');if(!box)return;
+  const ufIn=document.getElementById('soc-uf');if(ufIn)ufIn.value=ufValorClp;
+  const comIn=document.getElementById('soc-com');if(comIn)comIn.value=comisionPct;
+  const fuf=v=>v.toFixed(1).replace('.',',');
+  const fclp=v=>'$'+Math.round(v).toLocaleString('es-CL');
+  const conBita=contacts.map(x=>({c:x,ent:(x.bitacora||[]).filter(e=>(parseFloat(e.minutos)||0)>0&&e.fecha)})).filter(r=>r.ent.length&&(parseFloat(r.c.uf)||0)>0);
+  const meses=[...new Set(conBita.flatMap(r=>r.ent.map(e=>e.fecha.slice(0,7))))].sort();
+  if(!conBita.length||!meses.length){
+    box.innerHTML='<div style="color:#94a3b8;font-size:12px;padding:0.4rem 0">Aún no hay sesiones de bitácora con fecha y UF/hora definida en la ficha del cliente.</div>';
+    return;
+  }
+  const rows=conBita.map(r=>{
+    const uf=parseFloat(r.c.uf)||0;
+    const perM=meses.map(m=>{
+      const min=r.ent.filter(e=>e.fecha.startsWith(m)).reduce((s,e)=>s+(parseFloat(e.minutos)||0),0);
+      return min/60*uf;
+    });
+    const ufTot=perM.reduce((s,v)=>s+v,0);
+    const clpTot=ufTot*ufValorClp;
+    const split=partnerSplit(r.c,clpTot);
+    return {emp:r.c.emp,perM,ufTot,clpTot,split};
+  }).sort((a,b)=>a.emp.localeCompare(b.emp));
+  const totM=meses.map((m,i)=>rows.reduce((s,r)=>s+r.perM[i],0));
+  const ufGrand=rows.reduce((s,r)=>s+r.ufTot,0);
+  const clpGrand=rows.reduce((s,r)=>s+r.clpTot,0);
+  const jaelGrand=rows.reduce((s,r)=>s+r.split.jael,0);
+  const rafaGrand=rows.reduce((s,r)=>s+r.split.rafa,0);
+  box.innerHTML='<div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
+    meses.map(m=>'<th>'+mesLabel(m)+'</th>').join('')+
+    '<th class="hrs-tot">UF total</th><th class="hrs-tot" title="UF × valor de la UF en pesos">CLP</th><th class="hrs-tot" title="Reparto según dueño del cliente y comisión">Jael</th><th class="hrs-tot" title="Reparto según dueño del cliente y comisión">Rafa</th></tr></thead><tbody>'+
+    rows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perM.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fuf(v)+'</td>').join('')+'<td class="hrs-tot">'+fuf(r.ufTot)+'</td><td class="hrs-tot">'+fclp(r.clpTot)+'</td><td class="hrs-tot">'+fclp(r.split.jael)+'</td><td class="hrs-tot">'+fclp(r.split.rafa)+'</td></tr>').join('')+
+    '<tr class="hrs-total-row"><td class="hl">Total</td>'+totM.map(v=>'<td>'+fuf(v)+'</td>').join('')+'<td class="hrs-tot">'+fuf(ufGrand)+'</td><td class="hrs-tot">'+fclp(clpGrand)+'</td><td class="hrs-tot">'+fclp(jaelGrand)+'</td><td class="hrs-tot">'+fclp(rafaGrand)+'</td></tr>'+
+    '</tbody></table></div>';
 }
 function renderResumenHoras(){
   const box=document.getElementById('bita-resumen-interno');if(!box)return;
@@ -877,39 +928,28 @@ function renderResumenHoras(){
   const weeks=[...new Set(conBita.flatMap(r=>r.ent.map(e=>isoWeek(e.fecha)).filter(Boolean)))].sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
   const fh=m=>(m/60).toFixed(1).replace('.',',');
   const fuf=v=>v.toFixed(1).replace('.',',');
-  const fclp=v=>'$'+Math.round(v).toLocaleString('es-CL');
-  const ufInput='<span style="font-weight:400;text-transform:none;letter-spacing:0;display:inline-flex;align-items:center;gap:12px;flex-wrap:wrap">'+
-    '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#64748b">Valor UF <input type="number" step="0.01" value="'+ufValorClp+'" onchange="setUfValor(this.value)" style="width:90px;font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);background:white"> CLP</span>'+
-    '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#64748b" title="% que gana el socio dueño del cliente, sobre la base 50/50">Comisión dueño <input type="number" step="1" min="0" max="100" value="'+comisionPct+'" onchange="setComisionPct(this.value)" style="width:55px;font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);background:white"> %</span>'+
-    '</span>';
   if(!conBita.length||!weeks.length){
     if(bitaMes==='todos'&&bitaSem==='todos'){box.style.display='none';return;}
     box.style.display='block';
-    box.innerHTML='<div class="hrs-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px"><span>Horas por cliente · '+periodo+'</span>'+ufInput+'</div><div style="color:#94a3b8;font-size:12px;padding:0.4rem 0">Sin horas registradas en este periodo.</div>';
+    box.innerHTML='<div class="hrs-title">Horas por cliente · '+periodo+'</div><div style="color:#94a3b8;font-size:12px;padding:0.4rem 0">Sin horas registradas en este periodo.</div>';
     return;
   }
   const rows=conBita.map(r=>{
     const perW=weeks.map(w=>r.ent.filter(e=>isoWeek(e.fecha)===w).reduce((s,e)=>s+(parseFloat(e.minutos)||0),0));
     const tot=perW.reduce((s,v)=>s+v,0);
     const uf=parseFloat(r.c.uf)||0;
-    const ufTot=uf?tot/60*uf:null;
-    const clpTot=ufTot!=null?ufTot*ufValorClp:null;
-    const split=clpTot!=null?partnerSplit(r.c,clpTot):null;
-    return {emp:r.c.emp,perW,tot,ufTot,clpTot,split};
+    return {emp:r.c.emp,perW,tot,ufTot:uf?tot/60*uf:null};
   }).sort((a,b)=>a.emp.localeCompare(b.emp));
   box.style.display='block';
   const totW=weeks.map((w,i)=>rows.reduce((s,r)=>s+r.perW[i],0));
   const grand=totW.reduce((s,v)=>s+v,0);
   const ufGrand=rows.reduce((s,r)=>s+(r.ufTot||0),0);
-  const clpGrand=rows.reduce((s,r)=>s+(r.clpTot||0),0);
-  const jaelGrand=rows.reduce((s,r)=>s+(r.split?r.split.jael:0),0);
-  const rafaGrand=rows.reduce((s,r)=>s+(r.split?r.split.rafa:0),0);
-  box.innerHTML='<div class="hrs-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px"><span>Horas por cliente · '+periodo+'</span>'+ufInput+'</div><div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
-    weeks.map(w=>'<th>'+w+'</th>').join('')+'<th class="hrs-tot">HH</th><th class="hrs-tot" title="Horas × tarifa UF/hora de la ficha del cliente">UF</th><th class="hrs-tot" title="UF × valor de la UF en pesos">CLP</th><th class="hrs-tot" title="Reparto según dueño del cliente y su comisión">Jael</th><th class="hrs-tot" title="Reparto según dueño del cliente y su comisión">Rafa</th></tr></thead><tbody>'+
-    rows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perW.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(r.tot)+'</td><td class="hrs-tot">'+(r.ufTot!=null?fuf(r.ufTot):'<span title="Define UF/hora en la ficha del cliente" style="color:#cbd5e1">—</span>')+'</td><td class="hrs-tot">'+(r.clpTot!=null?fclp(r.clpTot):'—')+'</td><td class="hrs-tot">'+(r.split?fclp(r.split.jael):'—')+'</td><td class="hrs-tot">'+(r.split?fclp(r.split.rafa):'—')+'</td></tr>').join('')+
-    '<tr class="hrs-total-row"><td class="hl">Total</td>'+totW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(grand)+'</td><td class="hrs-tot">'+fuf(ufGrand)+'</td><td class="hrs-tot">'+fclp(clpGrand)+'</td><td class="hrs-tot">'+fclp(jaelGrand)+'</td><td class="hrs-tot">'+fclp(rafaGrand)+'</td></tr>'+
+  box.innerHTML='<div class="hrs-title">Horas por cliente · '+periodo+'</div><div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
+    weeks.map(w=>'<th>'+w+'</th>').join('')+'<th class="hrs-tot">HH</th><th class="hrs-tot" title="Horas × tarifa UF/hora de la ficha del cliente">UF</th></tr></thead><tbody>'+
+    rows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perW.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(r.tot)+'</td><td class="hrs-tot">'+(r.ufTot!=null?fuf(r.ufTot):'<span title="Define UF/hora en la ficha del cliente" style="color:#cbd5e1">—</span>')+'</td></tr>').join('')+
+    '<tr class="hrs-total-row"><td class="hl">Total</td>'+totW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(grand)+'</td><td class="hrs-tot">'+fuf(ufGrand)+'</td></tr>'+
     '</tbody></table></div>'+
-    '<div style="margin-top:6px;font-size:12px;color:#475569">Facturación estimada del periodo: <strong>'+fuf(ufGrand)+' UF</strong> ≈ <strong>'+fclp(clpGrand)+'</strong> <span style="color:#94a3b8;font-size:11px">(horas × UF/hora de cada ficha; clientes sin tarifa definida no suman) · Reparto: Jael '+fclp(jaelGrand)+' · Rafa '+fclp(rafaGrand)+'</span></div>';
+    '<div style="margin-top:6px;font-size:12px;color:#475569">Facturación estimada del periodo: <strong>'+fuf(ufGrand)+' UF</strong> <span style="color:#94a3b8;font-size:11px">(horas × UF/hora de cada ficha; clientes sin tarifa definida no suman)</span></div>';
 }
 function renderBitacora(){
   const chipsEl=document.getElementById('bita-clients');if(!chipsEl)return;
