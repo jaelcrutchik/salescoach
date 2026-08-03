@@ -35,6 +35,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .hrs-zero{color:#cbd5e1}
 .hrs-tot{font-weight:700;border-left:1px solid var(--border)}
 .hrs-total-row td{font-weight:700;border-top:2px solid var(--border);border-bottom:none}
+.soc-fixed{table-layout:fixed}
+.soc-fixed .hl{width:130px}
+.soc-mcol{width:100px}
 
 .tips-box{background:white;border:1px solid var(--border);border-radius:12px;padding:0.9rem 1rem;margin-bottom:0.85rem}
 .tips-title{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between}
@@ -912,8 +915,8 @@ function renderSocios(){
   const hTotM=meses.map((m,i)=>hRows.reduce((s,r)=>s+r.perM[i],0));
   const hGrand=hTotM.reduce((s,v)=>s+v,0);
   const hUfGrand=hRows.reduce((s,r)=>s+r.ufTot,0);
-  boxH.innerHTML='<div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
-    meses.map(m=>'<th>'+mesLabel(m)+'</th>').join('')+'<th class="hrs-tot">HH</th><th class="hrs-tot" title="Horas × UF/hora de la ficha del cliente">UF total</th></tr></thead><tbody>'+
+  boxH.innerHTML='<div style="overflow-x:auto"><table class="hrs-table soc-fixed"><thead><tr><th class="hl">Cliente</th>'+
+    meses.map(m=>'<th class="soc-mcol">'+mesLabel(m)+'</th>').join('')+'<th class="hrs-tot">HH</th><th class="hrs-tot" title="Horas × UF/hora de la ficha del cliente">UF total</th></tr></thead><tbody>'+
     hRows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perM.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(r.tot)+'</td><td class="hrs-tot">'+fuf(r.ufTot)+'</td></tr>').join('')+
     '<tr class="hrs-total-row"><td class="hl">Total</td>'+hTotM.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(hGrand)+'</td><td class="hrs-tot">'+fuf(hUfGrand)+'</td></tr>'+
     '</tbody></table></div>';
@@ -923,24 +926,18 @@ function renderSocios(){
     const perM=meses.map(m=>r.ent.filter(e=>e.fecha.startsWith(m)).reduce((s,e)=>s+(parseFloat(e.minutos)||0),0)/60*uf);
     const perMClp=meses.map((m,i)=>perM[i]*(ufPorMes[m]||ufValorClp));
     const perMSplit=perMClp.map(v=>partnerSplit(r.c,v));
-    const clpTot=perMClp.reduce((s,v)=>s+v,0);
-    const split=partnerSplit(r.c,clpTot);
-    return {emp:r.c.emp,perMClp,perMSplit,clpTot,split};
+    return {emp:r.c.emp,perMClp,perMSplit};
   }).sort((a,b)=>a.emp.localeCompare(b.emp));
   const ufRowInputs=meses.map(m=>'<td><input type="number" step="0.01" value="'+(ufPorMes[m]||ufValorClp)+'" onchange="setUfMes(\''+m+'\',this.value)" style="width:78px;font-size:11px;padding:3px 5px;border:1px solid var(--border);border-radius:5px;font-family:var(--sans);background:white"></td>').join('');
-  const clpGrand=cRows.reduce((s,r)=>s+r.clpTot,0);
-  const jaelGrand=cRows.reduce((s,r)=>s+r.split.jael,0);
-  const rafaGrand=cRows.reduce((s,r)=>s+r.split.rafa,0);
   const cellVal=(r,i)=>socView==='jael'?r.perMSplit[i].jael:socView==='rafa'?r.perMSplit[i].rafa:r.perMClp[i];
   const totLabel=socView==='jael'?'Total Jael':socView==='rafa'?'Total Rafa':'Total CLP';
   const corner='<select onchange="setSocView(this.value)" style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;border:none;background:transparent;color:#94a3b8;cursor:pointer;font-family:var(--sans)">'+
     ['rc','jael','rafa'].map(v=>'<option value="'+v+'"'+(socView===v?' selected':'')+'>'+(v==='rc'?'R&C (total)':v==='jael'?'Jael':'Rafa')+'</option>').join('')+'</select>';
-  boxC.innerHTML='<div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">'+corner+'</th>'+
-    meses.map(m=>'<th>'+mesLabel(m)+'</th>').join('')+
-    '<th class="hrs-tot">CLP</th><th class="hrs-tot" title="Reparto según dueño del cliente y su comisión">Jael</th><th class="hrs-tot" title="Reparto según dueño del cliente y su comisión">Rafa</th></tr></thead><tbody>'+
-    '<tr><td class="hl" style="font-weight:600;color:#64748b">Valor UF (CLP)</td>'+ufRowInputs+'<td class="hrs-tot"></td><td class="hrs-tot"></td><td class="hrs-tot"></td></tr>'+
-    cRows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+meses.map((m,i)=>{const v=cellVal(r,i);return '<td'+(v?'':' class="hrs-zero"')+'>'+(v?fclp(v):'—')+'</td>';}).join('')+'<td class="hrs-tot">'+fclp(r.clpTot)+'</td><td class="hrs-tot">'+fclp(r.split.jael)+'</td><td class="hrs-tot">'+fclp(r.split.rafa)+'</td></tr>').join('')+
-    '<tr class="hrs-total-row"><td class="hl">'+totLabel+'</td>'+meses.map((m,i)=>'<td>'+fclp(cRows.reduce((s,r)=>s+cellVal(r,i),0))+'</td>').join('')+'<td class="hrs-tot">'+fclp(clpGrand)+'</td><td class="hrs-tot">'+fclp(jaelGrand)+'</td><td class="hrs-tot">'+fclp(rafaGrand)+'</td></tr>'+
+  boxC.innerHTML='<div style="overflow-x:auto"><table class="hrs-table soc-fixed"><thead><tr><th class="hl">'+corner+'</th>'+
+    meses.map(m=>'<th class="soc-mcol">'+mesLabel(m)+'</th>').join('')+'</tr></thead><tbody>'+
+    '<tr><td class="hl" style="font-weight:600;color:#64748b">Valor UF (CLP)</td>'+ufRowInputs+'</tr>'+
+    cRows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+meses.map((m,i)=>{const v=cellVal(r,i);return '<td'+(v?'':' class="hrs-zero"')+'>'+(v?fclp(v):'—')+'</td>';}).join('')+'</tr>').join('')+
+    '<tr class="hrs-total-row"><td class="hl">'+totLabel+'</td>'+meses.map((m,i)=>'<td>'+fclp(cRows.reduce((s,r)=>s+cellVal(r,i),0))+'</td>').join('')+'</tr>'+
     '</tbody></table></div>';
 }
 function renderResumenHoras(){
