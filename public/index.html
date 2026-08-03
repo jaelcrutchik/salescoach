@@ -885,7 +885,8 @@ function partnerSplit(c,clp){
   return{jael:clp/2,rafa:clp/2};
 }
 function setUfMes(mes,v){
-  const n=parseInt(String(v).replace(/[^0-9]/g,''),10);
+  const cleaned=String(v).replace(/[^0-9,.-]/g,'').replace(/\./g,'').replace(',','.');
+  const n=parseFloat(cleaned);
   if(!n||n<=0)return;
   ufPorMes[mes]=n;persist();renderSocios();
 }
@@ -900,6 +901,7 @@ function renderSocios(){
   const fh=m=>(m/60).toFixed(1).replace('.',',');
   const fuf=v=>v.toFixed(1).replace('.',',');
   const fclp=v=>'$'+Math.round(v).toLocaleString('es-CL');
+  const fufval=v=>'$'+v.toLocaleString('es-CL',{minimumFractionDigits:2,maximumFractionDigits:2});
   const {conBita,meses}=socClientesPorMes();
   if(!conBita.length||!meses.length){
     const msg='<div style="color:#94a3b8;font-size:12px;padding:0.4rem 0">Aún no hay sesiones de bitácora con fecha y UF/hora definida en la ficha del cliente.</div>';
@@ -929,7 +931,7 @@ function renderSocios(){
     const perMSplit=perMClp.map(v=>partnerSplit(r.c,v));
     return {emp:r.c.emp,perMClp,perMSplit};
   }).sort((a,b)=>a.emp.localeCompare(b.emp));
-  const ufRowInputs=meses.map(m=>'<td><input type="text" inputmode="numeric" value="'+fclp(ufPorMes[m]||ufValorClp)+'" onchange="setUfMes(\''+m+'\',this.value)" style="width:78px;font-size:11px;padding:3px 5px;border:1px solid var(--border);border-radius:5px;font-family:var(--sans);background:white;text-align:center"></td>').join('');
+  const ufRowInputs=meses.map(m=>'<td><input type="text" inputmode="decimal" value="'+fufval(ufPorMes[m]||ufValorClp)+'" onchange="setUfMes(\''+m+'\',this.value)" style="width:86px;font-size:11px;padding:3px 5px;border:1px solid var(--border);border-radius:5px;font-family:var(--sans);background:white;text-align:center"></td>').join('');
   const cellVal=(r,i)=>socView==='jael'?r.perMSplit[i].jael:socView==='rafa'?r.perMSplit[i].rafa:r.perMClp[i];
   const totLabel=socView==='jael'?'Total Jael':socView==='rafa'?'Total Rafa':'Total CLP';
   const corner='<select onchange="setSocView(this.value)" style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;border:none;background:transparent;color:#94a3b8;cursor:pointer;font-family:var(--sans)">'+
