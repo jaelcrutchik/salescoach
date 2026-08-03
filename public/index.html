@@ -1013,9 +1013,10 @@ function renderBitacora(){
       '<td style="white-space:normal;vertical-align:top;font-size:11px;color:#64748b">'+esc(e.participantes||'—')+'</td>'+
       '<td style="white-space:normal;vertical-align:top;font-size:11px;color:#64748b">'+esc(e.lugar||'—')+'</td>'+
       '<td style="text-align:center;vertical-align:top">'+(e.minutos?e.minutos+' min':'—')+'</td>'+
-      '<td style="text-align:center;vertical-align:top;white-space:nowrap"><button onclick="event.stopPropagation();editBita('+c.id+','+idx+')" style="border:none;background:none;cursor:pointer;font-size:12px" title="Editar">✏️</button><button onclick="event.stopPropagation();delBita('+c.id+','+idx+')" style="border:none;background:none;cursor:pointer;color:#cbd5e1" title="Eliminar">✕</button></td></tr>';
+      '<td style="text-align:center;vertical-align:top;white-space:nowrap"><button onclick="event.stopPropagation();editBita('+c.id+','+idx+')" style="border:none;background:none;cursor:pointer;font-size:12px" title="Editar">✏️</button><button onclick="event.stopPropagation();delBita('+c.id+','+idx+')" style="border:none;background:none;cursor:pointer;color:#cbd5e1" title="Eliminar">✕</button></td>'+
+      '<td style="text-align:center;vertical-align:top"><button onclick="event.stopPropagation();toggleBitaRealizado('+c.id+','+idx+')" style="border:none;background:none;cursor:pointer;font-size:17px;line-height:1" title="'+(e.realizado?'Marcar como no realizada':'Marcar como realizada')+'">'+(e.realizado?'✅':'<span style="display:inline-block;width:17px;height:17px;border:2px solid #d1d5db;border-radius:50%;vertical-align:middle"></span>')+'</button></td></tr>';
   }).join('');
-  document.getElementById('bita-table').innerHTML='<thead><tr><th>Fecha</th><th>Reunión / Comentarios</th><th>Participantes</th><th>Lugar</th><th style="text-align:center">Duración</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:1.2rem">Sin entradas en este periodo.</td></tr>')+'</tbody>';
+  document.getElementById('bita-table').innerHTML='<thead><tr><th>Fecha</th><th>Reunión / Comentarios</th><th>Participantes</th><th>Lugar</th><th style="text-align:center">Duración</th><th></th><th style="text-align:center">Realizada</th></tr></thead><tbody>'+(rows||'<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:1.2rem">Sin entradas en este periodo.</td></tr>')+'</tbody>';
   // estado del formulario
   const editing=bitaEditIdx!=null;
   document.getElementById('b-form-title').textContent=editing?'✏️ Editar entrada':'+ Nueva entrada';
@@ -1060,10 +1061,15 @@ function addBita(){
   const entry={fecha:gv('b-fecha')||new Date().toISOString().split('T')[0],hora:normalizeHora(gv('b-hora')),tema,comentarios:gv('b-com'),participantes:gv('b-part'),lugar:gv('b-lugar'),minutos:parseFloat(gv('b-min'))||0};
   if(!c.bitacora)c.bitacora=[];
   const editing=bitaEditIdx!=null&&c.bitacora[bitaEditIdx];
-  if(editing)c.bitacora[bitaEditIdx]=entry;else c.bitacora.push(entry);
+  if(editing){entry.realizado=c.bitacora[bitaEditIdx].realizado;c.bitacora[bitaEditIdx]=entry;}else c.bitacora.push(entry);
   bitaEditIdx=null;
   ['b-tema','b-com','b-part','b-lugar','b-min','b-fecha','b-hora'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   persist();renderBitacora();renderCalendario();showToast(editing?'✅ Entrada actualizada':'✅ Entrada guardada');
+}
+function toggleBitaRealizado(cid,idx){
+  const c=contacts.find(x=>x.id===cid);if(!c||!c.bitacora||!c.bitacora[idx])return;
+  c.bitacora[idx].realizado=!c.bitacora[idx].realizado;
+  persist();renderBitacora();
 }
 function delBita(cid,idx){
   const c=contacts.find(x=>x.id===cid);if(!c||!c.bitacora)return;
