@@ -981,7 +981,9 @@ function renderBitacora(){
   const termToggle='<button class="fb" style="'+(bitaShowTerm?'background:#0369a1;color:white;border-color:#0369a1':'color:#94a3b8')+'" onclick="toggleBitaTerm()">'+(bitaShowTerm?'✓ ':'')+'Incluir terminados</button>';
   if(!clientes.length){chipsEl.innerHTML=termToggle;document.getElementById('bita-summary').textContent='Aún no hay clientes activos con bitácora. Se activa cuando ganas un cliente.';document.getElementById('bita-table').innerHTML='';document.getElementById('bita-period').innerHTML='';return;}
   if(!bitaClient||!clientes.some(c=>c.id===bitaClient))bitaClient=clientes[0].id;
-  chipsEl.innerHTML=clientes.map(c=>'<button class="fb'+(c.id===bitaClient?' on':'')+'" onclick="setBitaClient('+c.id+')">'+esc(c.emp)+(c.bitacora&&c.bitacora.length?' ('+c.bitacora.length+')':'')+(c.status==='Terminado'?' ✔':'')+'</button>').join('')+'<span style="width:1px;height:16px;background:var(--border);margin:0 3px;align-self:center"></span>'+termToggle;
+  chipsEl.innerHTML='<select onchange="setBitaClient(parseInt(this.value))" style="font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:white;font-family:var(--sans);min-width:220px;outline:none">'+
+    clientes.map(c=>'<option value="'+c.id+'"'+(c.id===bitaClient?' selected':'')+'>'+esc(c.emp)+(c.bitacora&&c.bitacora.length?' ('+c.bitacora.length+')':'')+(c.status==='Terminado'?' ✔':'')+'</option>').join('')+
+    '</select><span style="width:1px;height:16px;background:var(--border);margin:0 3px;align-self:center"></span>'+termToggle;
   const c=contacts.find(x=>x.id===bitaClient);if(!c)return;
   const all=(c.bitacora||[]).slice();
   // selects de periodo
