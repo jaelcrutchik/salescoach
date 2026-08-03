@@ -1173,7 +1173,7 @@ function openDetail(id){
   const c=contacts.find(x=>x.id===id);if(!c)return;
   const m=document.getElementById('detail-modal');
   m.innerHTML=
-    '<h3>'+esc(c.emp)+'</h3>'+
+    '<h3 id="detail-title">'+esc(c.emp)+'</h3>'+
     '<div style="font-size:12px;color:#64748b;margin-bottom:10px">'+esc(c.cont&&c.cont!=='-'?c.cont:'Sin contacto')+(c.cargo&&c.cargo!=='-'?' · '+esc(c.cargo):'')+(c.ciudad?' · '+esc(c.ciudad):'')+'</div>'+
     '<div class="detail-top">'+
       '<select id="d-status" onchange="changeStatus()">'+['Por contactar','Contactado','Respondió','Reunión','Propuesta enviada','Propuesta en conversación','Propuesta aceptada, inicio pendiente','Ganado','Terminado','On hold','No'].map(s=>'<option'+(c.status===s?' selected':'')+'>'+esc(s)+'</option>').join('')+'</select>'+
@@ -1194,6 +1194,7 @@ function openDetail(id){
       '<div class="hist-add"><select class="hist-sel" id="hist-type"><option>Email</option><option>LinkedIn</option><option>WhatsApp</option><option>Llamada</option><option>Reunión</option><option>Nota</option></select><input class="hist-input" id="hist-input" placeholder="¿Qué pasó?" onkeydown="if(event.key===\'Enter\')addHist()"><button class="mini-btn primary" onclick="addHist()">+</button></div>'+
     '</div></div>'+
     '<div class="dsec" id="sec-datos"><div class="dsec-hdr" onclick="toggleSec(\'sec-datos\')"><span class="t">✏️ Datos del contacto</span><span>▾</span></div><div class="dsec-body">'+
+      '<div class="field"><label>Empresa</label><input id="d-emp" value="'+esc(c.emp)+'"></div>'+
       '<div class="field-row"><div class="field"><label>Contacto</label><input id="d-cont" value="'+esc(c.cont)+'"></div><div class="field"><label>Cargo</label><input id="d-cargo" value="'+esc(c.cargo)+'"></div></div>'+
       '<div class="field-row"><div class="field"><label>Canal</label><select id="d-canal">'+['','Email','LinkedIn','WhatsApp','Llamada','Referido','Reunión'].map(x=>'<option value="'+x+'"'+(c.canal===x?' selected':'')+'>'+(x||'-')+'</option>').join('')+'</select></div><div class="field"><label>Ciudad</label><input id="d-ciudad" value="'+esc(c.ciudad)+'"></div></div>'+
       '<div class="field"><label>Cliente de</label><select id="d-owner">'+['','Jael','Rafa'].map(x=>'<option value="'+x+'"'+(c.owner===x?' selected':'')+'>'+(x||'Sin asignar')+'</option>').join('')+'</select></div>'+
@@ -1270,6 +1271,10 @@ function addHist(){
 function saveDetail(){
   const c=contacts.find(x=>x.id===detailId);if(!c)return;
   const gv=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
+  const emp=gv('d-emp');
+  if(!emp){showToast('El nombre de la empresa no puede quedar vacío');return;}
+  c.emp=emp;
+  const titleEl=document.getElementById('detail-title');if(titleEl)titleEl.textContent=emp;
   const prevCanal=c.canal,prevCargo=c.cargo;
   c.cont=gv('d-cont');c.cargo=gv('d-cargo');c.canal=document.getElementById('d-canal').value;
   c.ciudad=gv('d-ciudad');c.owner=document.getElementById('d-owner').value;
