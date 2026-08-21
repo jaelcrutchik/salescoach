@@ -1092,7 +1092,7 @@ function delBita(cid,idx){
 // ---------- CALENDARIO (grilla semanal desde bitácora) ----------
 const CAL_WEEKS=5,CAL_ROWS=28,CAL_START_H=9;
 const DIA_L=['L','M','M','J','V','S','D'];
-const CAL_PALETTE=['#2563eb','#16a34a','#d97706','#7c3aed','#dc2626','#0891b2','#be185d','#65a30d','#ea580c','#4338ca','#0d9488','#9333ea'];
+const CAL_PALETTE=[{bg:'#dbeafe',text:'#1e40af'},{bg:'#dcfce7',text:'#166534'},{bg:'#ede9fe',text:'#6d28d9'},{bg:'#fef9c3',text:'#854d0e'},{bg:'#fce7f3',text:'#9d174c'}];
 let calWeekOffset=0;
 function pad2(n){return n<10?'0'+n:''+n;}
 function mondayOf(d){const dt=new Date(d);const day=(dt.getDay()+6)%7;dt.setDate(dt.getDate()-day);dt.setHours(0,0,0,0);return dt;}
@@ -1106,10 +1106,9 @@ function empAbbrev(emp){
   if(words.length===1)return words[0].slice(0,2).toUpperCase();
   return (words[0][0]+words[1][0]).toUpperCase();
 }
+let calColorMap={};
 function empColor(emp){
-  const s=(emp||'').toLowerCase();
-  let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;
-  return CAL_PALETTE[h%CAL_PALETTE.length];
+  return calColorMap[emp]||CAL_PALETTE[0];
 }
 function calSlotIndex(hora){
   const m=(hora||'').match(/^(\d{1,2}):(\d{2})/);if(!m)return null;
@@ -1136,6 +1135,8 @@ function calBuildIndex(){
 }
 function renderCalendario(){
   const table=document.getElementById('cal-table');if(!table)return;
+  const emps=[...new Set(contacts.filter(c=>(c.bitacora||[]).some(e=>e.hora)).map(c=>c.emp))].sort();
+  calColorMap=Object.fromEntries(emps.map((e,i)=>[e,CAL_PALETTE[i%CAL_PALETTE.length]]));
   const idx=calBuildIndex();
   const today=new Date();today.setHours(0,0,0,0);
   const todayStr=isoDate(today);
@@ -1159,14 +1160,13 @@ function renderCalendario(){
     weeks.forEach(w=>w.days.forEach(d=>{
       const ds=isoDate(d),isWknd=d.getDay()===0||d.getDay()===6;
       const cell=idx[ds]?idx[ds][r]:null;
-      if(cell)rows+='<td title="'+esc(cell.title)+'" style="background:'+cell.color+'22;color:'+cell.color+';font-weight:700">'+esc(cell.abbr)+'</td>';
+      if(cell)rows+='<td title="'+esc(cell.title)+'" style="background:'+cell.color.bg+';color:'+cell.color.text+';font-weight:700">'+esc(cell.abbr)+'</td>';
       else rows+='<td style="'+(isWknd?'background:#fafbfd':'')+'"></td>';
     }));
     rows+='</tr>';
   }
   table.innerHTML=thead+'<tbody>'+rows+'</tbody>';
-  const emps=[...new Set(contacts.filter(c=>(c.bitacora||[]).some(e=>e.hora)).map(c=>c.emp))].sort();
-  document.getElementById('cal-legend').innerHTML=emps.length?emps.map(e=>'<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#475569;margin-right:14px;margin-bottom:4px"><span style="width:10px;height:10px;border-radius:3px;background:'+empColor(e)+';display:inline-block"></span>'+esc(empAbbrev(e))+' — '+esc(e)+'</span>').join(''):'<span style="font-size:12px;color:#94a3b8">Aún no hay sesiones con hora registrada.</span>';
+  document.getElementById('cal-legend').innerHTML=emps.length?emps.map(e=>'<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#475569;margin-right:14px;margin-bottom:4px"><span style="width:10px;height:10px;border-radius:3px;background:'+empColor(e).bg+';border:1px solid '+empColor(e).text+'44;display:inline-block"></span>'+esc(empAbbrev(e))+' — '+esc(e)+'</span>').join(''):'<span style="font-size:12px;color:#94a3b8">Aún no hay sesiones con hora registrada.</span>';
   calSyncSticky();
 }
 function calSyncSticky(){
