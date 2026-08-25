@@ -377,6 +377,7 @@ function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contact
 let contacts=[],nextId=60,activeFilter='todos',ownerFilter='todos',detailId=null,sortCol='default',sortDesc=true,loaded=false;
 let ufValorClp=40820.31;
 let ufPorMes={};
+let lastResumenHoras=null;
 
 // ---------- CONTACTOS DE RAFA (carga automática de una sola vez) ----------
 const RAFA_SEED=[
@@ -947,6 +948,24 @@ function renderSocios(){
     '<tr class="hrs-total-row"><td class="hl">'+totLabel+'</td>'+meses.map((m,i)=>'<td>'+fclp(cRows.reduce((s,r)=>s+cellVal(r,i),0))+'</td>').join('')+'</tr>'+
     '</tbody></table></div>';
 }
+function exportResumenHoras(){
+  const d=lastResumenHoras;if(!d)return;
+  const fh=m=>(m/60).toFixed(1).replace('.',',');
+  const fuf=v=>v.toFixed(1).replace('.',',');
+  const csvRow=arr=>arr.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';');
+  let csv=csvRow(['Cliente',...d.weeks,'HH','UF'])+'\n';
+  d.rows.forEach(r=>{
+    csv+=csvRow([r.emp,...r.perW.map(fh),fh(r.tot),r.ufTot!=null?fuf(r.ufTot):''])+'\n';
+  });
+  csv+=csvRow(['Total',...d.totW.map(fh),fh(d.grand),fuf(d.ufGrand)])+'\n';
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='Horas_'+d.periodo.replace(/[^a-zA-Z0-9]+/g,'_')+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  showToast('⬇ Reporte descargado');
+}
 function renderResumenHoras(){
   const box=document.getElementById('bita-resumen-interno');if(!box)return;
   // Aplica los mismos filtros de mes/semana que la tabla de sesiones
@@ -973,7 +992,8 @@ function renderResumenHoras(){
   const totW=weeks.map((w,i)=>rows.reduce((s,r)=>s+r.perW[i],0));
   const grand=totW.reduce((s,v)=>s+v,0);
   const ufGrand=rows.reduce((s,r)=>s+(r.ufTot||0),0);
-  box.innerHTML='<div class="hrs-title">Horas por cliente · '+periodo+'</div><div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
+  lastResumenHoras={periodo,weeks,rows,totW,grand,ufGrand};
+  box.innerHTML='<div class="hrs-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap"><span>Horas por cliente · '+periodo+'</span><button class="mini-btn" onclick="exportResumenHoras()" style="text-transform:none;letter-spacing:0;font-weight:600" title="Descargar esta tabla como CSV (para enviar a facturar)">⬇ Descargar reporte</button></div><div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
     weeks.map(w=>'<th>'+w+'</th>').join('')+'<th class="hrs-tot">HH</th><th class="hrs-tot" title="Horas × tarifa UF/hora de la ficha del cliente">UF</th></tr></thead><tbody>'+
     rows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perW.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(r.tot)+'</td><td class="hrs-tot">'+(r.ufTot!=null?fuf(r.ufTot):'<span title="Define UF/hora en la ficha del cliente" style="color:#cbd5e1">—</span>')+'</td></tr>').join('')+
     '<tr class="hrs-total-row"><td class="hl">Total</td>'+totW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(grand)+'</td><td class="hrs-tot">'+fuf(ufGrand)+'</td></tr>'+
