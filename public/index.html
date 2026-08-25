@@ -157,6 +157,21 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:8px 16px;border-radius:8px;font-size:12px;opacity:0;transition:opacity 0.3s;z-index:300;pointer-events:none}
 .toast.show{opacity:1}
 @media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.funnel-stages{grid-template-columns:repeat(3,1fr);row-gap:6px}#search-input{width:140px}}
+#print-report{display:none}
+#print-report h1{font-size:18px;margin:0 0 2px}
+#print-report .pr-sub{font-size:12px;color:#64748b;margin-bottom:18px}
+#print-report h2{font-size:14px;margin:18px 0 8px;border-bottom:1px solid #cbd5e1;padding-bottom:4px}
+#print-report h3{font-size:12px;margin:14px 0 4px;color:#334155}
+#print-report table{width:100%;border-collapse:collapse;font-size:10.5px;margin-bottom:6px}
+#print-report th,#print-report td{border:1px solid #cbd5e1;padding:4px 6px;text-align:center}
+#print-report th{background:#f1f5f9}
+#print-report td.l,#print-report th.l{text-align:left}
+#print-report tr.tot td{font-weight:700;background:#f8fafc}
+#print-report .mut{font-size:9.5px;color:#64748b;margin-top:2px}
+@media print{
+  body>*:not(#print-report){display:none!important}
+  #print-report{display:block!important}
+}
 </style>
 </head>
 <body>
@@ -949,22 +964,31 @@ function renderSocios(){
     '</tbody></table></div>';
 }
 function exportResumenHoras(){
-  const d=lastResumenHoras;if(!d)return;
+  const d=lastResumenHoras;if(!d){showToast('No hay datos para exportar en este periodo');return;}
   const fh=m=>(m/60).toFixed(1).replace('.',',');
   const fuf=v=>v.toFixed(1).replace('.',',');
-  const csvRow=arr=>arr.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';');
-  let csv=csvRow(['Cliente',...d.weeks,'HH','UF'])+'\n';
-  d.rows.forEach(r=>{
-    csv+=csvRow([r.emp,...r.perW.map(fh),fh(r.tot),r.ufTot!=null?fuf(r.ufTot):''])+'\n';
+  let html='<h1>Rave &amp; Crutchik — Reporte de horas</h1>'+
+    '<div class="pr-sub">Periodo: '+esc(d.periodo)+' · Generado el '+new Date().toLocaleDateString('es-CL')+'</div>'+
+    '<h2>Horas por cliente</h2>'+
+    '<table><thead><tr><th class="l">Cliente</th>'+d.weeks.map(w=>'<th>'+w+'</th>').join('')+'<th>HH</th><th>UF</th></tr></thead><tbody>'+
+    d.rows.map(r=>'<tr><td class="l">'+esc(r.emp)+'</td>'+r.perW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td><strong>'+fh(r.tot)+'</strong></td><td><strong>'+(r.ufTot!=null?fuf(r.ufTot):'—')+'</strong></td></tr>').join('')+
+    '<tr class="tot"><td class="l">Total</td>'+d.totW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td>'+fh(d.grand)+'</td><td>'+fuf(d.ufGrand)+'</td></tr>'+
+    '</tbody></table>';
+  const sessions=contacts.map(c=>({c,ent:bitaFiltered((c.bitacora||[]).filter(e=>(parseFloat(e.minutos)||0)>0)).sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''))}))
+    .filter(r=>r.ent.length).sort((a,b)=>a.c.emp.localeCompare(b.c.emp));
+  html+='<h2 class="pagebreak">Detalle de reuniones</h2>';
+  sessions.forEach(r=>{
+    html+='<h3>'+esc(r.c.emp)+'</h3>'+
+      '<table><thead><tr><th class="l">Fecha</th><th class="l">Reunión / Comentarios</th><th class="l">Participantes</th><th class="l">Lugar</th><th>Duración</th><th>Realizada</th></tr></thead><tbody>'+
+      r.ent.map(e=>'<tr><td class="l">'+esc(e.fecha||'—')+(e.hora?' · '+esc(e.hora):'')+'</td><td class="l">'+esc(e.tema||'—')+(e.comentarios?'<div class="mut">'+esc(e.comentarios)+'</div>':'')+'</td><td class="l">'+esc(e.participantes||'—')+'</td><td class="l">'+esc(e.lugar||'—')+'</td><td>'+(e.minutos?e.minutos+' min':'—')+'</td><td>'+(e.realizado?'Sí':'No')+'</td></tr>').join('')+
+      '</tbody></table>';
   });
-  csv+=csvRow(['Total',...d.totW.map(fh),fh(d.grand),fuf(d.ufGrand)])+'\n';
-  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download='Horas_'+d.periodo.replace(/[^a-zA-Z0-9]+/g,'_')+'.csv';
-  document.body.appendChild(a);a.click();document.body.removeChild(a);
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-  showToast('⬇ Reporte descargado');
+  const box=document.getElementById('print-report');
+  box.innerHTML=html;
+  const prevTitle=document.title;
+  document.title='Reporte de horas - '+d.periodo;
+  window.print();
+  setTimeout(()=>{document.title=prevTitle;},500);
 }
 function renderResumenHoras(){
   const box=document.getElementById('bita-resumen-interno');if(!box)return;
@@ -993,7 +1017,7 @@ function renderResumenHoras(){
   const grand=totW.reduce((s,v)=>s+v,0);
   const ufGrand=rows.reduce((s,r)=>s+(r.ufTot||0),0);
   lastResumenHoras={periodo,weeks,rows,totW,grand,ufGrand};
-  box.innerHTML='<div class="hrs-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap"><span>Horas por cliente · '+periodo+'</span><button class="mini-btn" onclick="exportResumenHoras()" style="text-transform:none;letter-spacing:0;font-weight:600" title="Descargar esta tabla como CSV (para enviar a facturar)">⬇ Descargar reporte</button></div><div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
+  box.innerHTML='<div class="hrs-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap"><span>Horas por cliente · '+periodo+'</span><button class="mini-btn" onclick="exportResumenHoras()" style="text-transform:none;letter-spacing:0;font-weight:600" title="Genera un PDF con las horas por cliente y el detalle de reuniones del periodo (para enviar a facturar)">⬇ Descargar PDF</button></div><div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
     weeks.map(w=>'<th>'+w+'</th>').join('')+'<th class="hrs-tot">HH</th><th class="hrs-tot" title="Horas × tarifa UF/hora de la ficha del cliente">UF</th></tr></thead><tbody>'+
     rows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perW.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(r.tot)+'</td><td class="hrs-tot">'+(r.ufTot!=null?fuf(r.ufTot):'<span title="Define UF/hora en la ficha del cliente" style="color:#cbd5e1">—</span>')+'</td></tr>').join('')+
     '<tr class="hrs-total-row"><td class="hl">Total</td>'+totW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(grand)+'</td><td class="hrs-tot">'+fuf(ufGrand)+'</td></tr>'+
@@ -1396,6 +1420,6 @@ document.getElementById('day-pill').textContent=DIAS[now.getDay()]+' '+now.getDa
   renderAll();
 })();
 </script>
-
+<div id="print-report"></div>
 </body>
 </html>
