@@ -172,6 +172,19 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
   body>*:not(#print-report){display:none!important}
   #print-report{display:block!important}
 }
+.lean-track{margin-bottom:16px}
+.lean-track-hdr{font-size:13px;font-weight:700;color:#1e293b;margin:0 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.lean-group{font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px}
+.lean-step{display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:8px;cursor:pointer;font-size:13px}
+.lean-step:hover{background:#f8fafc}
+.lean-step .ls-dot{width:15px;height:15px;border-radius:50%;flex-shrink:0;border:2px solid #cbd5e1;box-sizing:border-box}
+.lean-step.curso .ls-dot{background:#f59e0b;border-color:#f59e0b}
+.lean-step.hecho .ls-dot{background:#22c55e;border-color:#22c55e}
+.lean-step.na{opacity:.4}
+.lean-step.na .ls-dot{border-style:dashed}
+.lean-step .ls-txt{flex:1}
+.lean-step.hecho .ls-txt{text-decoration:line-through;color:#94a3b8}
+.lean-step .ls-badge{font-size:10px;font-weight:600;color:#94a3b8;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -190,6 +203,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
     <button class="tab" id="tab-bitacora" onclick="setView('bitacora')">📓 Bitácora</button>
     <button class="tab" id="tab-calendario" onclick="setView('calendario')">🗓️ Calendario</button>
     <button class="tab" id="tab-socios" onclick="setView('socios')">🤝 Socios</button>
+    <button class="tab" id="tab-lean" onclick="setView('lean')">🎯 Ruta Lean</button>
   </div>
   <div id="view-pipeline">
   <div class="tips-box">
@@ -268,6 +282,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
     </div>
     <div class="table-wrap" style="padding:0.9rem" id="socios-clp"></div>
     <p style="font-size:11px;color:#94a3b8;margin-top:8px">La UF se edita mes a mes (fila "Valor UF") porque su valor en pesos varía. La comisión de cada cliente se define en su ficha (Pipeline → Datos del contacto). Solo se listan clientes con UF/hora definida.</p>
+  </div>
+
+  <div id="view-lean" style="display:none">
+    <div class="section-hdr">
+      <div class="section-title">Ruta Lean</div>
+      <div id="lean-client-wrap" style="display:flex;align-items:center;gap:8px;margin-left:auto">
+        <span style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px">Cliente</span>
+        <select id="lean-client-select" class="hist-sel" onchange="setLeanClient(this.value)"></select>
+      </div>
+    </div>
+    <div id="lean-body"></div>
+    <p style="font-size:11px;color:#94a3b8;margin-top:8px">Cada cliente puede trabajar por bloques distintos, no necesariamente en orden ni todos los pasos — marca "No aplica" en lo que no corresponda para este cliente.</p>
   </div>
 </div>
 
@@ -387,7 +413,7 @@ const SEED=[
 {id:49,emp:'Alemán Experto',cont:'(vía Sofi)',cargo:'Dueño',status:'Por contactar',canal:'Referido',accion:'Contactar por Sofi/Berna',notas:'Sofi es esposa del dueño'},
 {id:50,emp:'Ferreterías Lonza',cont:'Simón Lonza',cargo:'Ejecutivo',status:'Contactado',canal:'Email',accion:'Seguimiento en 5 días',notas:'Referido de Luzma. Perfil emprendedor, ecoturismo.',fechaContacto:'2026-06-06',historial:[{fecha:'2026-06-06',tipo:'Email',texto:'Correo personalizado enviado vía Luzma.'}]}
 ];
-function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,com:20,accion:'',notas:'',email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:'',fechaTermino:'',franJugada:'',bitacora:[]},c);}
+function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,com:20,accion:'',notas:'',email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:'',fechaTermino:'',franJugada:'',bitacora:[],leanActive:false,leanSteps:{},leanCustom:{}},c);}
 
 let contacts=[],nextId=60,activeFilter='todos',ownerFilter='todos',detailId=null,sortCol='default',sortDesc=true,loaded=false;
 let ufValorClp=40820.31;
@@ -849,7 +875,7 @@ function renderTips(){
   box.innerHTML=tips.map(t=>'<div class="tip-item'+(t.id?' clickable" onclick="openDetail('+t.id+')':'"')+'"><div class="tip-ico">'+t.icono+'</div><div><div class="tip-label">'+t.label+'</div><div class="tip-text">'+t.texto+'</div></div></div>').join('');
 }
 
-function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderTips();renderBitacora();renderCalendario();renderSocios();}
+function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderTips();renderBitacora();renderCalendario();renderSocios();renderLean();}
 let currentView='pipeline',bitaClient=null,bitaMes='todos',bitaSem='todos',bitaShowTerm=false,bitaEditIdx=null;
 let socView='rc';
 function setSocView(v){socView=v;renderSocios();}
@@ -859,13 +885,16 @@ function setView(v){
   document.getElementById('view-bitacora').style.display=v==='bitacora'?'block':'none';
   document.getElementById('view-calendario').style.display=v==='calendario'?'block':'none';
   document.getElementById('view-socios').style.display=v==='socios'?'block':'none';
+  document.getElementById('view-lean').style.display=v==='lean'?'block':'none';
   document.getElementById('tab-pipeline').classList.toggle('on',v==='pipeline');
   document.getElementById('tab-bitacora').classList.toggle('on',v==='bitacora');
   document.getElementById('tab-calendario').classList.toggle('on',v==='calendario');
   document.getElementById('tab-socios').classList.toggle('on',v==='socios');
+  document.getElementById('tab-lean').classList.toggle('on',v==='lean');
   if(v==='bitacora')renderBitacora();
   if(v==='calendario')renderCalendario();
   if(v==='socios')renderSocios();
+  if(v==='lean')renderLean();
 }
 function isoWeek(dstr){
   const d=new Date(dstr+'T00:00:00');if(isNaN(d))return '';
@@ -877,6 +906,146 @@ function isoWeek(dstr){
 const MESES_L={'01':'Enero','02':'Febrero','03':'Marzo','04':'Abril','05':'Mayo','06':'Junio','07':'Julio','08':'Agosto','09':'Septiembre','10':'Octubre','11':'Noviembre','12':'Diciembre'};
 function mesLabel(ym){return ym==='todos'?'Total':(MESES_L[ym.slice(5,7)]||ym)+' '+ym.slice(0,4);}
 function mesLabelShort(ym){return (MESES_L[ym.slice(5,7)]||ym).slice(0,3).toUpperCase();}
+
+// ---- Ruta Lean: plantilla estándar (basada en el flujo de trabajo real) ----
+const LEAN_TEMPLATE=[
+  {id:'previo',label:'Fase inicial / Venta',steps:[
+    {id:'presentacion',texto:'Presentación de Lean en tu empresa'},
+    {id:'propuesta',texto:'Envío de propuesta'},
+    {id:'entrevistas',texto:'Entrevistas'},
+    {id:'diag_entrevistas',texto:'Diagnóstico entrevistas'},
+    {id:'encuesta_clima',texto:'Encuesta de Clima Laboral'},
+    {id:'diag_clima',texto:'Diagnóstico Clima laboral'},
+    {id:'pit',texto:'Plan de implementación táctico (PIT)'},
+    {id:'objetivos_comunes',texto:'Objetivos comunes (kickoff de las 4 líneas)'},
+  ]},
+  {id:'cultura',label:'Cultura y cambio',steps:[
+    {id:'taller_mvv',group:'Misión y Visión',texto:'Taller de Misión y Visión'},
+    {id:'def_mvv',group:'Misión y Visión',texto:'Definición de Misión y Visión de la empresa'},
+    {id:'plan_comunicacion',group:'Gestión del cambio',texto:'Plan de comunicación interna'},
+    {id:'gestion_resistencias',group:'Gestión del cambio',texto:'Gestión de resistencias'},
+    {id:'embajadores',group:'Gestión del cambio',texto:'Rol de embajadores Lean / agentes de cambio'},
+    {id:'kickoff',group:'Gestión del cambio',texto:'Realización de Kick Off'},
+  ]},
+  {id:'indicadores',label:'Indicadores y procesos',steps:[
+    {id:'taller_kpi',group:'KPI',texto:'Taller de indicadores (KPI)'},
+    {id:'kpi_n1',group:'KPI',texto:'Definición de KPI a medir por área N1'},
+    {id:'kpi_n2',group:'KPI',texto:'Definición de KPI a medir por área N2'},
+    {id:'tableros',group:'Gestión visual',texto:'Definición de tableros de control (KPIs visuales, etc)'},
+    {id:'tableros2',group:'Gestión visual',texto:'Gestión visual en tableros'},
+    {id:'pit_ciclico',group:'Mejora continua',texto:'Planes de implementación táctica (cíclicos)'},
+    {id:'quick_wins_rev',group:'Mejora continua',texto:'Revisión de Quick Wins implementados'},
+    {id:'vsm',group:'Procesos eficientes — mapeo',texto:'Mapeo de flujo de valor por familia'},
+    {id:'armado_flujos',group:'Procesos eficientes — mapeo',texto:'Armado de flujos de trabajo'},
+    {id:'revision_flujos',group:'Procesos eficientes — mapeo',texto:'Revisión de flujos de trabajo'},
+    {id:'def_flujos_eficientes',group:'Procesos eficientes — mapeo',texto:'Definición de flujos eficientes'},
+    {id:'estandarizacion',group:'Procesos eficientes — estandarización',texto:'Estandarización de procesos'},
+    {id:'implementacion_estandarizados',group:'Procesos eficientes — estandarización',texto:'Implementación de flujos estandarizados'},
+    {id:'revision_feedback',group:'Procesos eficientes — estandarización',texto:'Revisión y feedback de mejoras'},
+    {id:'auditoria_roles',group:'Cierre',texto:'Auditoría de roles y responsabilidades'},
+    {id:'kaizen_ciclo',group:'Cierre',texto:'Ciclo de Kaizen mensual/trimestral'},
+    {id:'reconocimiento',group:'Cierre',texto:'Mecanismos de reconocimiento'},
+    {id:'revision_resultados_pit',group:'Cierre',texto:'Revisión de resultados obtenidos en base al PIT'},
+    {id:'lecciones',group:'Cierre',texto:'Lecciones aprendidas'},
+    {id:'pct_quick_wins',group:'Cierre',texto:'% de Quick Wins implementados'},
+    {id:'pct_procesos_estandarizados',group:'Cierre',texto:'% de procesos estandarizados'},
+    {id:'niveles_satisfaccion',group:'Cierre',texto:'Niveles de satisfacción del empleado (barómetro)'},
+  ]},
+  {id:'personas',label:'Personas y estructura',steps:[
+    {id:'rev_actividades',group:'Rutina y actividades',texto:'Revisión de actividades diarias'},
+    {id:'rev_distribucion',group:'Rutina y actividades',texto:'Revisión de distribución de tareas'},
+    {id:'taller_mejora_continua',group:'Mejora continua',texto:'Taller de Mejora continua'},
+    {id:'resolucion_estructurada',group:'Mejora continua',texto:'Resolución estructurada de problemas (A3, PDCA, Kaizen)'},
+    {id:'rev_estructura_org',group:'Estructura organizacional',texto:'Revisión estructura organizacional'},
+    {id:'matriz_habilidades',group:'Estructura organizacional',texto:'Definición de matriz de habilidades'},
+    {id:'taller_roles',group:'Estructura organizacional',texto:'Taller de estructura de roles y definición de cargo'},
+    {id:'def_estructura_org',group:'Estructura organizacional',texto:'Definición de estructura organizacional'},
+    {id:'taller_feedback',group:'Desarrollo de personas',texto:'Taller de Feedback / Coaching'},
+    {id:'disc',group:'Desarrollo de personas',texto:'Gestión de liderazgo: realización de DISC'},
+  ]},
+  {id:'rutinas',label:'Rutinas diarias',steps:[
+    {id:'agenda',texto:'Organización de agenda semanal/mensual'},
+    {id:'taller_reuniones',texto:'Taller de reuniones'},
+    {id:'gestion_visual',texto:'Gestión visual'},
+    {id:'ddd',texto:'Implementación de DdD (Dirección diaria)'},
+  ]},
+];
+const LEAN_STATUS_LABEL={pendiente:'Pendiente',curso:'En curso',hecho:'Hecho',na:'No aplica'};
+const LEAN_NEXT_STATUS={pendiente:'curso',curso:'hecho',hecho:'na',na:'pendiente'};
+let leanClient=null;
+function leanStatus(c,trackId,stepId){
+  return (c.leanSteps&&c.leanSteps[trackId+'.'+stepId])||'pendiente';
+}
+function cycleLean(cid,trackId,stepId){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  if(!c.leanSteps)c.leanSteps={};
+  const key=trackId+'.'+stepId;
+  c.leanSteps[key]=LEAN_NEXT_STATUS[c.leanSteps[key]||'pendiente'];
+  persist();renderLean();
+}
+function cycleLeanCustom(cid,trackId,stepId){
+  const c=contacts.find(x=>x.id===cid);if(!c||!c.leanCustom||!c.leanCustom[trackId])return;
+  const item=c.leanCustom[trackId].find(s=>s.id===stepId);if(!item)return;
+  item.status=LEAN_NEXT_STATUS[item.status||'pendiente'];
+  persist();renderLean();
+}
+function addLeanCustom(cid,trackId){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const input=document.getElementById('lean-add-'+trackId);if(!input)return;
+  const texto=(input.value||'').trim();if(!texto)return;
+  if(!c.leanCustom)c.leanCustom={};
+  if(!c.leanCustom[trackId])c.leanCustom[trackId]=[];
+  c.leanCustom[trackId].push({id:'c'+Date.now(),texto,status:'pendiente'});
+  input.value='';
+  persist();renderLean();
+}
+function delLeanCustom(cid,trackId,stepId){
+  const c=contacts.find(x=>x.id===cid);if(!c||!c.leanCustom||!c.leanCustom[trackId])return;
+  if(!confirm('¿Eliminar este paso?'))return;
+  c.leanCustom[trackId]=c.leanCustom[trackId].filter(s=>s.id!==stepId);
+  persist();renderLean();
+}
+function setLeanClient(id){leanClient=parseInt(id,10);renderLean();}
+function leanStepRow(cid,trackId,stepId,texto,status,isCustom){
+  const fn=isCustom?'cycleLeanCustom':'cycleLean';
+  return '<div class="lean-step '+status+'" onclick="'+fn+'('+cid+',\''+trackId+'\',\''+stepId+'\')"><span class="ls-dot"></span><span class="ls-txt">'+esc(texto)+'</span><span class="ls-badge">'+LEAN_STATUS_LABEL[status]+'</span>'+
+    (isCustom?'<span onclick="event.stopPropagation();delLeanCustom('+cid+',\''+trackId+'\',\''+stepId+'\')" title="Eliminar paso" style="color:#cbd5e1;padding:0 2px 0 6px">✕</span>':'')+'</div>';
+}
+function renderLean(){
+  const box=document.getElementById('lean-body');if(!box)return;
+  const wrap=document.getElementById('lean-client-wrap');
+  const clients=contacts.filter(c=>c.leanActive).sort((a,b)=>a.emp.localeCompare(b.emp));
+  if(!clients.length){
+    wrap.style.display='none';
+    box.innerHTML='<div class="tips-box" style="color:#94a3b8;font-size:13px;padding:1rem">Ningún cliente tiene activada la Ruta Lean todavía. Actívala en <strong>Pipeline → ficha del cliente → Datos del contacto → Implementa Lean</strong>.</div>';
+    return;
+  }
+  wrap.style.display='flex';
+  if(!leanClient||!clients.some(c=>c.id===leanClient))leanClient=clients[0].id;
+  document.getElementById('lean-client-select').innerHTML=clients.map(c=>'<option value="'+c.id+'"'+(c.id===leanClient?' selected':'')+'>'+esc(c.emp)+'</option>').join('');
+  const c=contacts.find(x=>x.id===leanClient);if(!c)return;
+  let totalDone=0,totalCount=0;
+  const trackHtml=LEAN_TEMPLATE.map(track=>{
+    let lastGroup,stepsHtml='',doneT=0,countT=0;
+    track.steps.forEach(s=>{
+      const st=leanStatus(c,track.id,s.id);
+      if(st!=='na'){countT++;if(st==='hecho')doneT++;}
+      if(s.group&&s.group!==lastGroup){stepsHtml+='<div class="lean-group">'+esc(s.group)+'</div>';lastGroup=s.group;}
+      stepsHtml+=leanStepRow(c.id,track.id,s.id,s.texto,st,false);
+    });
+    (c.leanCustom&&c.leanCustom[track.id]||[]).forEach(s=>{
+      const st=s.status||'pendiente';
+      if(st!=='na'){countT++;if(st==='hecho')doneT++;}
+      stepsHtml+=leanStepRow(c.id,track.id,s.id,s.texto,st,true);
+    });
+    totalDone+=doneT;totalCount+=countT;
+    const pct=countT?Math.round(doneT/countT*100):0;
+    return '<div class="lean-track"><div class="lean-track-hdr">'+esc(track.label)+' <span style="font-weight:400;color:#94a3b8">— '+doneT+'/'+countT+' ('+pct+'%)</span></div>'+stepsHtml+
+      '<div style="display:flex;gap:6px;margin-top:8px"><input id="lean-add-'+track.id+'" placeholder="+ agregar paso propio de este cliente" style="flex:1;font-size:12px;padding:6px 9px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans)" onkeydown="if(event.key===\'Enter\')addLeanCustom('+c.id+',\''+track.id+'\')"><button class="mini-btn" onclick="addLeanCustom('+c.id+',\''+track.id+'\')">+</button></div></div>';
+  }).join('');
+  const overallPct=totalCount?Math.round(totalDone/totalCount*100):0;
+  box.innerHTML='<div class="tips-box" style="margin-bottom:14px"><strong>'+esc(c.emp)+'</strong> · Progreso general: <strong>'+totalDone+'/'+totalCount+'</strong> pasos hechos ('+overallPct+'%) <span style="color:#94a3b8;font-size:11px">— haz click en un paso para pasar Pendiente → En curso → Hecho → No aplica</span></div>'+trackHtml;
+}
 function entryUf(e,contactUf){return parseFloat(e.ufHora)||contactUf||0;}
 function bitaClientList(){
   return contacts.filter(c=>{
@@ -1276,6 +1445,7 @@ function openDetail(id){
       '<div class="field-row"><div class="field"><label>Contacto</label><input id="d-cont" value="'+esc(c.cont)+'"></div><div class="field"><label>Cargo</label><input id="d-cargo" value="'+esc(c.cargo)+'"></div></div>'+
       '<div class="field-row"><div class="field"><label>Canal</label><select id="d-canal">'+['','Email','LinkedIn','WhatsApp','Llamada','Referido','Reunión'].map(x=>'<option value="'+x+'"'+(c.canal===x?' selected':'')+'>'+(x||'-')+'</option>').join('')+'</select></div><div class="field"><label>Ciudad</label><input id="d-ciudad" value="'+esc(c.ciudad)+'"></div></div>'+
       '<div class="field"><label>Cliente de</label><select id="d-owner">'+['','Jael','Rafa'].map(x=>'<option value="'+x+'"'+(c.owner===x?' selected':'')+'>'+(x||'Sin asignar')+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input id="d-lean" type="checkbox" style="width:auto"'+(c.leanActive?' checked':'')+'> Implementa Lean (aparece en la pestaña Ruta Lean)</label></div>'+
       '<div class="field-row3"><div class="field"><label>UF/hora</label><input id="d-uf" type="number" step="0.1" value="'+(c.uf||'')+'"></div><div class="field"><label>Horas est.</label><input id="d-horas" type="number" value="'+(c.horas||'')+'"></div><div class="field"><label>Comisión mensual (%)</label><input id="d-com" type="number" step="1" min="0" max="100" value="'+(c.com??20)+'" title="% que gana el dueño de este cliente sobre la base 50/50 entre Jael y Rafa"></div></div>'+
       '<div class="field"><label>Email</label><input id="d-email" value="'+esc(c.email)+'"></div>'+
       '<div class="field"><label>Próxima acción</label><input id="d-accion" value="'+esc(c.accion)+'"></div>'+
@@ -1356,6 +1526,7 @@ function saveDetail(){
   const prevCanal=c.canal,prevCargo=c.cargo;
   c.cont=gv('d-cont');c.cargo=gv('d-cargo');c.canal=document.getElementById('d-canal').value;
   c.ciudad=gv('d-ciudad');c.owner=document.getElementById('d-owner').value;
+  c.leanActive=document.getElementById('d-lean').checked;
   c.uf=parseFloat(gv('d-uf'))||0;c.horas=parseInt(gv('d-horas'))||0;c.com=parseFloat(gv('d-com'))||0;
   c.email=gv('d-email');c.accion=gv('d-accion');c.notas=gv('d-notas');
   c.contexto=gv('d-contexto');c.diagDolor=gv('d-dolor');
