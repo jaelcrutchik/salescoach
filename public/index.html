@@ -963,22 +963,34 @@ function renderSocios(){
     '<tr class="hrs-total-row"><td class="hl">'+totLabel+'</td>'+meses.map((m,i)=>'<td>'+fclp(cRows.reduce((s,r)=>s+cellVal(r,i),0))+'</td>').join('')+'</tr>'+
     '</tbody></table></div>';
 }
-function exportResumenHoras(){
+function exportResumenHoras(onlyClient){
   const d=lastResumenHoras;if(!d){showToast('No hay datos para exportar en este periodo');return;}
   const fh=m=>(m/60).toFixed(1).replace('.',',');
   const fuf=v=>v.toFixed(1).replace('.',',');
-  let html='<h1>Rave &amp; Crutchik — Reporte de horas</h1>'+
+  let clientEmp=null;
+  if(onlyClient){
+    const cSel=contacts.find(x=>x.id===bitaClient);
+    if(!cSel){showToast('Selecciona un cliente primero');return;}
+    clientEmp=cSel.emp;
+  }
+  const rows=clientEmp?d.rows.filter(r=>r.emp===clientEmp):d.rows;
+  if(clientEmp&&!rows.length){showToast('Ese cliente no tiene horas en este periodo');return;}
+  const totW=clientEmp?d.weeks.map((w,i)=>rows.reduce((s,r)=>s+r.perW[i],0)):d.totW;
+  const grand=clientEmp?totW.reduce((s,v)=>s+v,0):d.grand;
+  const ufGrand=clientEmp?rows.reduce((s,r)=>s+(r.ufTot||0),0):d.ufGrand;
+  let html='<h1>Rave &amp; Crutchik — Reporte de horas'+(clientEmp?' · '+esc(clientEmp):'')+'</h1>'+
     '<div class="pr-sub">Periodo: '+esc(d.periodo)+' · Generado el '+new Date().toLocaleDateString('es-CL')+'</div>'+
-    '<h2>Horas por cliente</h2>'+
-    '<table><thead><tr><th class="l">Cliente</th>'+d.weeks.map(w=>'<th>'+w+'</th>').join('')+'<th>HH</th><th>UF</th></tr></thead><tbody>'+
-    d.rows.map(r=>'<tr><td class="l">'+esc(r.emp)+'</td>'+r.perW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td><strong>'+fh(r.tot)+'</strong></td><td><strong>'+(r.ufTot!=null?fuf(r.ufTot):'—')+'</strong></td></tr>').join('')+
-    '<tr class="tot"><td class="l">Total</td>'+d.totW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td>'+fh(d.grand)+'</td><td>'+fuf(d.ufGrand)+'</td></tr>'+
+    '<h2>Horas'+(clientEmp?'':' por cliente')+'</h2>'+
+    '<table><thead><tr>'+(clientEmp?'':'<th class="l">Cliente</th>')+d.weeks.map(w=>'<th>'+w+'</th>').join('')+'<th>HH</th><th>UF</th></tr></thead><tbody>'+
+    rows.map(r=>'<tr>'+(clientEmp?'':'<td class="l">'+esc(r.emp)+'</td>')+r.perW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td><strong>'+fh(r.tot)+'</strong></td><td><strong>'+(r.ufTot!=null?fuf(r.ufTot):'—')+'</strong></td></tr>').join('')+
+    (rows.length>1?'<tr class="tot"><td class="l">Total</td>'+totW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td>'+fh(grand)+'</td><td>'+fuf(ufGrand)+'</td></tr>':'')+
     '</tbody></table>';
-  const sessions=contacts.map(c=>({c,ent:bitaFiltered((c.bitacora||[]).filter(e=>(parseFloat(e.minutos)||0)>0)).sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''))}))
+  let sessions=contacts.map(c=>({c,ent:bitaFiltered((c.bitacora||[]).filter(e=>(parseFloat(e.minutos)||0)>0)).sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''))}))
     .filter(r=>r.ent.length).sort((a,b)=>a.c.emp.localeCompare(b.c.emp));
+  if(clientEmp)sessions=sessions.filter(r=>r.c.emp===clientEmp);
   html+='<h2 class="pagebreak">Detalle de reuniones</h2>';
   sessions.forEach(r=>{
-    html+='<h3>'+esc(r.c.emp)+'</h3>'+
+    html+=(clientEmp?'':'<h3>'+esc(r.c.emp)+'</h3>')+
       '<table><thead><tr><th class="l">Fecha</th><th class="l">Reunión / Comentarios</th><th class="l">Participantes</th><th class="l">Lugar</th><th>Duración</th><th>Realizada</th></tr></thead><tbody>'+
       r.ent.map(e=>'<tr><td class="l">'+esc(e.fecha||'—')+(e.hora?' · '+esc(e.hora):'')+'</td><td class="l">'+esc(e.tema||'—')+(e.comentarios?'<div class="mut">'+esc(e.comentarios)+'</div>':'')+'</td><td class="l">'+esc(e.participantes||'—')+'</td><td class="l">'+esc(e.lugar||'—')+'</td><td>'+(e.minutos?e.minutos+' min':'—')+'</td><td>'+(e.realizado?'Sí':'No')+'</td></tr>').join('')+
       '</tbody></table>';
@@ -986,7 +998,7 @@ function exportResumenHoras(){
   const box=document.getElementById('print-report');
   box.innerHTML=html;
   const prevTitle=document.title;
-  document.title='Reporte de horas - '+d.periodo;
+  document.title='Reporte de horas'+(clientEmp?' - '+clientEmp:'')+' - '+d.periodo;
   window.print();
   setTimeout(()=>{document.title=prevTitle;},500);
 }
@@ -1017,7 +1029,11 @@ function renderResumenHoras(){
   const grand=totW.reduce((s,v)=>s+v,0);
   const ufGrand=rows.reduce((s,r)=>s+(r.ufTot||0),0);
   lastResumenHoras={periodo,weeks,rows,totW,grand,ufGrand};
-  box.innerHTML='<div class="hrs-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap"><span>Horas por cliente · '+periodo+'</span><button class="mini-btn" onclick="exportResumenHoras()" style="text-transform:none;letter-spacing:0;font-weight:600" title="Genera un PDF con las horas por cliente y el detalle de reuniones del periodo (para enviar a facturar)">⬇ Descargar PDF</button></div><div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
+  const bitaClientObj=contacts.find(x=>x.id===bitaClient);
+  box.innerHTML='<div class="hrs-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap"><span>Horas por cliente · '+periodo+'</span><span style="display:flex;gap:6px;flex-wrap:wrap">'+
+    '<button class="mini-btn" onclick="exportResumenHoras()" style="text-transform:none;letter-spacing:0;font-weight:600" title="PDF con las horas de todos los clientes y el detalle de reuniones del periodo (para enviar a facturar)">⬇ PDF completo</button>'+
+    (bitaClientObj?'<button class="mini-btn" onclick="exportResumenHoras(true)" style="text-transform:none;letter-spacing:0;font-weight:600" title="PDF con solo los datos de '+esc(bitaClientObj.emp)+', para enviárselo directamente">⬇ PDF de '+esc(bitaClientObj.emp)+'</button>':'')+
+    '</span></div><div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
     weeks.map(w=>'<th>'+w+'</th>').join('')+'<th class="hrs-tot">HH</th><th class="hrs-tot" title="Horas × tarifa UF/hora de la ficha del cliente">UF</th></tr></thead><tbody>'+
     rows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perW.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(r.tot)+'</td><td class="hrs-tot">'+(r.ufTot!=null?fuf(r.ufTot):'<span title="Define UF/hora en la ficha del cliente" style="color:#cbd5e1">—</span>')+'</td></tr>').join('')+
     '<tr class="hrs-total-row"><td class="hl">Total</td>'+totW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(grand)+'</td><td class="hrs-tot">'+fuf(ufGrand)+'</td></tr>'+
