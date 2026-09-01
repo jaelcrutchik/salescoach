@@ -325,6 +325,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
       <div class="field"><label>Reunión / Tema *</label><input id="b-tema" type="text" placeholder="ej: Taller de indicadores"></div>
       <div class="field"><label>Comentarios / Acuerdos</label><textarea id="b-com" placeholder="Qué se revisó, acuerdos, pendientes..."></textarea></div>
       <div class="field"><label>Participantes</label><input id="b-part" type="text" placeholder="ej: Roberto, Andrea"></div>
+      <div class="field"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input id="b-split-on" type="checkbox" style="width:auto" onchange="toggleBitaSplit(this.checked)"> Reparto especial de esta sesión (más de 2 personas)</label></div>
+      <div id="b-split-rows" style="display:none">
+        <div class="field-row"><div class="field"><label>Persona 1</label><input id="b-split-n1" type="text" placeholder="ej: Paulo"></div><div class="field"><label>%</label><input id="b-split-p1" type="number" step="0.1" value="34"></div></div>
+        <div class="field-row"><div class="field"><label>Persona 2</label><input id="b-split-n2" type="text" placeholder="ej: Rafa"></div><div class="field"><label>%</label><input id="b-split-p2" type="number" step="0.1" value="33"></div></div>
+        <div class="field-row"><div class="field"><label>Persona 3</label><input id="b-split-n3" type="text" placeholder="ej: Jael"></div><div class="field"><label>%</label><input id="b-split-p3" type="number" step="0.1" value="33"></div></div>
+      </div>
       <div style="display:flex;gap:8px;align-items:center"><button class="btn-s" id="b-save" onclick="addBita()">Guardar entrada</button><button class="btn-c" id="b-cancel" style="display:none" onclick="cancelBitaEdit()">Cancelar edición</button><span id="b-edit-hint" style="display:none;font-size:11px;color:var(--amber)">✏️ Editando entrada existente</span></div>
     </div>
     <div class="table-wrap"><table class="ctable" id="bita-table"></table></div>
@@ -1742,6 +1748,18 @@ function renderPilares(){
   });
 }
 function entryUf(e,contactUf){return parseFloat(e.ufHora)||contactUf||0;}
+function bitaEntryClp(c,e){
+  const mes=(e.fecha||'').slice(0,7);
+  const uf=(parseFloat(e.minutos)||0)/60*entryUf(e,parseFloat(c.uf)||0);
+  return uf*(ufPorMes[mes]||ufValorClp);
+}
+function bitaSplitHtml(c,e){
+  if(!e.splitEspecial||!e.splitEspecial.length)return '';
+  const total=bitaEntryClp(c,e);
+  const fclp=v=>'$'+Math.round(v).toLocaleString('es-CL');
+  const parts=e.splitEspecial.map(s=>esc(s.nombre)+' '+fclp(total*(s.pct||0)/100)+' ('+s.pct+'%)').join(' · ');
+  return '<div style="font-size:10.5px;color:#7c3aed;margin-top:3px">👥 '+parts+'</div>';
+}
 function bitaClientList(){
   return contacts.filter(c=>{
     const tiene=['Ganado','Terminado'].includes(c.status)||(c.bitacora&&c.bitacora.length);
@@ -1944,7 +1962,7 @@ function renderBitacora(){
       (e.hora?'<div style="font-size:11px;color:#64748b;margin-top:2px">🕐 '+esc(e.hora)+' hrs</div>':'')+
       '<div style="font-size:10px;color:#94a3b8;margin-top:2px">'+isoWeek(e.fecha)+'</div></td>'+
       '<td style="white-space:normal;vertical-align:top"><div style="font-weight:600;font-size:12px">'+esc(e.tema||'—')+'</div>'+(e.comentarios?'<div style="font-size:11px;color:#64748b;margin-top:2px;line-height:1.45">'+esc(e.comentarios)+'</div>':'')+'</td>'+
-      '<td style="white-space:normal;vertical-align:top;font-size:11px;color:#64748b">'+esc(e.participantes||'—')+'</td>'+
+      '<td style="white-space:normal;vertical-align:top;font-size:11px;color:#64748b">'+esc(e.participantes||'—')+bitaSplitHtml(c,e)+'</td>'+
       '<td style="white-space:normal;vertical-align:top;font-size:11px;color:#64748b">'+esc(e.lugar||'—')+'</td>'+
       '<td style="text-align:center;vertical-align:top">'+(e.minutos?e.minutos+' min':'—')+(e.ufHora?'<div style="font-size:10px;color:#b45309;margin-top:2px" title="Esta sesi&#243;n se cobr&#243; a esta tarifa, distinta al UF/hora actual de la ficha">'+String(e.ufHora).replace('.',',')+' UF/h</div>':'')+'</td>'+
       '<td style="text-align:center;vertical-align:top;white-space:nowrap"><button onclick="event.stopPropagation();editBita('+c.id+','+idx+')" style="border:none;background:none;cursor:pointer;font-size:12px" title="Editar">✏️</button><button onclick="event.stopPropagation();delBita('+c.id+','+idx+')" style="border:none;background:none;cursor:pointer;color:#cbd5e1" title="Eliminar">✕</button></td>'+
@@ -1965,12 +1983,19 @@ function editBita(cid,idx){
   const e=c.bitacora[idx];
   const sv=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
   sv('b-fecha',e.fecha);sv('b-hora',e.hora);sv('b-min',e.minutos||'');sv('b-lugar',e.lugar);sv('b-tema',e.tema);sv('b-com',e.comentarios);sv('b-part',e.participantes);sv('b-uf',e.ufHora||'');
+  resetBitaSplitForm();
+  if(e.splitEspecial&&e.splitEspecial.length){
+    document.getElementById('b-split-on').checked=true;
+    document.getElementById('b-split-rows').style.display='block';
+    e.splitEspecial.slice(0,3).forEach((s,i)=>{sv('b-split-n'+(i+1),s.nombre);sv('b-split-p'+(i+1),s.pct);});
+  }
   renderBitacora();
   document.getElementById('b-tema').focus();
 }
 function cancelBitaEdit(){
   bitaEditIdx=null;
   ['b-tema','b-com','b-part','b-lugar','b-min','b-fecha','b-hora','b-uf'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  resetBitaSplitForm();
   renderBitacora();
 }
 function horaInput(el){
@@ -1986,19 +2011,37 @@ function normalizeHora(v){
   if(h<0||h>23||mi<0||mi>59)return '';
   return pad2(h)+':'+pad2(mi);
 }
+function toggleBitaSplit(checked){
+  document.getElementById('b-split-rows').style.display=checked?'block':'none';
+}
+function bitaSplitFromForm(){
+  const on=document.getElementById('b-split-on').checked;
+  if(!on)return null;
+  const rows=[1,2,3].map(i=>({nombre:(document.getElementById('b-split-n'+i).value||'').trim(),pct:parseFloat(document.getElementById('b-split-p'+i).value)||0})).filter(r=>r.nombre);
+  return rows.length?rows:null;
+}
 function addBita(){
   const c=contacts.find(x=>x.id===bitaClient);
   if(!c){showToast('Selecciona un cliente primero');return;}
   const gv=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
   const tema=gv('b-tema');
   if(!tema){showToast('Ingresa el tema de la reunión');return;}
-  const entry={fecha:gv('b-fecha')||new Date().toISOString().split('T')[0],hora:normalizeHora(gv('b-hora')),tema,comentarios:gv('b-com'),participantes:gv('b-part'),lugar:gv('b-lugar'),minutos:parseFloat(gv('b-min'))||0,ufHora:parseFloat(gv('b-uf'))||0};
+  const entry={fecha:gv('b-fecha')||new Date().toISOString().split('T')[0],hora:normalizeHora(gv('b-hora')),tema,comentarios:gv('b-com'),participantes:gv('b-part'),lugar:gv('b-lugar'),minutos:parseFloat(gv('b-min'))||0,ufHora:parseFloat(gv('b-uf'))||0,splitEspecial:bitaSplitFromForm()};
   if(!c.bitacora)c.bitacora=[];
   const editing=bitaEditIdx!=null&&c.bitacora[bitaEditIdx];
   if(editing){entry.realizado=c.bitacora[bitaEditIdx].realizado;c.bitacora[bitaEditIdx]=entry;}else c.bitacora.push(entry);
   bitaEditIdx=null;
   ['b-tema','b-com','b-part','b-lugar','b-min','b-fecha','b-hora','b-uf'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  resetBitaSplitForm();
   persist();renderBitacora();renderCalendario();showToast(editing?'✅ Entrada actualizada':'✅ Entrada guardada');
+}
+function resetBitaSplitForm(){
+  document.getElementById('b-split-on').checked=false;
+  document.getElementById('b-split-rows').style.display='none';
+  ['n1','n2','n3'].forEach(k=>{document.getElementById('b-split-'+k).value='';});
+  document.getElementById('b-split-p1').value='34';
+  document.getElementById('b-split-p2').value='33';
+  document.getElementById('b-split-p3').value='33';
 }
 function toggleBitaRealizado(cid,idx){
   const c=contacts.find(x=>x.id===cid);if(!c||!c.bitacora||!c.bitacora[idx])return;
