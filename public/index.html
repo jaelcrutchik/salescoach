@@ -260,6 +260,41 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-terminal .lean-flow-carril-hdr,.lean-terminal .lean-card-hdr{background:#fef3c7}
 .lean-terminal .lean-flow-carril-hdr:hover{background:#fde68a}
 .lean-terminal .lean-card-icon{background:#fde68a}
+/* Columna vertebral sugerida */
+.lean-vertebral{margin:10px 0 14px;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:#f8fafc}
+.lean-vertebral-lbl{font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px}
+.lean-vertebral-row{display:flex;align-items:center;overflow-x:auto;gap:0;padding-bottom:2px}
+.lean-vert-step{flex-shrink:0;font-size:10.5px;font-weight:700;padding:5px 9px;border-radius:20px;background:white;border:1px solid var(--border);color:#64748b;cursor:pointer;white-space:nowrap}
+.lean-vert-step:hover{border-color:#94a3b8}
+.lean-vert-step.curso{background:#fef3c7;border-color:#f59e0b;color:#92400e}
+.lean-vert-step.hecho{background:#dcfce7;border-color:#22c55e;color:#166534}
+.lean-vert-arrow{flex-shrink:0;color:#cbd5e1;font-size:12px;padding:0 3px}
+/* Entrada/salida por frente */
+.lean-flow-io{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:10.5px;color:#94a3b8;font-style:italic;margin-bottom:10px;padding-bottom:8px;border-bottom:1px dashed #e2e8f0}
+.lean-flow-io .lf-io-arrow{font-weight:700;color:#64748b;font-style:normal}
+.lean-flow-continua{margin-top:8px;padding-top:8px;border-top:1px dashed #e2e8f0;font-size:10.5px;color:#94a3b8;cursor:pointer}
+.lean-flow-continua:hover{color:#64748b}
+.lean-flow-continua strong{color:#b45309}
+/* Acciones de mejora compartidas */
+.lean-accion-form{margin-top:6px;padding-top:8px;border-top:1px dashed #e2e8f0}
+.lean-accion-chips{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.lean-accion-chip{display:flex;align-items:center;gap:5px;font-size:10.5px;background:#f8fafc;border:1px solid var(--border);border-radius:6px;padding:3px 6px}
+.lean-accion-chip.cerrada{opacity:.55;text-decoration:line-through}
+.lean-accion-chip .ac-txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lean-accion-chip .ac-check,.lean-accion-chip .ac-x{cursor:pointer;color:#94a3b8;flex-shrink:0}
+.lean-accion-chip .ac-check:hover,.lean-accion-chip .ac-x:hover{color:#1e293b}
+.lean-acciones-summary .lean-accion-row{display:flex;align-items:center;gap:6px;font-size:11.5px;padding:5px 2px;border-bottom:1px solid #f8fafc;flex-wrap:wrap}
+.lean-acciones-summary .lean-accion-row.cerrada{opacity:.55}
+.lean-acciones-summary .lean-accion-row.cerrada .ac-txt{text-decoration:line-through}
+.lean-acciones-summary .ac-tipo-lbl{font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;background:#f1f5f9;padding:1px 6px;border-radius:20px}
+.lean-acciones-summary .ac-txt{font-weight:600;color:#1e293b}
+.lean-acciones-summary .ac-origen{font-size:10.5px;color:#2563eb;cursor:pointer}
+.lean-acciones-summary .ac-origen:hover{text-decoration:underline}
+.lean-acciones-summary .ac-proceso{font-size:10.5px;color:#94a3b8;margin-left:auto}
+.lean-acciones-summary .ac-estado{font-size:10.5px;color:#64748b;cursor:pointer;white-space:nowrap}
+.lean-acciones-summary .ac-x{cursor:pointer;color:#cbd5e1}
+.lean-acciones-summary .ac-x:hover{color:#ef4444}
+.li-rec-badge,.li-accion-badge{font-size:10px}
 .lean-flow-frente{margin-bottom:12px}
 .lean-flow-frente:last-child{margin-bottom:0}
 .lean-flow-frente-hdr{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.3px;padding:2px 0;margin-bottom:6px}
@@ -279,6 +314,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-flow-node .txt{font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
 .lean-flow-node.hecho .txt{color:#166534}
 .lean-flow-node .badge{font-size:9px;color:#94a3b8;margin-top:3px;text-transform:uppercase;letter-spacing:.3px}
+.lean-flow-node.recurrente{border-style:dashed;border-color:#94a3b8}
+.lf-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.lf-tag{font-size:8.5px;font-weight:700;padding:1px 5px;border-radius:20px;white-space:nowrap}
+.lf-tag.indep{background:#e0f2fe;color:#0369a1}
+.lf-tag.conv{background:#fae8ff;color:#a21caf}
+.lf-tag.rec{background:#f1f5f9;color:#64748b}
 .lean-flow-detail{border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:4px;margin-bottom:14px;background:white}
 .lean-flow-detail .lean-meta{padding:0;background:transparent}
 @media(max-width:700px){
@@ -1112,13 +1153,13 @@ const LEAN_CATALOG=[
 {id:8,o:'existente',fa:'Ruta existente',fr:'KPI N1',a:'Taller de indicadores (KPI)',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[5],c:'Taller realizado; asistencia, acuerdos, decisiones y próximos pasos registrados.',e:'Material del taller + asistencia + acta/acuerdos.'},
 {id:9,o:'existente',fa:'Ruta existente',fr:'KPI N1',a:'Definición de KPI a medir por área N1',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[8],c:'Indicador definido con propósito, fórmula, fuente, frecuencia, meta, responsable y reacción.',e:'Ficha del indicador + fuente de datos + tablero o reporte.',ap:1},
 {id:10,o:'existente',fa:'Ruta existente',fr:'KPI N2 e indicadores de proceso',a:'Definición de KPI a medir por área N2',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[9],c:'Indicador definido con propósito, fórmula, fuente, frecuencia, meta, responsable y reacción.',e:'Ficha del indicador + fuente de datos + tablero o reporte.',ap:1},
-{id:11,o:'existente',fa:'Ruta existente',fr:'Gestión diaria',a:'Revisión de actividades diarias',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[5],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.'},
-{id:12,o:'existente',fa:'Ruta existente',fr:'Gestión diaria',a:'Revisión de distribución de tareas',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[11],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.'},
-{id:13,o:'existente',fa:'Ruta existente',fr:'Gestión diaria',a:'Organización de agenda semanal/mensual',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[12],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.'},
-{id:14,o:'existente',fa:'Ruta existente',fr:'Gestión diaria',a:'Taller de reuniones',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[5],c:'Taller realizado; asistencia, acuerdos, decisiones y próximos pasos registrados.',e:'Material del taller + asistencia + acta/acuerdos.'},
-{id:15,o:'existente',fa:'Ruta existente',fr:'Gestión visual',a:'Definición de tableros de control (KPIs visuales, etc)',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[9],c:'Indicador definido con propósito, fórmula, fuente, frecuencia, meta, responsable y reacción.',e:'Ficha del indicador + fuente de datos + tablero o reporte.',ap:1},
-{id:16,o:'existente',fa:'Ruta existente',fr:'Gestión visual',a:'Implementación de DdD',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[14,15],c:'Solución operando en condición real, con responsable y seguimiento definido.',e:'Foto, captura o registro de uso + verificación en terreno.'},
-{id:17,o:'existente',fa:'Ruta existente',fr:'Gestión visual',a:'Gestión visual en tableros',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[16],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.'},
+{id:11,o:'existente',fa:'Ruta existente',fr:'Gestión diaria',a:'Revisión de actividades diarias',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[5],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.',rec:1},
+{id:12,o:'existente',fa:'Ruta existente',fr:'Gestión diaria',a:'Revisión de distribución de tareas',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[11],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.',rec:1},
+{id:13,o:'existente',fa:'Ruta existente',fr:'Gestión diaria',a:'Organización de agenda semanal/mensual',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[12],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.',rec:1},
+{id:14,o:'existente',fa:'Ruta existente',fr:'Gestión diaria',a:'Taller de reuniones',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[5],c:'Taller realizado; asistencia, acuerdos, decisiones y próximos pasos registrados.',e:'Material del taller + asistencia + acta/acuerdos.',rec:1},
+{id:15,o:'existente',fa:'Ruta existente',fr:'Gestión visual',a:'Definición de tableros de control (KPIs visuales, etc)',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[9],c:'Indicador definido con propósito, fórmula, fuente, frecuencia, meta, responsable y reacción.',e:'Ficha del indicador + fuente de datos + tablero o reporte.',ap:1,rec:1},
+{id:16,o:'existente',fa:'Ruta existente',fr:'Gestión visual',a:'Implementación de DdD',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[14,15],c:'Solución operando en condición real, con responsable y seguimiento definido.',e:'Foto, captura o registro de uso + verificación en terreno.',rec:1},
+{id:17,o:'existente',fa:'Ruta existente',fr:'Gestión visual',a:'Gestión visual en tableros',t:'Transversal',car:'Indicadores y gestión',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[16],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.',rec:1},
 {id:18,o:'existente',fa:'Ruta existente',fr:'Comunicación del cambio',a:'Taller Plan de Medios',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[5],c:'Taller realizado; asistencia, acuerdos, decisiones y próximos pasos registrados.',e:'Material del taller + asistencia + acta/acuerdos.'},
 {id:19,o:'existente',fa:'Ruta existente',fr:'Comunicación del cambio',a:'Armado de plan de medios',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[18],c:'Plan documentado con alcance, acciones, responsables, fechas, métricas y aprobación.',e:'Plan versionado + aprobación.',ap:1},
 {id:20,o:'existente',fa:'Ruta existente',fr:'Comunicación del cambio',a:'Fijar reunión de Plan de Medios',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[19],c:'Plan documentado con alcance, acciones, responsables, fechas, métricas y aprobación.',e:'Plan versionado + aprobación.'},
@@ -1141,7 +1182,7 @@ const LEAN_CATALOG=[
 {id:37,o:'existente',fa:'Ruta existente',fr:'Mejoras implementadas',a:'Revisión y feedback de mejoras',t:'Transversal',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[36],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.'},
 {id:38,o:'existente',fa:'Ruta existente',fr:'Roles y responsabilidades',a:'Definición de matriz de habilidades',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[5],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.'},
 {id:39,o:'existente',fa:'Ruta existente',fr:'Roles y responsabilidades',a:'Taller de estructura de roles y definición de cargo',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[38],c:'Taller realizado; asistencia, acuerdos, decisiones y próximos pasos registrados.',e:'Material del taller + asistencia + acta/acuerdos.'},
-{id:40,o:'existente',fa:'Ruta existente',fr:'Feedback y coaching',a:'Taller de Feedback / Coaching',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[39],c:'Taller realizado; asistencia, acuerdos, decisiones y próximos pasos registrados.',e:'Material del taller + asistencia + acta/acuerdos.'},
+{id:40,o:'existente',fa:'Ruta existente',fr:'Feedback y coaching',a:'Taller de Feedback / Coaching',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[39],c:'Taller realizado; asistencia, acuerdos, decisiones y próximos pasos registrados.',e:'Material del taller + asistencia + acta/acuerdos.',rec:1},
 {id:41,o:'existente',fa:'Ruta existente',fr:'Habilidades y desarrollo',a:'Desarrollo humano',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[40],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.'},
 {id:42,o:'existente',fa:'Ruta existente',fr:'Liderazgo y comportamientos',a:'Gestión de liderazgo: realización de DISC',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[5],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.'},
 {id:43,o:'existente',fa:'Ruta existente',fr:'Roles y responsabilidades',a:'Auditoría de roles y responsabilidades',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P4 Implementación estabilizada',ch:'Condicional por diagnóstico',pr:[39],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.',ap:1},
@@ -1322,12 +1363,158 @@ function leanFrenteSort(a,b){
 }
 let leanClient=null,leanView='plan',leanCatOrigen='salescoach',leanFlowMode='seguimiento',leanFlowSelected=null;
 const leanFlowClosedCarriles=new Set(),leanFlowClosedFrentes=new Set();
+// ---- Herramientas de mejora compartidas (A3/PDCA/Kaizen/Quick Win): una sola acción, visible desde varios lugares ----
+const LEAN_ACCION_TIPOS=['A3','PDCA','Kaizen','Quick Win'];
+const LEAN_ACCION_ICON={'A3':'📄','PDCA':'🔄','Kaizen':'⚡','Quick Win':'🏅'};
+const LEAN_ACCION_PROCESOS=[...LEAN_CARRIL_ORDER,'Voz y experiencia del cliente',LEAN_CARRIL_RESULTADOS];
+// ---- Entrada/salida sugerida por frente (visual, no bloqueante) ----
+const LEAN_CARRIL_IO={
+  'Estrategia y alineamiento':{entrada:'PIT aprobado',salida:'Objetivos comunes y estrategia desplegada'},
+  'Cultura, personas y liderazgo':{entrada:'PIT aprobado / kickoff del cambio',salida:'Cultura, roles y liderazgo alineados con el cambio'},
+  'Indicadores y gestión':{entrada:'Objetivos comunes y KPI N1 definidos',salida:'Tableros y gestión diaria funcionando'},
+  'Operación y procesos':{entrada:'VSM/Flujo mapeado y brechas identificadas',salida:'Mejoras implementadas y estandarizadas'},
+  'Voz y experiencia del cliente':{entrada:'PIT aprobado',salida:'Brechas de experiencia priorizadas'}
+};
+// ---- Columna vertebral sugerida (visual, no bloqueante): puerta inicial → frentes → resultados ----
+const LEAN_VERTEBRAL=[
+  {label:'Misión y Visión',car:'Estrategia y alineamiento',fr:'Misión y Visión'},
+  {label:'Objetivos comunes',car:'Estrategia y alineamiento',fr:'Objetivos comunes'},
+  {label:'KPI N1',car:'Indicadores y gestión',fr:'KPI N1'},
+  {label:'VSM / Flujos',car:'Operación y procesos',fr:'VSM / Flujo actual'},
+  {label:'KPI N2',car:'Indicadores y gestión',fr:'KPI N2 e indicadores de proceso'},
+  {label:'Mejoras',car:'Operación y procesos',fr:'Mejoras implementadas'},
+  {label:'Implementación',car:'Operación y procesos',fr:'Mejoras implementadas'},
+  {label:'Resultados',car:LEAN_CARRIL_RESULTADOS,fr:null}
+];
 function leanCatalogById(id){return LEAN_CATALOG.find(x=>x.id===id);}
+// ---- Columna vertebral: franja sugerida (no bloqueante) después de la puerta inicial ----
+function leanVertebralStatus(c,stage){
+  const plan=leanEnsurePlan(c);
+  const rows=Object.keys(plan.items).map(k=>({id:parseInt(k,10),item:plan.items[k],cat:leanCatalogById(parseInt(k,10))}))
+    .filter(r=>r.cat&&r.cat.car===stage.car&&(!stage.fr||r.cat.fr===stage.fr));
+  if(!rows.length)return 'vacio';
+  const applicable=rows.filter(r=>(r.item.status||'pendiente')!=='na');
+  if(!applicable.length)return 'vacio';
+  if(applicable.every(r=>r.item.status==='hecho'))return 'hecho';
+  if(applicable.some(r=>r.item.status==='hecho'||r.item.status==='curso'||r.item.status==='revision'))return 'curso';
+  return 'pendiente';
+}
+function leanVertebralClick(cid,stage){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  if(stage.car===LEAN_CARRIL_RESULTADOS){leanFlowClosedCarriles.delete(LEAN_CARRIL_RESULTADOS);renderLean();return;}
+  leanFlowClosedCarriles.delete(stage.car);
+  if(stage.fr){const key=stage.car+'|'+stage.fr;leanFlowClosedFrentes.delete(key);}
+  renderLean();
+  setTimeout(()=>{
+    const els=[...document.querySelectorAll('#lean-body .lean-flow-carril-hdr .t')].filter(el=>el.textContent.trim()===leanCarrilLabel(stage.car));
+    if(els[0])els[0].closest('.lean-flow-carril').scrollIntoView({behavior:'smooth',block:'center'});
+  },50);
+}
+function leanVertebralHtml(c){
+  const stagesHtml=LEAN_VERTEBRAL.map((s,i)=>{
+    const st=leanVertebralStatus(c,s);
+    const box='<div class="lean-vert-step '+st+'" onclick="leanVertebralClick('+c.id+',LEAN_VERTEBRAL['+i+'])" title="Orden sugerido, no bloqueante">'+esc(s.label)+'</div>';
+    return i<LEAN_VERTEBRAL.length-1?box+'<div class="lean-vert-arrow">→</div>':box;
+  }).join('');
+  return '<div class="lean-vertebral"><div class="lean-vertebral-lbl">Secuencia sugerida después del PIT · no bloquea el avance</div><div class="lean-vertebral-row">'+stagesHtml+'</div></div>';
+}
 function leanEnsurePlan(c){
   if(!c.leanPlan)c.leanPlan={pitAprobado:false,items:{},custom:[]};
   if(!c.leanPlan.items)c.leanPlan.items={};
   if(!c.leanPlan.custom)c.leanPlan.custom=[];
+  if(!c.leanPlan.acciones)c.leanPlan.acciones=[];
   return c.leanPlan;
+}
+// ---- Acciones de mejora (A3/PDCA/Kaizen/Quick Win): se crean desde cualquier actividad, se guardan una sola vez ----
+function leanAccionesEnsure(c){const plan=leanEnsurePlan(c);return plan.acciones;}
+function leanAccionOrigenLabel(cid,ref,isCustom){
+  const c=contacts.find(x=>x.id===cid);if(!c)return '';
+  const plan=leanEnsurePlan(c);
+  if(isCustom){const it=(plan.custom||[]).find(x=>x.id===ref);return it?it.texto:'';}
+  const cat=leanCatalogById(ref);const item=plan.items[ref];
+  return (item&&item.snapTexto)||(cat&&cat.a)||'';
+}
+function leanOrigenFrenteOf(cid,ref,isCustom){
+  const c=contacts.find(x=>x.id===cid);if(!c)return '';
+  if(isCustom){const plan=leanEnsurePlan(c);const it=(plan.custom||[]).find(x=>x.id===ref);return it?it.frente:'';}
+  const cat=leanCatalogById(ref);return cat?cat.car:'';
+}
+function leanCreateAccionFromBtn(btn,cid,ref,isCustom){
+  const wrap=btn.closest('.lean-accion-form');if(!wrap)return;
+  const tipo=wrap.querySelector('.af-tipo').value;
+  const titulo=(wrap.querySelector('.af-titulo').value||'').trim();
+  const proceso=wrap.querySelector('.af-proceso').value;
+  if(!titulo){showToast('Ingresa un título para la acción de mejora');return;}
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const acciones=leanAccionesEnsure(c);
+  acciones.push({id:'ac'+Date.now(),tipo,titulo,origenIsCustom:!!isCustom,origenRef:ref,
+    origenLabel:leanAccionOrigenLabel(cid,ref,isCustom),origenFrente:leanOrigenFrenteOf(cid,ref,isCustom),
+    proceso,estado:'abierta',creada:new Date().toISOString()});
+  persist();renderLean();showToast('✅ Acción de mejora creada');
+}
+function leanToggleAccionEstado(cid,accionId){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const acc=leanAccionesEnsure(c).find(a=>a.id===accionId);if(!acc)return;
+  acc.estado=acc.estado==='cerrada'?'abierta':'cerrada';
+  persist();renderLean();
+}
+function leanDelAccion(cid,accionId){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  if(!confirm('¿Eliminar esta acción de mejora?'))return;
+  const c2=leanAccionesEnsure(c);
+  const idx=c2.findIndex(a=>a.id===accionId);if(idx>=0)c2.splice(idx,1);
+  persist();renderLean();
+}
+function leanFocusOrigen(cid,ref,isCustom){
+  if(cid!==leanClient){leanClient=cid;leanView='plan';}
+  leanFlowMode='flujo';
+  leanFlowSelected={ref,isCustom:!!isCustom};
+  renderLean();
+}
+function leanAccionChipsHtml(cid,ref,isCustom){
+  const c=contacts.find(x=>x.id===cid);if(!c)return '';
+  const mine=leanAccionesEnsure(c).filter(a=>!!a.origenIsCustom===!!isCustom&&a.origenRef===ref);
+  if(!mine.length)return '';
+  return '<div class="lean-accion-chips">'+mine.map(acc=>
+    '<span class="lean-accion-chip'+(acc.estado==='cerrada'?' cerrada':'')+'" title="'+esc(acc.tipo)+' · '+esc(leanCarrilLabel(acc.proceso))+(acc.estado==='cerrada'?' · cerrada':' · abierta')+'">'+
+      '<span class="ac-ico">'+(LEAN_ACCION_ICON[acc.tipo]||'📌')+'</span><span class="ac-txt">'+esc(acc.titulo)+'</span>'+
+      '<span class="ac-check" onclick="leanToggleAccionEstado('+cid+',\''+acc.id+'\')" title="'+(acc.estado==='cerrada'?'Reabrir':'Marcar cerrada')+'">'+(acc.estado==='cerrada'?'✓':'○')+'</span>'+
+      '<span class="ac-x" onclick="leanDelAccion('+cid+',\''+acc.id+'\')" title="Eliminar">✕</span>'+
+    '</span>'
+  ).join('')+'</div>';
+}
+function leanAccionesSummaryHtml(c){
+  const acciones=leanAccionesEnsure(c);
+  if(!acciones.length)return '';
+  const abiertas=acciones.filter(a=>a.estado!=='cerrada').length;
+  const rows=acciones.slice().sort((a,b)=>(a.creada||'').localeCompare(b.creada||'')).map(acc=>{
+    const idArg=acc.origenIsCustom?"'"+acc.origenRef+"'":acc.origenRef;
+    return '<div class="lean-accion-row'+(acc.estado==='cerrada'?' cerrada':'')+'">'+
+      '<span class="ac-ico">'+(LEAN_ACCION_ICON[acc.tipo]||'📌')+'</span>'+
+      '<span class="ac-tipo-lbl">'+esc(acc.tipo)+'</span>'+
+      '<span class="ac-txt">'+esc(acc.titulo)+'</span>'+
+      '<span class="ac-origen" onclick="leanFocusOrigen('+c.id+','+idArg+','+(acc.origenIsCustom?'true':'false')+')" title="Ver actividad de origen en Flujo">↳ '+esc(acc.origenLabel||'origen')+'</span>'+
+      '<span class="ac-proceso">→ '+esc(leanCarrilLabel(acc.proceso))+'</span>'+
+      '<span class="ac-estado" onclick="leanToggleAccionEstado('+c.id+',\''+acc.id+'\')">'+(acc.estado==='cerrada'?'✓ Cerrada':'○ Abierta')+'</span>'+
+      '<span class="ac-x" onclick="leanDelAccion('+c.id+',\''+acc.id+'\')" title="Eliminar">✕</span>'+
+    '</div>';
+  }).join('');
+  return '<div class="lean-track lean-acciones-summary"><div class="lean-track-hdr">📋 Acciones de mejora generadas ('+abiertas+' abierta'+(abiertas===1?'':'s')+' de '+acciones.length+')</div>'+rows+'</div>';
+}
+function leanAccionFormHtml(cid,idArg,ref,isCustom){
+  const tiposOpts=LEAN_ACCION_TIPOS.map(t=>'<option>'+t+'</option>').join('');
+  const procesosOpts=LEAN_ACCION_PROCESOS.map(p=>'<option value="'+esc(p)+'">'+esc(leanCarrilLabel(p))+'</option>').join('');
+  return '<div class="lean-accion-form">'+
+    '<div class="field-row3">'+
+      '<div class="field"><label>Tipo</label><select class="af-tipo">'+tiposOpts+'</select></div>'+
+      '<div class="field" style="grid-column:span 2"><label>Título de la acción</label><input class="af-titulo" type="text" placeholder="ej: Reducir tiempo de espera en recepción"></div>'+
+    '</div>'+
+    '<div class="field-row3">'+
+      '<div class="field" style="grid-column:span 2"><label>Proceso/frente afectado</label><select class="af-proceso">'+procesosOpts+'</select></div>'+
+      '<div class="field" style="align-self:end"><button type="button" class="mini-btn" onclick="leanCreateAccionFromBtn(this,'+cid+','+idArg+','+(isCustom?'true':'false')+')">+ Crear acción</button></div>'+
+    '</div>'+
+    leanAccionChipsHtml(cid,ref,isCustom)+
+  '</div>';
 }
 function leanBlankItem(){return {status:'pendiente',responsable:'',fecha:'',entregable:'',evidencia:'',notas:''};}
 function leanSnapshotOf(cat){const item=leanBlankItem();item.snapTexto=cat.a;item.snapFrente=cat.fr;return item;}
@@ -1473,7 +1660,7 @@ function leanFlowNodeClick(cid,ref,isCustom){
   if(isCustom)leanCycleCustom(cid,ref);else leanCycle(cid,ref);
 }
 function setLeanFlowClose(){leanFlowSelected=null;renderLean();}
-function leanItemMetaPanel(cid,idArg,item,isCustom){
+function leanItemMetaPanel(cid,idArg,item,isCustom,refId){
   const setFn=isCustom?'leanSetMetaCustom':'leanSetMeta';
   return '<div class="lean-meta" hidden>'+
     '<div class="field-row3">'+
@@ -1483,6 +1670,7 @@ function leanItemMetaPanel(cid,idArg,item,isCustom){
     '</div>'+
     '<div class="field"><label>Evidencia</label><input type="text" value="'+esc(item.evidencia||'')+'" placeholder="link o descripción de la evidencia" onchange="'+setFn+'('+cid+','+idArg+',\'evidencia\',this.value)"></div>'+
     '<div class="field"><label>Notas</label><textarea onchange="'+setFn+'('+cid+','+idArg+',\'notas\',this.value)" rows="2">'+esc(item.notas||'')+'</textarea></div>'+
+    (refId!==undefined?'<div class="lean-track-hdr" style="margin-top:8px">🔧 Crear acción de mejora (A3 / PDCA / Kaizen / Quick Win)</div>'+leanAccionFormHtml(cid,idArg,refId,isCustom):'')+
   '</div>';
 }
 function leanItemRow(cid,refId,label,item,isCustom,removable,cat){
@@ -1494,15 +1682,17 @@ function leanItemRow(cid,refId,label,item,isCustom,removable,cat){
   const hasMeta=!!(item.responsable||item.fecha||item.entregable||item.evidencia||item.notas);
   const removeFn=isCustom?'leanDelCustom':'leanRemoveFromPlan';
   const clickHandler=cycleFn+'('+cid+','+idArg+')';
+  const c0=contacts.find(x=>x.id===cid);
+  const hasAccion=c0&&leanAccionesEnsure(c0).some(a=>!!a.origenIsCustom===!!isCustom&&a.origenRef===refId);
   return '<div class="lean-item">'+
     '<div class="lean-step '+st+'" onclick="'+clickHandler+'">'+
-      '<span class="ls-dot"></span><span class="ls-txt">'+esc(label)+(cat&&cat.ap?' <span class="li-approval" title="Requiere aprobación formal">✓</span>':'')+(hasDep?' <span class="li-dep-badge" title="'+esc(depReason)+'">🔗</span>':'')+'</span>'+
+      '<span class="ls-dot"></span><span class="ls-txt">'+esc(label)+(cat&&cat.ap?' <span class="li-approval" title="Requiere aprobación formal">✓</span>':'')+(cat&&cat.rec?' <span class="li-rec-badge" title="Actividad recurrente">↻</span>':'')+(hasDep?' <span class="li-dep-badge" title="'+esc(depReason)+'">🔗</span>':'')+(hasAccion?' <span class="li-accion-badge" title="Tiene una acción de mejora vinculada">🔧</span>':'')+'</span>'+
       (hasMeta?'<span class="li-dot-meta" title="Tiene datos registrados">●</span>':'')+
       '<span class="ls-badge">'+LEAN_STATUS_LABEL[st]+'</span>'+
-      '<span class="li-meta-toggle" onclick="event.stopPropagation();leanToggleMeta(this)" title="Responsable / fecha / entregable / evidencia">⋯</span>'+
+      '<span class="li-meta-toggle" onclick="event.stopPropagation();leanToggleMeta(this)" title="Responsable / fecha / entregable / evidencia / acción de mejora">⋯</span>'+
       (removable!==false?'<span class="li-x" onclick="event.stopPropagation();'+removeFn+'('+cid+','+idArg+')" title="Quitar del plan">✕</span>':'')+
     '</div>'+
-    leanItemMetaPanel(cid,idArg,item,isCustom)+
+    leanItemMetaPanel(cid,idArg,item,isCustom,refId)+
   '</div>';
 }
 function renderLeanPlan(c){
@@ -1608,6 +1798,7 @@ function renderLeanPlan(c){
     '<div style="font-size:12px;color:#94a3b8;margin-bottom:8px">Click en una actividad para pasar de estado — 🔗 = depende de otra actividad sin terminar</div>'+
     ((paraleloCarriles.length||c.vocActive)?('<div class="lean-cards">'+cardsHtml+'</div>'):'<div class="tips-box" style="color:#94a3b8;font-size:13px;margin-bottom:14px">Aún no hay actividades en el plan de este cliente (fuera de la puerta inicial). Agrégalas desde el catálogo.</div>')+
     resultadosHtml+
+    leanAccionesSummaryHtml(c)+
     '<div class="lean-addbar"><button class="mini-btn primary" onclick="setLeanView(\'catalogo\')">📚 Agregar actividades desde el catálogo</button></div>'+
     '<div class="lean-track"><div class="lean-track-hdr">+ Actividad personalizada (fuera del catálogo)</div>'+
       '<div class="field-row"><div class="field"><label>Frente</label><input id="lean-custom-frente" placeholder="ej: Bodega"></div><div class="field"><label>Actividad</label><input id="lean-custom-texto" placeholder="ej: Rediseño de picking"></div></div>'+
@@ -1713,14 +1904,26 @@ function renderLeanFlujo(c){
     if(!r.isCustom&&succIds.includes(r.ref))return 'succ';
     return '';
   };
+  // ---- Clasificación visual de relaciones: independiente / convergencia / recurrente (secuencia = flechas ya existentes) ----
+  const succCountOf=id=>LEAN_CATALOG.filter(x=>x.pr&&x.pr.includes(id)&&plan.items[x.id]).length;
+  const predsPresentOf=cat=>(cat&&cat.pr?cat.pr.filter(pid=>plan.items[pid]):[]);
   const leanFlowNode=(r,suggestedRef)=>{
     const st=r.item.status||'pendiente';
     const state=nodeState(r);
     const suggested=r.ref===suggestedRef&&!r.isCustom;
     const idArg=r.isCustom?"'"+r.ref+"'":r.ref;
-    const cls=['lean-flow-node',st,state,suggested?'suggested':''].filter(Boolean).join(' ');
+    const predsPresent=r.isCustom?[]:predsPresentOf(r.cat);
+    const independent=!r.isCustom&&predsPresent.length===0&&succCountOf(r.ref)===0;
+    const convergente=predsPresent.length>1;
+    const recurrente=!!(r.cat&&r.cat.rec);
+    const cls=['lean-flow-node',st,state,suggested?'suggested':'',recurrente?'recurrente':''].filter(Boolean).join(' ');
     return '<div class="'+cls+'" title="'+esc(r.label)+'" onclick="leanFlowNodeClick('+c.id+','+idArg+','+(r.isCustom?'true':'false')+')">'+
       '<div class="txt">'+esc(r.label)+(r.cat&&r.cat.ap?' <span class="li-approval" title="Requiere aprobación formal">✓</span>':'')+'</div>'+
+      '<div class="lf-tags">'+
+        (independent?'<span class="lf-tag indep" title="No depende de otra actividad ni es predecesora de otra — puede ejecutarse en paralelo, en cualquier momento">🔓 Independiente</span>':'')+
+        (convergente?'<span class="lf-tag conv" title="Convergen '+predsPresent.length+' actividades antes de esta">🔀 Convergencia</span>':'')+
+        (recurrente?'<span class="lf-tag rec" title="Actividad recurrente, se repite en el ciclo de gestión">↻ Recurrente</span>':'')+
+      '</div>'+
       '<div class="badge">'+LEAN_STATUS_LABEL[st]+'</div>'+
     '</div>';
   };
@@ -1753,9 +1956,12 @@ function renderLeanFlujo(c){
         laneHtml+
       '</div>';
     }).join('');
+    const io=LEAN_CARRIL_IO[g.car];
+    const ioHtml=(io&&!closed)?'<div class="lean-flow-io"><span class="lf-io-in">◀ '+esc(io.entrada)+'</span><span class="lf-io-arrow">→ '+esc(leanCarrilLabel(g.car))+' →</span><span class="lf-io-out">'+esc(io.salida)+' ▶</span></div>':'';
+    const continuaHtml=(io&&!closed&&g.car!==LEAN_CARRIL_RESULTADOS)?'<div class="lean-flow-continua" onclick="leanVertebralClick('+c.id+',{car:LEAN_CARRIL_RESULTADOS,fr:null})">↳ El flujo continúa en <strong>'+esc(leanCarrilLabel(LEAN_CARRIL_RESULTADOS))+'</strong></div>':'';
     return '<div class="lean-flow-carril">'+
       '<div class="lean-flow-carril-hdr" onclick="toggleLeanFlowCarril(\''+carJs+'\')"><span class="chev">'+(closed?'▸':'▾')+'</span><span>'+leanCarrilIcon(g.car)+'</span><span class="t">'+esc(leanCarrilLabel(g.car))+'</span><span class="cnt">'+g.doneCount+'/'+g.applicable.length+'</span></div>'+
-      (closed?'':'<div class="lean-flow-carril-body">'+bodyHtml+'</div>')+
+      (closed?'':'<div class="lean-flow-carril-body">'+ioHtml+bodyHtml+continuaHtml+'</div>')+
     '</div>';
   };
   const carrilesHtml=paraleloCarriles.map(leanFlowCarrilHtml).join('')+(c.vocActive?vocFlowLaneHtml(c):'');
@@ -1776,7 +1982,7 @@ function renderLeanFlujo(c){
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><strong style="font-size:13.5px">'+esc(label||'')+'</strong><span class="ls-badge" style="font-size:11px">'+LEAN_STATUS_LABEL[st]+'</span><span style="margin-left:auto;font-size:11px;color:#94a3b8;cursor:pointer" onclick="setLeanFlowClose()">✕ Cerrar</span></div>'+
         (isCustom?'':'<div style="font-size:11.5px;color:#64748b;margin-bottom:3px"><strong>Viene antes:</strong> '+esc(predTxt)+'</div>'+
         '<div style="font-size:11.5px;color:#64748b;margin-bottom:8px"><strong>Viene después:</strong> '+esc(succTxt)+'</div>')+
-        leanItemMetaPanel(c.id,idArg,item,isCustom).replace(' hidden','')+
+        leanItemMetaPanel(c.id,idArg,item,isCustom,leanFlowSelected.ref).replace(' hidden','')+
       '</div>';
     }
   }
@@ -1790,10 +1996,12 @@ function renderLeanFlujo(c){
       '<div class="lean-gate2-hdr"><div class="t">Puerta inicial '+(gateDone>=gateEntries.length?'completada':'en curso')+'</div><button class="lean-gate2-badge '+(plan.pitAprobado?'on':'off')+'" onclick="toggleLeanPit('+c.id+')">'+(plan.pitAprobado?'PIT aprobado':'PIT pendiente')+'</button></div>'+
       '<div class="lean-gate2-steps">'+gateHtml+'</div>'+
     '</div>'+
+    leanVertebralHtml(c)+
     '<div class="section-hdr" style="margin-bottom:2px"><div class="section-title" style="font-size:14px">Frentes en paralelo</div><div style="display:flex;gap:6px;margin-left:auto"><button class="fb" onclick="setLeanFlowMode(\'seguimiento\')">Seguimiento</button><button class="fb on" onclick="setLeanFlowMode(\'flujo\')">Flujo</button></div></div>'+
     '<div style="font-size:12px;color:#94a3b8;margin-bottom:8px">Click en una actividad para pasar de estado y ver de dónde viene / hacia dónde va — borde azul = siguiente sugerida (no bloquea el resto)</div>'+
     ((paraleloCarriles.length||c.vocActive)?carrilesHtml:'<div class="tips-box" style="color:#94a3b8;font-size:13px;margin-bottom:14px">Aún no hay actividades en el plan de este cliente (fuera de la puerta inicial). Agrégalas desde el catálogo.</div>')+
     resultadosFlowHtml+
+    leanAccionesSummaryHtml(c)+
     detailHtml+
     vocFlowDetailHtml(c)+
     '<div class="lean-addbar"><button class="mini-btn primary" onclick="setLeanView(\'catalogo\')">📚 Agregar actividades desde el catálogo</button></div>'+
