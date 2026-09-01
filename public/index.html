@@ -209,6 +209,61 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-cat-row .lc-txt{flex:1}
 .lean-cat-row .lc-tag{font-size:9.5px;color:#7c3aed;background:#ede9fe;padding:1px 7px;border-radius:99px;white-space:nowrap}
 .lean-cat-row .lc-inplan{font-size:11px;color:#16a34a;font-weight:600;white-space:nowrap}
+.lean-summary{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 18px;background:white;border:1px solid var(--border);border-radius:14px;margin-bottom:14px;flex-wrap:wrap}
+.lean-summary .t{font-size:18px;font-weight:700;color:#1e293b}
+.lean-summary .s{font-size:13px;color:#64748b;margin-top:3px;max-width:640px}
+.lean-summary-pct{text-align:right;min-width:150px}
+.lean-summary-pct .lbl{font-size:12px;color:#64748b;margin-bottom:6px}
+.lean-summary-pct .val{font-size:20px;font-weight:700;color:#1e293b}
+.lean-pbar{width:150px;height:7px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin-top:6px}
+.lean-pbar>div{height:100%;background:#22c55e;border-radius:99px}
+.lean-gate2{border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:18px;background:white}
+.lean-gate2-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.lean-gate2-hdr .t{font-size:14px;font-weight:700;color:#1e293b}
+.lean-gate2-badge{font-size:11px;font-weight:700;padding:5px 12px;border-radius:99px;cursor:pointer;border:none;font-family:var(--sans)}
+.lean-gate2-badge.on{background:#dcfce7;color:#166534}
+.lean-gate2-badge.off{background:#fef3c7;color:#92400e}
+.lean-gate2-steps{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+.lean-gate2-step{flex:1;min-width:160px;background:#f8fafc;border-radius:10px;padding:12px 14px;cursor:pointer;border:1px solid transparent}
+.lean-gate2-step.hecho{background:#dcfce7}
+.lean-gate2-step.curso{background:#fef3c7}
+.lean-gate2-step.pendiente{background:#f8fafc}
+.lean-gate2-step.blocked{cursor:not-allowed;opacity:.7}
+.lean-gate2-step .t{font-size:13px;font-weight:700;color:#1e293b;margin-bottom:3px}
+.lean-gate2-step .s{font-size:12px;color:#64748b}
+.lean-gate2-arrow{display:flex;align-items:center;color:#94a3b8;font-size:16px;flex:0 0 auto}
+.lean-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:760px){.lean-cards{grid-template-columns:1fr}}
+.lean-card{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:white;cursor:pointer}
+.lean-card.sel{border-color:#2563eb;box-shadow:0 0 0 1px #2563eb}
+.lean-card.locked{opacity:.6}
+.lean-card-hdr{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.lean-card-icon{width:30px;height:30px;border-radius:8px;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.lean-card-hdr .txt{min-width:0}
+.lean-card-hdr .t{font-size:13.5px;font-weight:700;color:#1e293b}
+.lean-card-hdr .s{font-size:11px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lean-card-hdr .cnt{margin-left:auto;font-size:12px;color:#94a3b8;font-weight:600;flex-shrink:0}
+.lean-card-status{border-radius:8px;padding:8px 10px;margin-bottom:10px}
+.lean-card-status.curso,.lean-card-status.pendiente{background:#fef3c7}
+.lean-card-status.hecho{background:#dcfce7}
+.lean-card-status.blocked{background:#fef2f2}
+.lean-card-status .lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.lean-card-status.curso .lbl,.lean-card-status.pendiente .lbl{color:#92400e}
+.lean-card-status.hecho .lbl{color:#166534}
+.lean-card-status.blocked .lbl{color:#991b1b}
+.lean-card-status .txt{font-size:12.5px;color:#1e293b;font-weight:600;margin-top:2px}
+.lean-card-foot{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.lean-card-foot button{font-size:11.5px;padding:6px 11px;border:1px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-family:var(--sans);font-weight:600}
+.lean-card-foot button:hover{background:#f8fafc}
+.lean-detail{border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:16px;background:white}
+.lean-detail .t{font-size:15px;font-weight:700;color:#1e293b;margin-bottom:2px}
+.lean-detail .sub{font-size:12.5px;color:#94a3b8;margin-bottom:14px}
+.lean-detail-lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#94a3b8;margin-bottom:3px}
+.lean-detail-val{font-size:13.5px;color:#1e293b;margin-bottom:12px}
+.lean-detail-note{background:#eff6ff;color:#1d4ed8;border-radius:8px;padding:10px 12px;font-size:12.5px;margin-bottom:4px}
+.lean-detail-note.blocked{background:#fef2f2;color:#991b1b}
+.lean-detail-items{margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
+.lean-detail-items>.hdr{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
 .pilar-table{width:100%;border-collapse:collapse;font-size:12.5px}
 .pilar-table th{background:#f1f5f9;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;padding:6px 8px;text-align:left;border-bottom:1px solid var(--border)}
 .pilar-table td{padding:4px;vertical-align:top;border-bottom:1px solid #f1f5f9}
@@ -1176,7 +1231,25 @@ const LEAN_ORIGEN_LABEL={existente:'Ruta de consultoría (actual)',salescoach:'P
 const LEAN_ORIGEN_ORDER=['salescoach','existente','shingo_ls','shingo_hb'];
 const LEAN_FASE_INICIAL_IDS=[177,178,1,2,3,4,5];
 const LEAN_STATUS_LABEL={pendiente:'Pendiente',curso:'En curso',revision:'En revisión',hecho:'Hecho',na:'No aplica'};
-let leanClient=null,leanView='plan',leanCatOrigen='salescoach';
+const LEAN_GATE_CARRIL='Diagnóstico y PIT';
+const LEAN_CARRIL_LABEL={'Diagnóstico y PIT':'Diagnóstico y PIT','Clima laboral':'Clima laboral','Estrategia y alineamiento':'Estrategia y alineamiento','Indicadores y gestión visual':'Indicadores y gestión','Cultura y cambio':'Cultura y cambio','Procesos y mejora continua':'Procesos eficientes','Personas y liderazgo':'Personas y liderazgo','Pre-implementación comercial':'Pre-implementación comercial','Alcance empresarial':'Alcance empresarial','Cadena operativa':'Cadena operativa','Resultados y sostenibilidad':'Resultados y sostenibilidad'};
+function leanCarrilLabel(car){return LEAN_CARRIL_LABEL[car]||car;}
+function leanCarrilIcon(car){
+  const s=(car||'').toLowerCase();
+  if(s.includes('cultura')||s.includes('cambio'))return '🧑‍🤝‍🧑';
+  if(s.includes('indicador'))return '📊';
+  if(s.includes('clima'))return '🌤️';
+  if(s.includes('proceso'))return '🔀';
+  if(s.includes('persona')||s.includes('liderazgo'))return '👥';
+  if(s.includes('estrategia')||s.includes('alineamiento'))return '🎯';
+  if(s.includes('comercial')||s.includes('pre-implementación'))return '🤝';
+  if(s.includes('diagnóstico')||s.includes('pit'))return '🧭';
+  if(s.includes('alcance'))return '🏢';
+  if(s.includes('cadena')||s.includes('operativa'))return '🔗';
+  if(s.includes('resultado')||s.includes('sostenibilidad'))return '🏆';
+  return '📁';
+}
+let leanClient=null,leanView='plan',leanCatOrigen='salescoach',leanCarrilSel=null;
 function leanCatalogById(id){return LEAN_CATALOG.find(x=>x.id===id);}
 function leanEnsurePlan(c){
   if(!c.leanPlan)c.leanPlan={pitAprobado:false,items:{},custom:[]};
@@ -1266,6 +1339,25 @@ function leanCycleCustom(cid,customId){
   it.status=seq[(i+1)%seq.length];
   persist();renderLean();
 }
+function leanGateIds(){return LEAN_FASE_INICIAL_IDS.filter(id=>{const cat=leanCatalogById(id);return cat&&cat.car===LEAN_GATE_CARRIL;});}
+function leanAdvance(cid,refId,isCustom){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const plan=leanEnsurePlan(c);
+  const it=isCustom?plan.custom.find(x=>x.id===refId):plan.items[refId];
+  if(!it)return;
+  const cat=isCustom?null:leanCatalogById(refId);
+  const cur=it.status||'pendiente';
+  if(cur==='hecho'||cur==='na'){showToast('Esta actividad ya está completa');return;}
+  if(cat){
+    const reason=leanBlockedReason(cid,cat);
+    if(reason){leanBlockedToast(reason);return;}
+  }
+  const seq=(cat&&cat.ap)?['pendiente','curso','revision','hecho']:['pendiente','curso','hecho'];
+  const i=seq.indexOf(cur);
+  it.status=seq[Math.min(i+1,seq.length-1)];
+  persist();renderLean();
+}
+function setLeanCarril(car){leanCarrilSel=car;renderLean();}
 function leanSetMeta(cid,catId,field,value){
   const c=contacts.find(x=>x.id===cid);if(!c)return;
   const plan=leanEnsurePlan(c);
@@ -1314,7 +1406,7 @@ function leanFilterCatalogo(v){
 }
 function setLeanView(v){leanView=v;renderLean();}
 function setLeanCatOrigen(o){leanCatOrigen=o;renderLean();}
-function setLeanClient(id){leanClient=parseInt(id,10);leanView='plan';renderLean();}
+function setLeanClient(id){leanClient=parseInt(id,10);leanView='plan';leanCarrilSel=null;renderLean();}
 function leanItemMetaPanel(cid,idArg,item,isCustom){
   const setFn=isCustom?'leanSetMetaCustom':'leanSetMeta';
   return '<div class="lean-meta" hidden>'+
@@ -1351,50 +1443,131 @@ function leanItemRow(cid,refId,label,item,isCustom,removable,cat){
 function renderLeanPlan(c){
   const box=document.getElementById('lean-body');
   const plan=leanEnsurePlan(c);
-  const faseHtml=LEAN_FASE_INICIAL_IDS.map(id=>{
+  const gateIds=leanGateIds();
+
+  // ---- Puerta inicial (núcleo: Entrevistas → Diagnóstico → PIT) ----
+  const gateEntries=gateIds.map(id=>{
     const cat=leanCatalogById(id);
     const item=plan.items[id]||leanSnapshotOf(cat);
-    return leanItemRow(c.id,id,item.snapTexto||cat.a,item,false,false,cat);
+    return {ref:id,label:item.snapTexto||cat.a,item,cat};
+  });
+  const gateDone=gateEntries.filter(g=>g.item.status==='hecho').length;
+  const gateHtml=gateEntries.map((g,i)=>{
+    const st=g.item.status||'pendiente';
+    const blockedReason=leanBlockedReason(c.id,g.cat);
+    const isBlocked=!!blockedReason&&st!=='hecho'&&st!=='na';
+    const reasonJs=blockedReason?blockedReason.replace(/\\/g,'\\\\').replace(/'/g,"\\'"):'';
+    const clickHandler=isBlocked?"leanBlockedToast('"+reasonJs+"')":('leanCycle('+c.id+','+g.ref+')');
+    let caption=isBlocked?'Bloqueada':LEAN_STATUS_LABEL[st];
+    if(st==='hecho'&&g.item.evidencia)caption='Hecho · evidencia registrada';
+    const box2='<div class="lean-gate2-step '+(isBlocked?'blocked':st)+'" onclick="'+clickHandler+'"><div class="t">'+esc(g.label)+'</div><div class="s">'+esc(caption)+'</div></div>';
+    return i<gateEntries.length-1?box2+'<div class="lean-gate2-arrow">→</div>':box2;
   }).join('');
-  const faseDone=LEAN_FASE_INICIAL_IDS.filter(id=>(plan.items[id]||{}).status==='hecho').length;
 
-  const groups={};const frenteOrder=[];
+  // ---- Agrupación por carril (frentes en paralelo) ----
+  const groups={};const carrilOrder=[];
   Object.keys(plan.items).forEach(k=>{
     const id=parseInt(k,10);
-    if(LEAN_FASE_INICIAL_IDS.includes(id))return;
+    if(gateIds.includes(id))return;
     const cat=leanCatalogById(id);if(!cat)return;
     const item=plan.items[k];
-    const frName=item.snapFrente||cat.fr;
-    if(!groups[frName]){groups[frName]=[];frenteOrder.push(frName);}
-    groups[frName].push({ref:id,label:item.snapTexto||cat.a,item,isCustom:false,cat});
+    const car=cat.car||'Otros';
+    if(!groups[car]){groups[car]=[];carrilOrder.push(car);}
+    groups[car].push({ref:id,label:item.snapTexto||cat.a,item,isCustom:false,cat});
   });
   (plan.custom||[]).forEach(cu=>{
-    if(!groups[cu.frente]){groups[cu.frente]=[];frenteOrder.push(cu.frente);}
-    groups[cu.frente].push({ref:cu.id,label:cu.texto,item:cu,isCustom:true,cat:null});
+    const car=cu.frente;
+    if(!groups[car]){groups[car]=[];carrilOrder.push(car);}
+    groups[car].push({ref:cu.id,label:cu.texto,item:cu,isCustom:true,cat:null});
   });
-  frenteOrder.sort((a,b)=>a.localeCompare(b));
+  carrilOrder.sort((a,b)=>leanCarrilLabel(a).localeCompare(leanCarrilLabel(b)));
 
-  let totalDone=faseDone,totalCount=LEAN_FASE_INICIAL_IDS.length;
-  const frentesHtml=frenteOrder.map(fr=>{
-    const rows=groups[fr];
+  const carriles=carrilOrder.map(car=>{
+    const rows=groups[car];
     const applicable=rows.filter(r=>(r.item.status||'pendiente')!=='na');
     const doneCount=applicable.filter(r=>r.item.status==='hecho').length;
-    totalDone+=doneCount;totalCount+=applicable.length;
     const pct=applicable.length?Math.round(doneCount/applicable.length*100):0;
-    const rowsHtml=plan.pitAprobado?rows.map(r=>leanItemRow(c.id,r.ref,r.label,r.item,r.isCustom,true,r.cat)).join(''):'<div class="lean-lock-msg">🔒 Se desbloquea cuando el PIT esté aprobado</div>';
-    return '<div class="lean-track'+(plan.pitAprobado?'':' locked')+'"><div class="lean-track-hdr">'+esc(fr)+' <span style="font-weight:400;color:#94a3b8">— '+doneCount+'/'+applicable.length+' ('+pct+'%)</span></div>'+rowsHtml+'</div>';
+    const sorted=rows.slice().sort((a,b)=>(typeof a.ref==='number'?a.ref:1e9)-(typeof b.ref==='number'?b.ref:1e9));
+    let current=sorted.find(r=>(r.item.status||'pendiente')==='curso');
+    if(!current)current=sorted.find(r=>{const st=r.item.status||'pendiente';return st!=='hecho'&&st!=='na';});
+    const subFrentes=[...new Set(rows.map(r=>r.cat?r.cat.fr:r.item.frente).filter(Boolean))];
+    return {car,rows,sorted,applicable,doneCount,pct,current,subFrentes};
+  });
+
+  let totalDone=gateDone,totalCount=gateEntries.filter(g=>g.item.status!=='na').length;
+  carriles.forEach(g=>{totalDone+=g.doneCount;totalCount+=g.applicable.length;});
+  const overallPct=totalCount?Math.round(totalDone/totalCount*100):0;
+  const activos=carriles.filter(g=>g.pct<100).length;
+  const paraleloTxt=carriles.length===0?'sin frentes activos todavía':(activos+' frente'+(activos===1?'':'s')+' avanzando en paralelo');
+  const estado=gateDone<gateEntries.length?'Puerta inicial en curso':(overallPct===100?'Implementación completa':'Implementación en curso');
+
+  // ---- Cards de frentes ----
+  const cardsHtml=carriles.map(g=>{
+    const locked=!plan.pitAprobado;
+    let statusCls='hecho',statusLbl='Hecho',statusTxt='Todas las actividades completas';
+    if(g.current){
+      const st=g.current.item.status||'pendiente';
+      const blockedReason=g.current.cat?leanBlockedReason(c.id,g.current.cat):null;
+      const isBlocked=!!blockedReason&&st!=='hecho'&&st!=='na';
+      statusCls=isBlocked?'blocked':st;
+      statusLbl=isBlocked?'Bloqueada':LEAN_STATUS_LABEL[st];
+      statusTxt=g.current.label;
+    }
+    const canAdvance=g.current&&!locked;
+    const advArgs=g.current?(c.id+','+(g.current.isCustom?"'"+g.current.ref+"'":g.current.ref)+','+(g.current.isCustom?'true':'false')):'';
+    return '<div class="lean-card'+(leanCarrilSel===g.car?' sel':'')+(locked?' locked':'')+'" onclick="setLeanCarril(\''+esc(g.car).replace(/'/g,"\\'")+'\')">'+
+      '<div class="lean-card-hdr"><div class="lean-card-icon">'+leanCarrilIcon(g.car)+'</div><div class="txt"><div class="t">'+esc(leanCarrilLabel(g.car))+'</div>'+(g.subFrentes.length?'<div class="s">'+esc(g.subFrentes.join(', '))+'</div>':'')+'</div><div class="cnt">'+g.doneCount+'/'+g.applicable.length+'</div></div>'+
+      '<div class="lean-card-status '+statusCls+'"><div class="lbl">'+esc(statusLbl)+'</div><div class="txt">'+esc(statusTxt)+'</div></div>'+
+      '<div class="lean-card-foot">'+(g.current?'<button onclick="event.stopPropagation();'+(canAdvance?'leanAdvance('+advArgs+')':"showToast('🔒 Se desbloquea cuando el PIT esté aprobado')")+'">Completar siguiente</button>':'')+'</div>'+
+    '</div>';
   }).join('');
 
-  const faseApplicable=LEAN_FASE_INICIAL_IDS.filter(id=>(plan.items[id]||{}).status!=='na');
-  const overallApplicable=faseApplicable.length+frenteOrder.reduce((s,fr)=>s+groups[fr].filter(r=>(r.item.status||'pendiente')!=='na').length,0);
-  const overallDone=faseDone+frenteOrder.reduce((s,fr)=>s+groups[fr].filter(r=>r.item.status==='hecho').length,0);
-  const overallPct=overallApplicable?Math.round(overallDone/overallApplicable*100):0;
+  // ---- Panel de detalle del frente seleccionado ----
+  if(!leanCarrilSel||!carriles.some(g=>g.car===leanCarrilSel))leanCarrilSel=carriles.length?carriles[0].car:null;
+  let detailHtml='';
+  if(leanCarrilSel){
+    const g=carriles.find(x=>x.car===leanCarrilSel);
+    let depVal='Sin dependencia interna.',noteHtml='',noteCls='';
+    if(g.current){
+      if(g.current.cat&&g.current.cat.pr&&g.current.cat.pr.length){
+        depVal='Depende de completar: '+g.current.cat.pr.map(pid=>{const p=leanCatalogById(pid);return p?p.a:'#'+pid;}).join(', ')+'.';
+      }
+      const blockedReason=g.current.cat?leanBlockedReason(c.id,g.current.cat):null;
+      if(blockedReason){
+        noteCls='blocked';
+        noteHtml='🔒 Bloqueada — falta completar: '+blockedReason.replace('Falta: ','')+'.';
+      }else{
+        noteHtml='Puede avanzar aunque otros frentes estén pendientes.';
+      }
+      const unlocks=g.current.cat?LEAN_CATALOG.filter(x=>x.pr&&x.pr.includes(g.current.cat.id)).map(x=>x.a):[];
+      var desbloqueaVal=unlocks.length?unlocks.join(', '):'No desbloquea otras actividades directamente.';
+    }else{
+      var desbloqueaVal='—';
+    }
+    const itemsHtml=g.sorted.map(r=>leanItemRow(c.id,r.ref,r.label,r.item,r.isCustom,true,r.cat)).join('');
+    detailHtml='<div class="lean-detail">'+
+      '<div class="t">'+esc(leanCarrilLabel(g.car))+'</div>'+
+      '<div class="sub">'+g.doneCount+' de '+g.applicable.length+' actividades hechas</div>'+
+      (g.current?('<div class="lean-detail-lbl">Actividad actual</div><div class="lean-detail-val">'+esc(g.current.label)+'</div>'+
+        '<div class="lean-detail-lbl">Dependencia interna</div><div class="lean-detail-val">'+esc(depVal)+'</div>'+
+        '<div class="lean-detail-note'+(noteCls?' '+noteCls:'')+'">'+esc(noteHtml)+'</div>'+
+        '<div class="lean-detail-lbl" style="margin-top:12px">Desbloquea</div><div class="lean-detail-val" style="margin-bottom:0">'+esc(desbloqueaVal)+'</div>')
+      :'<div class="lean-detail-val">🎉 Todas las actividades de este frente están completas.</div>')+
+      '<div class="lean-detail-items"><div class="hdr">Todas las actividades de este frente</div>'+itemsHtml+'</div>'+
+    '</div>';
+  }
+
   box.innerHTML=
-    '<div class="tips-box" style="margin-bottom:14px"><strong>'+esc(c.emp)+'</strong> · Progreso general: <strong>'+overallDone+'/'+overallApplicable+'</strong> ('+overallPct+'%) <span style="color:#94a3b8;font-size:11px">— click en una actividad para pasar Pendiente → En curso → (En revisión si requiere aprobación ✓) → Hecho → No aplica. El ⋯ abre responsable/fecha/entregable/evidencia. 🔒 = bloqueada por una predecesora sin terminar.</span></div>'+
-    '<div class="lean-track"><div class="lean-track-hdr">Fase inicial / Venta <span style="font-weight:400;color:#94a3b8">— '+faseDone+'/'+faseApplicable.length+'</span></div>'+faseHtml+'</div>'+
-    '<div class="lean-gate'+(plan.pitAprobado?' on':'')+'" onclick="toggleLeanPit('+c.id+')">'+(plan.pitAprobado?'🔓 PIT aprobado — frentes desbloqueados (click para revertir)':'🔒 PIT pendiente de aprobación — click aquí cuando el PIT esté aprobado para desbloquear los frentes')+'</div>'+
-    frentesHtml+
-    (frenteOrder.length===0?'<div class="tips-box" style="color:#94a3b8;font-size:13px;margin-top:8px">Aún no hay actividades en el plan de este cliente (fuera de la fase inicial). Agrégalas desde el catálogo.</div>':'')+
+    '<div class="lean-summary">'+
+      '<div><div class="t">'+esc(c.emp)+' · '+esc(estado)+'</div><div class="s">'+totalDone+' de '+totalCount+' pasos hechos · PIT '+(plan.pitAprobado?'aprobado':'pendiente')+' · '+esc(paraleloTxt)+'</div></div>'+
+      '<div class="lean-summary-pct"><div class="lbl">Avance general '+overallPct+'%</div><div class="lean-pbar"><div style="width:'+overallPct+'%"></div></div></div>'+
+    '</div>'+
+    '<div class="lean-gate2">'+
+      '<div class="lean-gate2-hdr"><div class="t">Puerta inicial '+(gateDone>=gateEntries.length?'completada':'en curso')+'</div><button class="lean-gate2-badge '+(plan.pitAprobado?'on':'off')+'" onclick="toggleLeanPit('+c.id+')">'+(plan.pitAprobado?'PIT aprobado':'PIT pendiente')+'</button></div>'+
+      '<div class="lean-gate2-steps">'+gateHtml+'</div>'+
+    '</div>'+
+    '<div class="section-hdr" style="margin-bottom:8px"><div class="section-title" style="font-size:14px">Frentes en paralelo</div><span style="font-size:12px;color:#94a3b8;margin-left:auto">Selecciona un frente para ver su detalle</span></div>'+
+    (carriles.length?('<div class="lean-cards">'+cardsHtml+'</div>'+detailHtml):'<div class="tips-box" style="color:#94a3b8;font-size:13px;margin-bottom:14px">Aún no hay actividades en el plan de este cliente (fuera de la puerta inicial). Agrégalas desde el catálogo.</div>')+
     '<div class="lean-addbar"><button class="mini-btn primary" onclick="setLeanView(\'catalogo\')">📚 Agregar actividades desde el catálogo</button></div>'+
     '<div class="lean-track"><div class="lean-track-hdr">+ Actividad personalizada (fuera del catálogo)</div>'+
       '<div class="field-row"><div class="field"><label>Frente</label><input id="lean-custom-frente" placeholder="ej: Bodega"></div><div class="field"><label>Actividad</label><input id="lean-custom-texto" placeholder="ej: Rediseño de picking"></div></div>'+
