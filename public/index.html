@@ -1785,6 +1785,16 @@ function partnerSplit(c,clp){
   if(c.owner==='Rafa')return{jael:clp*(100-ownerShare)/100,rafa:clp*ownerShare/100};
   return{jael:clp/2,rafa:clp/2};
 }
+function partnerSplitEntry(c,e,clp){
+  if(e.splitEspecial&&e.splitEspecial.length){
+    const pct=name=>{
+      const found=e.splitEspecial.find(s=>(s.nombre||'').trim().toLowerCase()===name);
+      return found?parseFloat(found.pct)||0:0;
+    };
+    return{jael:clp*pct('jael')/100,rafa:clp*pct('rafa')/100};
+  }
+  return partnerSplit(c,clp);
+}
 function setUfMes(mes,v){
   const cleaned=String(v).replace(/[^0-9,.-]/g,'').replace(/\./g,'').replace(',','.');
   const n=parseFloat(cleaned);
@@ -1828,10 +1838,18 @@ function renderSocios(){
   // ---- Tabla 2: conversión a CLP (UF editable por mes) + reparto ----
   const cRows=conBita.map(r=>{
     const uf=parseFloat(r.c.uf)||0;
-    const perM=meses.map(m=>r.ent.filter(e=>e.fecha.startsWith(m)).reduce((s,e)=>s+(parseFloat(e.minutos)||0)/60*entryUf(e,uf),0));
-    const perMClp=meses.map((m,i)=>perM[i]*(ufPorMes[m]||ufValorClp));
-    const perMSplit=perMClp.map(v=>partnerSplit(r.c,v));
-    return {emp:r.c.emp,perMClp,perMSplit};
+    const perM=meses.map(m=>{
+      const monthEnt=r.ent.filter(e=>e.fecha.startsWith(m));
+      let clp=0,jael=0,rafa=0;
+      monthEnt.forEach(e=>{
+        const entryClp=(parseFloat(e.minutos)||0)/60*entryUf(e,uf)*(ufPorMes[m]||ufValorClp);
+        clp+=entryClp;
+        const sp=partnerSplitEntry(r.c,e,entryClp);
+        jael+=sp.jael;rafa+=sp.rafa;
+      });
+      return {clp,jael,rafa};
+    });
+    return {emp:r.c.emp,perMClp:perM.map(x=>x.clp),perMSplit:perM.map(x=>({jael:x.jael,rafa:x.rafa}))};
   }).sort((a,b)=>a.emp.localeCompare(b.emp));
   const ufRowInputs=meses.map(m=>'<td><input type="text" inputmode="decimal" value="'+fufval(ufPorMes[m]||ufValorClp)+'" onchange="setUfMes(\''+m+'\',this.value)" style="box-sizing:border-box;width:100%;max-width:92px;font-size:11px;padding:3px 5px;border:1px solid var(--border);border-radius:5px;font-family:var(--sans);background:white;text-align:center"></td>').join('');
   const cellVal=(r,i)=>socView==='jael'?r.perMSplit[i].jael:socView==='rafa'?r.perMSplit[i].rafa:r.perMClp[i];
