@@ -232,38 +232,22 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-gate2-step .t{font-size:13px;font-weight:700;color:#1e293b;margin-bottom:3px}
 .lean-gate2-step .s{font-size:12px;color:#64748b}
 .lean-gate2-arrow{display:flex;align-items:center;color:#94a3b8;font-size:16px;flex:0 0 auto}
-.lean-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
-@media(max-width:760px){.lean-cards{grid-template-columns:1fr}}
-.lean-card{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:white;cursor:pointer}
-.lean-card.sel{border-color:#2563eb;box-shadow:0 0 0 1px #2563eb}
+.lean-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:1000px){.lean-cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.lean-cards{grid-template-columns:1fr}}
+.lean-card{border:1px solid var(--border);border-radius:10px;padding:10px 11px;background:white}
 .lean-card.locked{opacity:.6}
-.lean-card-hdr{display:flex;align-items:center;gap:9px;margin-bottom:10px}
-.lean-card-icon{width:30px;height:30px;border-radius:8px;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.lean-card-hdr{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.lean-card-icon{width:22px;height:22px;border-radius:6px;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
 .lean-card-hdr .txt{min-width:0}
-.lean-card-hdr .t{font-size:13.5px;font-weight:700;color:#1e293b}
-.lean-card-hdr .s{font-size:11px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lean-card-hdr .cnt{margin-left:auto;font-size:12px;color:#94a3b8;font-weight:600;flex-shrink:0}
-.lean-card-status{border-radius:8px;padding:8px 10px;margin-bottom:10px}
-.lean-card-status.curso,.lean-card-status.pendiente{background:#fef3c7}
-.lean-card-status.hecho{background:#dcfce7}
-.lean-card-status.blocked{background:#fef2f2}
-.lean-card-status .lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
-.lean-card-status.curso .lbl,.lean-card-status.pendiente .lbl{color:#92400e}
-.lean-card-status.hecho .lbl{color:#166534}
-.lean-card-status.blocked .lbl{color:#991b1b}
-.lean-card-status .txt{font-size:12.5px;color:#1e293b;font-weight:600;margin-top:2px}
-.lean-card-foot{display:flex;align-items:center;justify-content:flex-end;gap:8px}
-.lean-card-foot button{font-size:11.5px;padding:6px 11px;border:1px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-family:var(--sans);font-weight:600}
-.lean-card-foot button:hover{background:#f8fafc}
-.lean-detail{border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:16px;background:white}
-.lean-detail .t{font-size:15px;font-weight:700;color:#1e293b;margin-bottom:2px}
-.lean-detail .sub{font-size:12.5px;color:#94a3b8;margin-bottom:14px}
-.lean-detail-lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#94a3b8;margin-bottom:3px}
-.lean-detail-val{font-size:13.5px;color:#1e293b;margin-bottom:12px}
-.lean-detail-note{background:#eff6ff;color:#1d4ed8;border-radius:8px;padding:10px 12px;font-size:12.5px;margin-bottom:4px}
-.lean-detail-note.blocked{background:#fef2f2;color:#991b1b}
-.lean-detail-items{margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
-.lean-detail-items>.hdr{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.lean-card-hdr .t{font-size:12px;font-weight:700;color:#1e293b}
+.lean-card-hdr .s{font-size:10px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lean-card-hdr .cnt{margin-left:auto;font-size:11px;color:#94a3b8;font-weight:600;flex-shrink:0}
+.lean-card-list{max-height:280px;overflow-y:auto;margin:0 -4px}
+.lean-card-list .lean-item{border-bottom:1px solid #f8fafc}
+.lean-card-list .lean-step{padding:4px 4px;font-size:11.5px;gap:6px}
+.lean-card-list .lean-step .ls-dot{width:11px;height:11px}
+.lean-card-list .lean-meta{padding:6px 6px 8px 24px}
 .pilar-table{width:100%;border-collapse:collapse;font-size:12.5px}
 .pilar-table th{background:#f1f5f9;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;padding:6px 8px;text-align:left;border-bottom:1px solid var(--border)}
 .pilar-table td{padding:4px;vertical-align:top;border-bottom:1px solid #f1f5f9}
@@ -1249,7 +1233,7 @@ function leanCarrilIcon(car){
   if(s.includes('resultado')||s.includes('sostenibilidad'))return '🏆';
   return '📁';
 }
-let leanClient=null,leanView='plan',leanCatOrigen='salescoach',leanCarrilSel=null;
+let leanClient=null,leanView='plan',leanCatOrigen='salescoach';
 function leanCatalogById(id){return LEAN_CATALOG.find(x=>x.id===id);}
 function leanEnsurePlan(c){
   if(!c.leanPlan)c.leanPlan={pitAprobado:false,items:{},custom:[]};
@@ -1340,24 +1324,6 @@ function leanCycleCustom(cid,customId){
   persist();renderLean();
 }
 function leanGateIds(){return LEAN_FASE_INICIAL_IDS.filter(id=>{const cat=leanCatalogById(id);return cat&&cat.car===LEAN_GATE_CARRIL;});}
-function leanAdvance(cid,refId,isCustom){
-  const c=contacts.find(x=>x.id===cid);if(!c)return;
-  const plan=leanEnsurePlan(c);
-  const it=isCustom?plan.custom.find(x=>x.id===refId):plan.items[refId];
-  if(!it)return;
-  const cat=isCustom?null:leanCatalogById(refId);
-  const cur=it.status||'pendiente';
-  if(cur==='hecho'||cur==='na'){showToast('Esta actividad ya está completa');return;}
-  if(cat){
-    const reason=leanBlockedReason(cid,cat);
-    if(reason){leanBlockedToast(reason);return;}
-  }
-  const seq=(cat&&cat.ap)?['pendiente','curso','revision','hecho']:['pendiente','curso','hecho'];
-  const i=seq.indexOf(cur);
-  it.status=seq[Math.min(i+1,seq.length-1)];
-  persist();renderLean();
-}
-function setLeanCarril(car){leanCarrilSel=car;renderLean();}
 function leanSetMeta(cid,catId,field,value){
   const c=contacts.find(x=>x.id===cid);if(!c)return;
   const plan=leanEnsurePlan(c);
@@ -1406,7 +1372,7 @@ function leanFilterCatalogo(v){
 }
 function setLeanView(v){leanView=v;renderLean();}
 function setLeanCatOrigen(o){leanCatOrigen=o;renderLean();}
-function setLeanClient(id){leanClient=parseInt(id,10);leanView='plan';leanCarrilSel=null;renderLean();}
+function setLeanClient(id){leanClient=parseInt(id,10);leanView='plan';renderLean();}
 function leanItemMetaPanel(cid,idArg,item,isCustom){
   const setFn=isCustom?'leanSetMetaCustom':'leanSetMeta';
   return '<div class="lean-meta" hidden>'+
@@ -1501,61 +1467,16 @@ function renderLeanPlan(c){
   const paraleloTxt=carriles.length===0?'sin frentes activos todavía':(activos+' frente'+(activos===1?'':'s')+' avanzando en paralelo');
   const estado=gateDone<gateEntries.length?'Puerta inicial en curso':(overallPct===100?'Implementación completa':'Implementación en curso');
 
-  // ---- Cards de frentes ----
+  // ---- Cards de frentes (compactas, con todas las actividades visibles dentro) ----
   const cardsHtml=carriles.map(g=>{
     const locked=!plan.pitAprobado;
-    let statusCls='hecho',statusLbl='Hecho',statusTxt='Todas las actividades completas';
-    if(g.current){
-      const st=g.current.item.status||'pendiente';
-      const blockedReason=g.current.cat?leanBlockedReason(c.id,g.current.cat):null;
-      const isBlocked=!!blockedReason&&st!=='hecho'&&st!=='na';
-      statusCls=isBlocked?'blocked':st;
-      statusLbl=isBlocked?'Bloqueada':LEAN_STATUS_LABEL[st];
-      statusTxt=g.current.label;
-    }
-    const canAdvance=g.current&&!locked;
-    const advArgs=g.current?(c.id+','+(g.current.isCustom?"'"+g.current.ref+"'":g.current.ref)+','+(g.current.isCustom?'true':'false')):'';
-    return '<div class="lean-card'+(leanCarrilSel===g.car?' sel':'')+(locked?' locked':'')+'" onclick="setLeanCarril(\''+esc(g.car).replace(/'/g,"\\'")+'\')">'+
+    const bodyHtml=locked?'<div class="lean-lock-msg">🔒 Se desbloquea cuando el PIT esté aprobado</div>':
+      '<div class="lean-card-list">'+g.sorted.map(r=>leanItemRow(c.id,r.ref,r.label,r.item,r.isCustom,true,r.cat)).join('')+'</div>';
+    return '<div class="lean-card'+(locked?' locked':'')+'">'+
       '<div class="lean-card-hdr"><div class="lean-card-icon">'+leanCarrilIcon(g.car)+'</div><div class="txt"><div class="t">'+esc(leanCarrilLabel(g.car))+'</div>'+(g.subFrentes.length?'<div class="s">'+esc(g.subFrentes.join(', '))+'</div>':'')+'</div><div class="cnt">'+g.doneCount+'/'+g.applicable.length+'</div></div>'+
-      '<div class="lean-card-status '+statusCls+'"><div class="lbl">'+esc(statusLbl)+'</div><div class="txt">'+esc(statusTxt)+'</div></div>'+
-      '<div class="lean-card-foot">'+(g.current?'<button onclick="event.stopPropagation();'+(canAdvance?'leanAdvance('+advArgs+')':"showToast('🔒 Se desbloquea cuando el PIT esté aprobado')")+'">Completar siguiente</button>':'')+'</div>'+
+      bodyHtml+
     '</div>';
   }).join('');
-
-  // ---- Panel de detalle del frente seleccionado ----
-  if(!leanCarrilSel||!carriles.some(g=>g.car===leanCarrilSel))leanCarrilSel=carriles.length?carriles[0].car:null;
-  let detailHtml='';
-  if(leanCarrilSel){
-    const g=carriles.find(x=>x.car===leanCarrilSel);
-    let depVal='Sin dependencia interna.',noteHtml='',noteCls='';
-    if(g.current){
-      if(g.current.cat&&g.current.cat.pr&&g.current.cat.pr.length){
-        depVal='Depende de completar: '+g.current.cat.pr.map(pid=>{const p=leanCatalogById(pid);return p?p.a:'#'+pid;}).join(', ')+'.';
-      }
-      const blockedReason=g.current.cat?leanBlockedReason(c.id,g.current.cat):null;
-      if(blockedReason){
-        noteCls='blocked';
-        noteHtml='🔒 Bloqueada — falta completar: '+blockedReason.replace('Falta: ','')+'.';
-      }else{
-        noteHtml='Puede avanzar aunque otros frentes estén pendientes.';
-      }
-      const unlocks=g.current.cat?LEAN_CATALOG.filter(x=>x.pr&&x.pr.includes(g.current.cat.id)).map(x=>x.a):[];
-      var desbloqueaVal=unlocks.length?unlocks.join(', '):'No desbloquea otras actividades directamente.';
-    }else{
-      var desbloqueaVal='—';
-    }
-    const itemsHtml=g.sorted.map(r=>leanItemRow(c.id,r.ref,r.label,r.item,r.isCustom,true,r.cat)).join('');
-    detailHtml='<div class="lean-detail">'+
-      '<div class="t">'+esc(leanCarrilLabel(g.car))+'</div>'+
-      '<div class="sub">'+g.doneCount+' de '+g.applicable.length+' actividades hechas</div>'+
-      (g.current?('<div class="lean-detail-lbl">Actividad actual</div><div class="lean-detail-val">'+esc(g.current.label)+'</div>'+
-        '<div class="lean-detail-lbl">Dependencia interna</div><div class="lean-detail-val">'+esc(depVal)+'</div>'+
-        '<div class="lean-detail-note'+(noteCls?' '+noteCls:'')+'">'+esc(noteHtml)+'</div>'+
-        '<div class="lean-detail-lbl" style="margin-top:12px">Desbloquea</div><div class="lean-detail-val" style="margin-bottom:0">'+esc(desbloqueaVal)+'</div>')
-      :'<div class="lean-detail-val">🎉 Todas las actividades de este frente están completas.</div>')+
-      '<div class="lean-detail-items"><div class="hdr">Todas las actividades de este frente</div>'+itemsHtml+'</div>'+
-    '</div>';
-  }
 
   box.innerHTML=
     '<div class="lean-summary">'+
@@ -1566,8 +1487,8 @@ function renderLeanPlan(c){
       '<div class="lean-gate2-hdr"><div class="t">Puerta inicial '+(gateDone>=gateEntries.length?'completada':'en curso')+'</div><button class="lean-gate2-badge '+(plan.pitAprobado?'on':'off')+'" onclick="toggleLeanPit('+c.id+')">'+(plan.pitAprobado?'PIT aprobado':'PIT pendiente')+'</button></div>'+
       '<div class="lean-gate2-steps">'+gateHtml+'</div>'+
     '</div>'+
-    '<div class="section-hdr" style="margin-bottom:8px"><div class="section-title" style="font-size:14px">Frentes en paralelo</div><span style="font-size:12px;color:#94a3b8;margin-left:auto">Selecciona un frente para ver su detalle</span></div>'+
-    (carriles.length?('<div class="lean-cards">'+cardsHtml+'</div>'+detailHtml):'<div class="tips-box" style="color:#94a3b8;font-size:13px;margin-bottom:14px">Aún no hay actividades en el plan de este cliente (fuera de la puerta inicial). Agrégalas desde el catálogo.</div>')+
+    '<div class="section-hdr" style="margin-bottom:8px"><div class="section-title" style="font-size:14px">Frentes en paralelo</div><span style="font-size:12px;color:#94a3b8;margin-left:auto">Click en una actividad para pasar de estado — 🔒 = bloqueada por una predecesora</span></div>'+
+    (carriles.length?('<div class="lean-cards">'+cardsHtml+'</div>'):'<div class="tips-box" style="color:#94a3b8;font-size:13px;margin-bottom:14px">Aún no hay actividades en el plan de este cliente (fuera de la puerta inicial). Agrégalas desde el catálogo.</div>')+
     '<div class="lean-addbar"><button class="mini-btn primary" onclick="setLeanView(\'catalogo\')">📚 Agregar actividades desde el catálogo</button></div>'+
     '<div class="lean-track"><div class="lean-track-hdr">+ Actividad personalizada (fuera del catálogo)</div>'+
       '<div class="field-row"><div class="field"><label>Frente</label><input id="lean-custom-frente" placeholder="ej: Bodega"></div><div class="field"><label>Actividad</label><input id="lean-custom-texto" placeholder="ej: Rediseño de picking"></div></div>'+
