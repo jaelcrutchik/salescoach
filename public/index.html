@@ -212,8 +212,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .pilar-table{width:100%;border-collapse:collapse;font-size:12.5px}
 .pilar-table th{background:#f1f5f9;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;padding:6px 8px;text-align:left;border-bottom:1px solid var(--border)}
 .pilar-table td{padding:4px;vertical-align:top;border-bottom:1px solid #f1f5f9}
-.pilar-table textarea{width:100%;box-sizing:border-box;border:1px solid transparent;border-radius:6px;padding:5px 7px;font-family:var(--sans);font-size:12.5px;line-height:1.4;resize:vertical}
+.pilar-table textarea{width:100%;box-sizing:border-box;border:1px solid transparent;border-radius:6px;padding:5px 7px;font-family:var(--sans);font-size:12.5px;line-height:1.4;resize:vertical;background:transparent}
 .pilar-table textarea:hover,.pilar-table textarea:focus{border-color:var(--border);background:white}
+.pilar-table tr.pilar-done{background:#bbf7d0}
+.pilar-table tr.pilar-done textarea{background:transparent}
+.pilar-table tr.pilar-done textarea:hover,.pilar-table tr.pilar-done textarea:focus{background:white}
 </style>
 </head>
 <body>
@@ -1522,7 +1525,7 @@ function renderPilares(){
   if(pilarActivo){
     const rows=pilares[pilarActivo]||[];
     tableHtml='<div class="table-wrap" style="padding:0.9rem;margin-top:12px"><table class="pilar-table"><thead><tr><th style="width:90px">Semana</th><th style="width:150px">Foco</th><th>Actividades</th><th style="width:170px">Responsable</th><th style="width:190px">Entregable</th><th style="width:60px">Realizada</th><th style="width:24px"></th></tr></thead><tbody>'+
-      rows.map((r,idx)=>'<tr'+(r.realizada?' style="background:#f0fdf4"':'')+'>'+
+      rows.map((r,idx)=>'<tr'+(r.realizada?' class="pilar-done"':'')+'>'+
         '<td><textarea rows="2" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'semana\',this.value)">'+esc(r.semana||'')+'</textarea></td>'+
         '<td><textarea rows="3" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'foco\',this.value)">'+esc(r.foco||'')+'</textarea></td>'+
         '<td><textarea rows="4" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'actividades\',this.value)">'+esc(r.actividades||'')+'</textarea></td>'+
