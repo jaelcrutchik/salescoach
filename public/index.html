@@ -315,6 +315,19 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-flow-node.hecho .txt{color:#166534}
 .lean-flow-node .badge{font-size:9px;color:#94a3b8;margin-top:3px;text-transform:uppercase;letter-spacing:.3px}
 .lean-flow-node.recurrente{border-style:dashed;border-color:#94a3b8}
+.lean-flow-node.lean-flow-group{cursor:default}
+.lean-flow-node.lean-flow-group.open{width:320px}
+.lf-grp-hdr{display:flex;align-items:flex-start;gap:4px;cursor:pointer}
+.lf-grp-hdr .chev{flex-shrink:0;color:#94a3b8;font-size:10px;margin-top:2px}
+.lean-flow-group-subs{margin-top:8px;padding-top:8px;border-top:1px dashed #e2e8f0}
+.lean-flow-group-subs .lean-step{padding:4px 4px;font-size:11px}
+.lean-group-subs{margin:4px 0 2px 18px;padding-left:8px;border-left:2px solid #f1f5f9}
+.lean-group-subs .lean-step{font-size:11.5px}
+.lean-group-hdr{cursor:pointer}
+.lean-group-hdr .chev{color:#94a3b8;font-size:10px;margin-right:2px}
+.lean-vsm-hub{margin:8px 0 12px;padding:10px 12px;border:1px solid #ddd6fe;border-radius:10px;background:#f5f3ff}
+.lean-vsm-hub-hdr{font-size:12px;font-weight:700;color:#5b21b6;margin-bottom:4px}
+.lean-vsm-hub .lean-accion-form{border-top:none;margin-top:0;padding-top:0}
 .lf-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
 .lf-tag{font-size:8.5px;font-weight:700;padding:1px 5px;border-radius:20px;white-space:nowrap}
 .lf-tag.indep{background:#e0f2fe;color:#0369a1}
@@ -1186,7 +1199,7 @@ const LEAN_CATALOG=[
 {id:41,o:'existente',fa:'Ruta existente',fr:'Habilidades y desarrollo',a:'Desarrollo humano',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[40],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.'},
 {id:42,o:'existente',fa:'Ruta existente',fr:'Liderazgo y comportamientos',a:'Gestión de liderazgo: realización de DISC',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[5],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.'},
 {id:43,o:'existente',fa:'Ruta existente',fr:'Roles y responsabilidades',a:'Auditoría de roles y responsabilidades',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P4 Implementación estabilizada',ch:'Condicional por diagnóstico',pr:[39],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.',ap:1},
-{id:44,o:'existente',fa:'Ruta existente',fr:'Mejoras implementadas',a:'Ciclo de Kaizen mensual/trimestral',t:'Transversal',car:'Operación y procesos',g:'P4 Implementación estabilizada',ch:'Condicional por diagnóstico',pr:[5],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.'},
+{id:44,o:'existente',fa:'Ruta existente',fr:'Mejoras implementadas',a:'Ciclo de Kaizen mensual/trimestral',t:'Transversal',car:'Operación y procesos',g:'P4 Implementación estabilizada',ch:'Condicional por diagnóstico',pr:[5],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.',rec:1},
 {id:45,o:'existente',fa:'Ruta existente',fr:'Liderazgo y comportamientos',a:'Mecanismos de reconocimiento',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P4 Implementación estabilizada',ch:'Condicional por diagnóstico',pr:[23],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.'},
 {id:46,o:'existente',fa:'Ruta existente',fr:'Cierre del proyecto',a:'Revisión de resultados obtenidos en base al PIT',t:'Transversal',car:'Resultados y sostenibilidad',g:'P4 Implementación estabilizada',ch:'Núcleo',pr:[5],c:'Resultados comparados con la línea base y compromisos del PIT; desviaciones explicadas.',e:'Reporte de resultados versus PIT.',ap:1},
 {id:47,o:'existente',fa:'Ruta existente',fr:'Cierre del proyecto',a:'Lecciones aprendidas',t:'Transversal',car:'Resultados y sostenibilidad',g:'P5 Cierre y transferencia',ch:'Núcleo',pr:[46],c:'Lecciones, pendientes, transferencia y próximos pasos acordados.',e:'Acta de cierre + lecciones + plan de continuidad.',ap:1},
@@ -1225,38 +1238,38 @@ const LEAN_CATALOG=[
 {id:80,o:'shingo_ls',fa:'1. Alineamiento',fr:'Valor desde el cliente',a:'Definir el valor estrictamente desde la perspectiva del cliente',t:'Lean/Shingo',car:'Diagnóstico y PIT',g:'P0 Venta confirmada',ch:'Núcleo',pr:[178],c:'Definición de valor validada desde la perspectiva del cliente.',e:'Definición de valor y necesidad del cliente + validación de la contraparte.',ap:1},
 {id:81,o:'shingo_ls',fa:'1. Alineamiento',fr:'Valor desde el cliente',a:'Precisar el problema concreto que el cliente busca resolver',t:'Lean/Shingo',car:'Diagnóstico y PIT',g:'P0 Venta confirmada',ch:'Núcleo',pr:[80],c:'Problema formulado con condición actual, necesidad y resultado esperado.',e:'Problema priorizado y formulado + validación de la contraparte.',ap:1},
 {id:82,o:'shingo_ls',fa:'1. Alineamiento',fr:'Valor desde el cliente',a:'Contrastar la perspectiva del productor con la perspectiva del cliente',t:'Lean/Shingo',car:'Diagnóstico y PIT',g:'P0 Venta confirmada',ch:'Condicional por diagnóstico',pr:[80,81],c:'Brechas de perspectiva registradas completado, revisado y aceptado por la contraparte responsable.',e:'Brechas de perspectiva registradas + validación de la contraparte.'},
-{id:83,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Cadena de valor',a:'Mapear el estado actual de la cadena de valor',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[5],c:'Mapa o flujo validado por quienes ejecutan y por el dueño del proceso.',e:'Mapa/VSM/diagrama versionado + validación.'},
-{id:84,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Cadena de valor',a:'Distinguir actividades de valor agregado y tiempos de espera',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Clasificación de actividades y esperas completado, revisado y aceptado por la contraparte responsable.',e:'Clasificación de actividades y esperas + validación de la contraparte.'},
-{id:85,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Flujo',a:'Identificar lotes, interrupciones y transferencias que impiden el flujo',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Mapa o flujo validado por quienes ejecutan y por el dueño del proceso.',e:'Mapa/VSM/diagrama versionado + validación.'},
-{id:86,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Sistema pull',a:'Revisar inventarios y producción sin demanda concreta',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
-{id:87,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Muri · Mura · Muda',a:'Identificar condiciones de sobrecarga (Muri)',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Registro de sobrecargas completado, revisado y aceptado por la contraparte responsable.',e:'Registro de sobrecargas + validación de la contraparte.'},
-{id:88,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Muri · Mura · Muda',a:'Identificar variabilidad e irregularidad (Mura)',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Registro de variabilidad completado, revisado y aceptado por la contraparte responsable.',e:'Registro de variabilidad + validación de la contraparte.'},
-{id:89,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Muri · Mura · Muda',a:'Identificar desperdicio visible (Muda)',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Registro de desperdicios completado, revisado y aceptado por la contraparte responsable.',e:'Registro de desperdicios + validación de la contraparte.'},
-{id:90,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar transporte innecesario',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
-{id:91,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar exceso de inventario',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
-{id:92,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar movimientos innecesarios',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
-{id:93,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar esperas de personas o equipos',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
-{id:94,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar sobreproducción',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
-{id:95,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar sobreprocesamiento',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
-{id:96,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar defectos y reprocesos',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
-{id:97,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar talento no aprovechado',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
-{id:98,o:'shingo_ls',fa:'3. Diseño del sistema',fr:'Estado futuro',a:'Diseñar un estado futuro con menos esperas y traspasos',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Mapa de estado futuro + validación de la contraparte.',ap:1},
-{id:99,o:'shingo_ls',fa:'3. Diseño del sistema',fr:'Flujo',a:'Definir oportunidades de flujo continuo',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[98],c:'Mapa o flujo validado por quienes ejecutan y por el dueño del proceso.',e:'Mapa/VSM/diagrama versionado + validación.'},
-{id:100,o:'shingo_ls',fa:'3. Diseño del sistema',fr:'Sistema pull',a:'Definir señales de consumo y reposición',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[98],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Diseño preliminar de pull/Kanban + validación de la contraparte.'},
-{id:101,o:'shingo_ls',fa:'3. Diseño del sistema',fr:'Selección de herramientas',a:'Seleccionar herramientas según el problema diagnosticado',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[98],c:'Matriz problema–herramienta completado, revisado y aceptado por la contraparte responsable.',e:'Matriz problema–herramienta + validación de la contraparte.',ap:1},
-{id:102,o:'shingo_ls',fa:'4. Implementación',fr:'5S',a:'Clasificar elementos necesarios e innecesarios',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[101],c:'Área clasificada completado, revisado y aceptado por la contraparte responsable.',e:'Área clasificada + validación de la contraparte.'},
-{id:103,o:'shingo_ls',fa:'4. Implementación',fr:'5S',a:'Ordenar y definir ubicación visible',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[102],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Condición de orden definida + validación de la contraparte.'},
-{id:104,o:'shingo_ls',fa:'4. Implementación',fr:'5S',a:'Limpiar y eliminar fuentes de desorden',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[103],c:'Condición básica estabilizada completado, revisado y aceptado por la contraparte responsable.',e:'Condición básica estabilizada + validación de la contraparte.'},
-{id:105,o:'shingo_ls',fa:'4. Implementación',fr:'5S',a:'Estandarizar condiciones visibles',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[104],c:'Estándar documentado, probado, disponible en el trabajo y con responsable de actualización.',e:'Estándar visual + validación de la contraparte.',ap:1},
-{id:106,o:'shingo_ls',fa:'4. Implementación',fr:'5S',a:'Sostener la disciplina del sistema',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[105],c:'Rutina de sostenimiento completado, revisado y aceptado por la contraparte responsable.',e:'Rutina de sostenimiento + validación de la contraparte.'},
-{id:107,o:'shingo_ls',fa:'4. Implementación',fr:'Kaizen',a:'Ejecutar mejoras pequeñas, rápidas y de bajo costo',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[101],c:'Mejora implementada y comparación antes/después completado, revisado y aceptado por la contraparte responsable.',e:'Mejora implementada y comparación antes/después + validación de la contraparte.'},
-{id:108,o:'shingo_ls',fa:'4. Implementación',fr:'Kanban',a:'Implementar una señal visual de reposición por consumo',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[100,101],c:'Solución operando en condición real, con responsable y seguimiento definido.',e:'Foto, captura o registro de uso + verificación en terreno.',ap:1},
-{id:109,o:'shingo_ls',fa:'4. Implementación',fr:'SMED',a:'Identificar actividades de preparación interna y externa',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[101],c:'Preparaciones clasificadas completado, revisado y aceptado por la contraparte responsable.',e:'Preparaciones clasificadas + validación de la contraparte.'},
-{id:110,o:'shingo_ls',fa:'4. Implementación',fr:'SMED',a:'Mover fuera de la detención las preparaciones externas',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[109],c:'Preparación externa definida completado, revisado y aceptado por la contraparte responsable.',e:'Preparación externa definida + validación de la contraparte.'},
-{id:111,o:'shingo_ls',fa:'4. Implementación',fr:'SMED',a:'Reducir la preparación interna restante',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[110],c:'Nuevo método de cambio completado, revisado y aceptado por la contraparte responsable.',e:'Nuevo método de cambio + validación de la contraparte.',ap:1},
-{id:112,o:'shingo_ls',fa:'4. Implementación',fr:'Poka‑Yoke',a:'Definir el error que se debe impedir o evidenciar',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[101],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Error objetivo definido + validación de la contraparte.'},
-{id:113,o:'shingo_ls',fa:'4. Implementación',fr:'Poka‑Yoke',a:'Diseñar un mecanismo físico, lógico o de diseño',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[112],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Mecanismo preventivo diseñado + validación de la contraparte.'},
-{id:114,o:'shingo_ls',fa:'4. Implementación',fr:'Poka‑Yoke',a:'Verificar detección o prevención en el origen',t:'Lean/Shingo',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[113],c:'Prueba de funcionamiento completado, revisado y aceptado por la contraparte responsable.',e:'Prueba de funcionamiento + validación de la contraparte.',ap:1},
+{id:83,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Cadena de valor',a:'Mapear el estado actual de la cadena de valor',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[5],c:'Mapa o flujo validado por quienes ejecutan y por el dueño del proceso.',e:'Mapa/VSM/diagrama versionado + validación.'},
+{id:84,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Cadena de valor',a:'Distinguir actividades de valor agregado y tiempos de espera',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Clasificación de actividades y esperas completado, revisado y aceptado por la contraparte responsable.',e:'Clasificación de actividades y esperas + validación de la contraparte.'},
+{id:85,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Flujo',a:'Identificar lotes, interrupciones y transferencias que impiden el flujo',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Mapa o flujo validado por quienes ejecutan y por el dueño del proceso.',e:'Mapa/VSM/diagrama versionado + validación.'},
+{id:86,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Sistema pull',a:'Revisar inventarios y producción sin demanda concreta',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
+{id:87,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Muri · Mura · Muda',a:'Identificar condiciones de sobrecarga (Muri)',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Registro de sobrecargas completado, revisado y aceptado por la contraparte responsable.',e:'Registro de sobrecargas + validación de la contraparte.'},
+{id:88,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Muri · Mura · Muda',a:'Identificar variabilidad e irregularidad (Mura)',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Registro de variabilidad completado, revisado y aceptado por la contraparte responsable.',e:'Registro de variabilidad + validación de la contraparte.'},
+{id:89,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Muri · Mura · Muda',a:'Identificar desperdicio visible (Muda)',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Registro de desperdicios completado, revisado y aceptado por la contraparte responsable.',e:'Registro de desperdicios + validación de la contraparte.'},
+{id:90,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar transporte innecesario',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
+{id:91,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar exceso de inventario',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
+{id:92,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar movimientos innecesarios',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
+{id:93,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar esperas de personas o equipos',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
+{id:94,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar sobreproducción',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
+{id:95,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar sobreprocesamiento',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
+{id:96,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar defectos y reprocesos',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
+{id:97,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar talento no aprovechado',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
+{id:98,o:'shingo_ls',fa:'3. Diseño del sistema',fr:'Estado futuro',a:'Diseñar un estado futuro con menos esperas y traspasos',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[83],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Mapa de estado futuro + validación de la contraparte.',ap:1},
+{id:99,o:'shingo_ls',fa:'3. Diseño del sistema',fr:'Flujo',a:'Definir oportunidades de flujo continuo',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[98],c:'Mapa o flujo validado por quienes ejecutan y por el dueño del proceso.',e:'Mapa/VSM/diagrama versionado + validación.'},
+{id:100,o:'shingo_ls',fa:'3. Diseño del sistema',fr:'Sistema pull',a:'Definir señales de consumo y reposición',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[98],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Diseño preliminar de pull/Kanban + validación de la contraparte.'},
+{id:101,o:'shingo_ls',fa:'3. Diseño del sistema',fr:'Selección de herramientas',a:'Seleccionar herramientas según el problema diagnosticado',t:'Lean/Shingo',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[98],c:'Matriz problema–herramienta completado, revisado y aceptado por la contraparte responsable.',e:'Matriz problema–herramienta + validación de la contraparte.',ap:1},
+{id:102,o:'shingo_ls',fa:'4. Implementación',fr:'5S',a:'Clasificar elementos necesarios e innecesarios',t:'Lean/Shingo',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[101],c:'Área clasificada completado, revisado y aceptado por la contraparte responsable.',e:'Área clasificada + validación de la contraparte.'},
+{id:103,o:'shingo_ls',fa:'4. Implementación',fr:'5S',a:'Ordenar y definir ubicación visible',t:'Lean/Shingo',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[102],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Condición de orden definida + validación de la contraparte.'},
+{id:104,o:'shingo_ls',fa:'4. Implementación',fr:'5S',a:'Limpiar y eliminar fuentes de desorden',t:'Lean/Shingo',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[103],c:'Condición básica estabilizada completado, revisado y aceptado por la contraparte responsable.',e:'Condición básica estabilizada + validación de la contraparte.'},
+{id:105,o:'shingo_ls',fa:'4. Implementación',fr:'5S',a:'Estandarizar condiciones visibles',t:'Lean/Shingo',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[104],c:'Estándar documentado, probado, disponible en el trabajo y con responsable de actualización.',e:'Estándar visual + validación de la contraparte.',ap:1},
+{id:106,o:'shingo_ls',fa:'4. Implementación',fr:'5S',a:'Sostener la disciplina del sistema',t:'Lean/Shingo',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[105],c:'Rutina de sostenimiento completado, revisado y aceptado por la contraparte responsable.',e:'Rutina de sostenimiento + validación de la contraparte.'},
+{id:107,o:'shingo_ls',fa:'4. Implementación',fr:'Kaizen',a:'Ejecutar mejoras pequeñas, rápidas y de bajo costo',t:'Lean/Shingo',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[101],c:'Mejora implementada y comparación antes/después completado, revisado y aceptado por la contraparte responsable.',e:'Mejora implementada y comparación antes/después + validación de la contraparte.',rec:1},
+{id:108,o:'shingo_ls',fa:'4. Implementación',fr:'Kanban',a:'Implementar una señal visual de reposición por consumo',t:'Lean/Shingo',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[100,101],c:'Solución operando en condición real, con responsable y seguimiento definido.',e:'Foto, captura o registro de uso + verificación en terreno.',ap:1},
+{id:109,o:'shingo_ls',fa:'4. Implementación',fr:'SMED',a:'Identificar actividades de preparación interna y externa',t:'Lean/Shingo',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[101],c:'Preparaciones clasificadas completado, revisado y aceptado por la contraparte responsable.',e:'Preparaciones clasificadas + validación de la contraparte.'},
+{id:110,o:'shingo_ls',fa:'4. Implementación',fr:'SMED',a:'Mover fuera de la detención las preparaciones externas',t:'Lean/Shingo',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[109],c:'Preparación externa definida completado, revisado y aceptado por la contraparte responsable.',e:'Preparación externa definida + validación de la contraparte.'},
+{id:111,o:'shingo_ls',fa:'4. Implementación',fr:'SMED',a:'Reducir la preparación interna restante',t:'Lean/Shingo',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[110],c:'Nuevo método de cambio completado, revisado y aceptado por la contraparte responsable.',e:'Nuevo método de cambio + validación de la contraparte.',ap:1},
+{id:112,o:'shingo_ls',fa:'4. Implementación',fr:'Poka‑Yoke',a:'Definir el error que se debe impedir o evidenciar',t:'Lean/Shingo',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[101],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Error objetivo definido + validación de la contraparte.'},
+{id:113,o:'shingo_ls',fa:'4. Implementación',fr:'Poka‑Yoke',a:'Diseñar un mecanismo físico, lógico o de diseño',t:'Lean/Shingo',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[112],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Mecanismo preventivo diseñado + validación de la contraparte.'},
+{id:114,o:'shingo_ls',fa:'4. Implementación',fr:'Poka‑Yoke',a:'Verificar detección o prevención en el origen',t:'Lean/Shingo',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[113],c:'Prueba de funcionamiento completado, revisado y aceptado por la contraparte responsable.',e:'Prueba de funcionamiento + validación de la contraparte.',ap:1},
 {id:115,o:'shingo_ls',fa:'5. Cultura Shingo',fr:'Principios y sistemas',a:'Revisar si los sistemas reflejan los principios declarados',t:'Lean/Shingo',car:'Estrategia y alineamiento',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[129,154],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.',ap:1},
 {id:116,o:'shingo_ls',fa:'5. Cultura Shingo',fr:'Comportamientos',a:'Definir comportamientos ideales que sostienen el sistema',t:'Lean/Shingo',car:'Cultura y cambio',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[115],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Comportamientos ideales acordados + validación de la contraparte.',ap:1},
 {id:117,o:'shingo_ls',fa:'5. Cultura Shingo',fr:'Liderazgo',a:'Revisar liderazgo con humildad y respeto por cada individuo',t:'Lean/Shingo',car:'Personas y liderazgo',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[126],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
@@ -1281,18 +1294,18 @@ const LEAN_CATALOG=[
 {id:136,o:'shingo_hb',fa:'1. Facilitadores culturales',fr:'Comportamientos',a:'Definir comportamientos ideales para líderes, gerentes y asociados',t:'Shingo Handbook',p:'Liderar con humildad',r:'Todos',car:'Cultura y cambio',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[130,133,134],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Biblioteca de comportamientos por rol + validación de la contraparte.',ap:1},
 {id:137,o:'shingo_hb',fa:'1. Facilitadores culturales',fr:'Comportamientos',a:'Crear retroalimentación periódica sobre comportamientos de liderazgo',t:'Shingo Handbook',p:'Liderar con humildad',r:'Líderes',car:'Cultura y cambio',g:'P4 Implementación estabilizada',ch:'Según alcance Shingo',pr:[136],c:'Rutina de retroalimentación completado, revisado y aceptado por la contraparte responsable.',e:'Rutina de retroalimentación + validación de la contraparte.'},
 {id:138,o:'shingo_hb',fa:'2. Mejora continua',fr:'Valor',a:'Definir valor considerando innovación, calidad, costo, flexibilidad, entrega, seguridad y ambiente',t:'Shingo Handbook',p:'Crear valor para el cliente',r:'Todos',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[81,129],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Definición integral de valor + validación de la contraparte.'},
-{id:139,o:'shingo_hb',fa:'2. Mejora continua',fr:'Estándar',a:'Definir qué significa un resultado bueno y qué hacer cuando no lo es',t:'Shingo Handbook',p:'Asegurar la calidad desde el inicio',r:'Todos',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[138],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Estándar y reacción ante anormalidad + validación de la contraparte.',ap:1},
+{id:139,o:'shingo_hb',fa:'2. Mejora continua',fr:'Estándar',a:'Definir qué significa un resultado bueno y qué hacer cuando no lo es',t:'Shingo Handbook',p:'Asegurar la calidad desde el inicio',r:'Todos',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[138],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Estándar y reacción ante anormalidad + validación de la contraparte.',ap:1},
 {id:140,o:'shingo_hb',fa:'2. Mejora continua',fr:'Perfección',a:'Buscar oportunidades incluso cuando el proceso aparenta funcionar',t:'Shingo Handbook',p:'Buscar la perfección',r:'Todos',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[139],c:'Oportunidades de perfeccionamiento completado, revisado y aceptado por la contraparte responsable.',e:'Oportunidades de perfeccionamiento + validación de la contraparte.'},
 {id:141,o:'shingo_hb',fa:'2. Mejora continua',fr:'Proceso',a:'Redirigir problemas desde la culpa individual hacia el proceso',t:'Shingo Handbook',p:'Enfocarse en los procesos',r:'Todos',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[139],c:'Análisis centrado en el proceso completado, revisado y aceptado por la contraparte responsable.',e:'Análisis centrado en el proceso + validación de la contraparte.'},
 {id:142,o:'shingo_hb',fa:'2. Mejora continua',fr:'Pensamiento científico',a:'Definir condición actual, resultado deseado e hipótesis',t:'Shingo Handbook',p:'Adoptar el pensamiento científico',r:'Todos',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[141,149],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Hipótesis y predicción documentadas + validación de la contraparte.'},
 {id:143,o:'shingo_hb',fa:'2. Mejora continua',fr:'Pensamiento científico',a:'Ejecutar experimento y comparar resultado previsto versus real',t:'Shingo Handbook',p:'Adoptar el pensamiento científico',r:'Todos',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Según alcance Shingo',pr:[142],c:'Aprendizaje del experimento completado, revisado y aceptado por la contraparte responsable.',e:'Aprendizaje del experimento + validación de la contraparte.'},
-{id:144,o:'shingo_hb',fa:'2. Mejora continua',fr:'Flow & Pull',a:'Medir plazo total y barreras que interrumpen el flujo de valor',t:'Shingo Handbook',p:'Hacer fluir y traer valor',r:'Todos',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[83],c:'Mapa o flujo validado por quienes ejecutan y por el dueño del proceso.',e:'Mapa/VSM/diagrama versionado + validación.'},
-{id:145,o:'shingo_hb',fa:'2. Mejora continua',fr:'Flow & Pull',a:'Ajustar la tasa de producción o servicio al nivel de demanda',t:'Shingo Handbook',p:'Hacer fluir y traer valor',r:'Todos',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Según alcance Shingo',pr:[144],c:'Regla de pull y capacidad de respuesta completado, revisado y aceptado por la contraparte responsable.',e:'Regla de pull y capacidad de respuesta + validación de la contraparte.',ap:1},
-{id:146,o:'shingo_hb',fa:'2. Mejora continua',fr:'Calidad en la fuente',a:'Definir regla de no dejar pasar defectos al proceso siguiente',t:'Shingo Handbook',p:'Asegurar la calidad desde el inicio',r:'Todos',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[139],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Política de calidad en la fuente + validación de la contraparte.'},
-{id:147,o:'shingo_hb',fa:'2. Mejora continua',fr:'Calidad en la fuente',a:'Definir autoridad para detener, corregir y analizar el problema',t:'Shingo Handbook',p:'Asegurar la calidad desde el inicio',r:'Todos',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Según alcance Shingo',pr:[146],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Mecanismo de detención y respuesta + validación de la contraparte.',ap:1},
-{id:148,o:'shingo_hb',fa:'2. Mejora continua',fr:'Estabilidad',a:'Evaluar estabilidad y fuentes de variación del proceso',t:'Shingo Handbook',p:'Enfocarse en los procesos',r:'Todos',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
+{id:144,o:'shingo_hb',fa:'2. Mejora continua',fr:'Flow & Pull',a:'Medir plazo total y barreras que interrumpen el flujo de valor',t:'Shingo Handbook',p:'Hacer fluir y traer valor',r:'Todos',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[83],c:'Mapa o flujo validado por quienes ejecutan y por el dueño del proceso.',e:'Mapa/VSM/diagrama versionado + validación.'},
+{id:145,o:'shingo_hb',fa:'2. Mejora continua',fr:'Flow & Pull',a:'Ajustar la tasa de producción o servicio al nivel de demanda',t:'Shingo Handbook',p:'Hacer fluir y traer valor',r:'Todos',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Según alcance Shingo',pr:[144],c:'Regla de pull y capacidad de respuesta completado, revisado y aceptado por la contraparte responsable.',e:'Regla de pull y capacidad de respuesta + validación de la contraparte.',ap:1},
+{id:146,o:'shingo_hb',fa:'2. Mejora continua',fr:'Calidad en la fuente',a:'Definir regla de no dejar pasar defectos al proceso siguiente',t:'Shingo Handbook',p:'Asegurar la calidad desde el inicio',r:'Todos',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[139],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Política de calidad en la fuente + validación de la contraparte.'},
+{id:147,o:'shingo_hb',fa:'2. Mejora continua',fr:'Calidad en la fuente',a:'Definir autoridad para detener, corregir y analizar el problema',t:'Shingo Handbook',p:'Asegurar la calidad desde el inicio',r:'Todos',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Según alcance Shingo',pr:[146],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Mecanismo de detención y respuesta + validación de la contraparte.',ap:1},
+{id:148,o:'shingo_hb',fa:'2. Mejora continua',fr:'Estabilidad',a:'Evaluar estabilidad y fuentes de variación del proceso',t:'Shingo Handbook',p:'Enfocarse en los procesos',r:'Todos',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[83],c:'Hallazgos y brechas documentados; decisiones y responsables acordados.',e:'Informe/checklist + evidencias observadas + acuerdos.'},
 {id:149,o:'shingo_hb',fa:'2. Mejora continua',fr:'Observación directa',a:'Realizar observación directa en el lugar real de trabajo',t:'Shingo Handbook',p:'Adoptar el pensamiento científico',r:'Todos',car:'Procesos y mejora continua',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[5],c:'Registro de hechos observados completado, revisado y aceptado por la contraparte responsable.',e:'Registro de hechos observados + validación de la contraparte.'},
-{id:150,o:'shingo_hb',fa:'2. Mejora continua',fr:'Estandarización',a:'Crear o actualizar trabajo estandarizado para mantener la mejora',t:'Shingo Handbook',p:'Enfocarse en los procesos',r:'Todos',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Según alcance Shingo',pr:[143],c:'Estándar documentado, probado, disponible en el trabajo y con responsable de actualización.',e:'Estándar de trabajo actualizado + validación de la contraparte.',ap:1},
+{id:150,o:'shingo_hb',fa:'2. Mejora continua',fr:'Estandarización y calidad',a:'Crear o actualizar trabajo estandarizado para mantener la mejora',t:'Shingo Handbook',p:'Enfocarse en los procesos',r:'Todos',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Según alcance Shingo',pr:[143],c:'Estándar documentado, probado, disponible en el trabajo y con responsable de actualización.',e:'Estándar de trabajo actualizado + validación de la contraparte.',ap:1},
 {id:151,o:'shingo_hb',fa:'2. Mejora continua',fr:'Gestión visual',a:'Simplificar y hacer visual la información necesaria',t:'Shingo Handbook',p:'Enfocarse en los procesos',r:'Todos',car:'Indicadores y gestión visual',g:'P3 Diseño aprobado',ch:'Según alcance Shingo',pr:[139],c:'Gestión simple y visual completado, revisado y aceptado por la contraparte responsable.',e:'Gestión simple y visual + validación de la contraparte.'},
 {id:152,o:'shingo_hb',fa:'2. Mejora continua',fr:'Trabajo diario',a:'Integrar la mejora al trabajo diario de cada rol',t:'Shingo Handbook',p:'Buscar la perfección',r:'Todos',car:'Procesos y mejora continua',g:'P3 Diseño aprobado',ch:'Según alcance Shingo',pr:[150,151],c:'Rutina de mejora integrada completado, revisado y aceptado por la contraparte responsable.',e:'Rutina de mejora integrada + validación de la contraparte.',ap:1},
 {id:153,o:'shingo_hb',fa:'2. Mejora continua',fr:'Datos',a:'Definir datos correctos y reconciliar predicción con resultado real',t:'Shingo Handbook',p:'Adoptar el pensamiento científico',r:'Todos',car:'Indicadores y gestión visual',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[142],c:'Definición documentada, validada por el responsable y comunicada a quienes la ejecutan.',e:'Protocolo de datos y aprendizaje + validación de la contraparte.'},
@@ -1320,7 +1333,10 @@ const LEAN_CATALOG=[
 {id:175,o:'shingo_hb',fa:'6. Evaluación y sostenibilidad',fr:'Plan de mejora',a:'Priorizar brechas y construir plan de mejora cultural',t:'Shingo Handbook',p:'Buscar la perfección',r:'Líderes',car:'Resultados y sostenibilidad',g:'P2 PIT aprobado',ch:'Según alcance Shingo',pr:[174],c:'Brechas priorizadas y convertidas en un plan con responsables y seguimiento.',e:'Plan versionado + aprobación.',ap:1},
 {id:176,o:'shingo_hb',fa:'6. Evaluación y sostenibilidad',fr:'Reevaluación',a:'Repetir evaluación y comparar madurez, comportamientos y resultados',t:'Shingo Handbook',p:'Buscar la perfección',r:'Todos',car:'Resultados y sostenibilidad',g:'P6 Sostenibilidad activa',ch:'Según alcance Shingo',pr:[175],c:'Reevaluación comparada con la línea base; madurez, comportamientos y resultados revisados.',e:'Informe de reevaluación y comparación con la línea base.',ap:1},
 {id:177,o:'salescoach',fa:'Pre-implementación',fr:'Comercial',a:'Presentación de Lean en la empresa',t:'Transversal',p:'Crear valor para el cliente',r:'Liderazgo',car:'Pre-implementación comercial',g:'Inicio',ch:'Núcleo',c:'Presentación realizada; sponsor comprende problema, enfoque, alcance preliminar y siguiente decisión.',e:'Presentación utilizada + minuta o registro de la reunión.'},
-{id:178,o:'salescoach',fa:'Pre-implementación',fr:'Comercial',a:'Envío y aceptación de propuesta',t:'Transversal',p:'Crear constancia de propósito',r:'Liderazgo',car:'Pre-implementación comercial',g:'Inicio',ch:'Núcleo',pr:[177],c:'Propuesta aceptada; sponsor, alcance, condiciones y autorización para iniciar están confirmados.',e:'Propuesta/contrato aceptado + confirmación del sponsor.',ap:1}
+{id:178,o:'salescoach',fa:'Pre-implementación',fr:'Comercial',a:'Envío y aceptación de propuesta',t:'Transversal',p:'Crear constancia de propósito',r:'Liderazgo',car:'Pre-implementación comercial',g:'Inicio',ch:'Núcleo',pr:[177],c:'Propuesta aceptada; sponsor, alcance, condiciones y autorización para iniciar están confirmados.',e:'Propuesta/contrato aceptado + confirmación del sponsor.',ap:1},
+{id:179,o:'existente',fa:'Ruta existente',fr:'VSM / Flujo actual',a:'Definir alcance, inicio, término y cliente del flujo',t:'Metodología operativa propia',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[31],c:'Alcance, inicio, término y cliente del flujo documentados y validados.',e:'Ficha de alcance del flujo + validación de la contraparte.'},
+{id:180,o:'existente',fa:'Ruta existente',fr:'SMED',a:'Verificar el nuevo tiempo de preparación (SMED)',t:'Metodología operativa propia',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[111],c:'Nuevo tiempo de preparación medido y comparado contra el tiempo original.',e:'Medición antes/después del tiempo de preparación.'},
+{id:181,o:'existente',fa:'Ruta existente',fr:'SMED',a:'Estandarizar el nuevo método de preparación (SMED)',t:'Metodología operativa propia',car:'Operación y procesos',g:'P3 Diseño aprobado',ch:'Condicional por diagnóstico',pr:[180],c:'Estándar documentado, probado, disponible en el trabajo y con responsable de actualización.',e:'Estándar del nuevo método + validación de la contraparte.',ap:1}
 ];
 const LEAN_ORIGEN_LABEL={existente:'Ruta de consultoría (actual)',salescoach:'Pre-implementación comercial',shingo_ls:'Lean/Shingo — Desperdicios y herramientas',shingo_hb:'Shingo Handbook — Principios rectores'};
 const LEAN_ORIGEN_ORDER=['salescoach','existente','shingo_ls','shingo_hb'];
@@ -1352,7 +1368,7 @@ function leanCarrilSort(a,b){
 const LEAN_FRENTE_ORDER=['Fase Inicial','Misión y Visión','Objetivos comunes',
   'Gobernanza y kickoff','Comunicación del cambio','Resistencias y agentes de cambio','Liderazgo y comportamientos','Roles y responsabilidades','Habilidades y desarrollo','Feedback y coaching','Seguridad física y psicológica','Clima laboral','Capacidad interna Lean',
   'KPI N1','KPI N2 e indicadores de proceso','Gestión diaria','Gestión visual',
-  'Diagnóstico del flujo','VSM / Flujo actual','VSM / Flujo futuro','Planning','Stock e inventarios','Operaciones','Producción','Transportes','Flujo y Pull','Estandarización y calidad','Mejoras implementadas',
+  'Diagnóstico del flujo','VSM / Flujo actual','VSM / Flujo futuro','Planning','Stock e inventarios','Operaciones','Producción','Transportes','Flujo y Pull','Mejoras implementadas','SMED','Estandarización y calidad',
   'Cierre del proyecto'];
 function leanFrenteSort(a,b){
   const ia=LEAN_FRENTE_ORDER.indexOf(a),ib=LEAN_FRENTE_ORDER.indexOf(b);
@@ -1364,9 +1380,36 @@ function leanFrenteSort(a,b){
 let leanClient=null,leanView='plan',leanCatOrigen='salescoach',leanFlowMode='seguimiento',leanFlowSelected=null;
 const leanFlowClosedCarriles=new Set(),leanFlowClosedFrentes=new Set();
 // ---- Herramientas de mejora compartidas (A3/PDCA/Kaizen/Quick Win): una sola acción, visible desde varios lugares ----
-const LEAN_ACCION_TIPOS=['A3','PDCA','Kaizen','Quick Win'];
-const LEAN_ACCION_ICON={'A3':'📄','PDCA':'🔄','Kaizen':'⚡','Quick Win':'🏅'};
+const LEAN_ACCION_TIPOS=['A3','PDCA','Kaizen','Quick Win','SMED','Kanban','5S','Poka-Yoke','Mejora de layout','Estandarización'];
+const LEAN_ACCION_ICON={'A3':'📄','PDCA':'🔄','Kaizen':'⚡','Quick Win':'🏅','SMED':'⏱️','Kanban':'🗂️','5S':'🧹','Poka-Yoke':'🚫','Mejora de layout':'📐','Estandarización':'📏'};
 const LEAN_ACCION_PROCESOS=[...LEAN_CARRIL_ORDER,'Voz y experiencia del cliente',LEAN_CARRIL_RESULTADOS];
+// ---- Actividades principales con subpasos (checklist): consolidan VSM/flujo/SMED sin duplicar catálogo ----
+// ids reutilizados sin cambios: 31,32,33,83,84,85,87,88,89,90-97,98,99,34,109,110,111,148.
+// ids nuevos (solo 3, sin cobertura existente, origen 'Metodología operativa propia'): 179,180,181.
+const LEAN_GRUPOS=[
+  {id:'grp_vsm_actual',label:'Construir y validar VSM / flujo actual',car:'Operación y procesos',fr:'VSM / Flujo actual',
+    subIds:[31,179,32,83,33,84,85,87,88,89,90,91,92,93,94,95,96,97,148]},
+  {id:'grp_vsm_futuro',label:'Diseñar y validar VSM / flujo futuro',car:'Operación y procesos',fr:'VSM / Flujo futuro',
+    subIds:[99,98,34]},
+  {id:'grp_smed',label:'Aplicar SMED para reducir tiempos de preparación',car:'Operación y procesos',fr:'SMED',condicional:true,
+    subIds:[109,110,111,180,181]}
+];
+function leanGrupoOf(catId){return LEAN_GRUPOS.find(g=>g.subIds.includes(catId));}
+function leanGrupoById(grpId){return LEAN_GRUPOS.find(g=>g.id===grpId);}
+function leanGroupStatusItem(subRows){
+  if(!subRows.length)return {status:'pendiente'};
+  const applicable=subRows.filter(r=>(r.item.status||'pendiente')!=='na');
+  if(!applicable.length)return {status:'na'};
+  if(applicable.every(r=>r.item.status==='hecho'))return {status:'hecho'};
+  if(applicable.some(r=>r.item.status==='curso'||r.item.status==='revision'))return {status:'curso'};
+  if(applicable.every(r=>(r.item.status||'pendiente')==='pendiente'))return {status:'pendiente'};
+  return {status:'curso'};
+}
+const leanOpenGroups=new Set();
+function toggleLeanGroup(grpId){
+  if(leanOpenGroups.has(grpId))leanOpenGroups.delete(grpId);else leanOpenGroups.add(grpId);
+  renderLean();
+}
 // ---- Entrada/salida sugerida por frente (visual, no bloqueante) ----
 const LEAN_CARRIL_IO={
   'Estrategia y alineamiento':{entrada:'PIT aprobado',salida:'Objetivos comunes y estrategia desplegada'},
@@ -1390,8 +1433,11 @@ function leanCatalogById(id){return LEAN_CATALOG.find(x=>x.id===id);}
 // ---- Columna vertebral: franja sugerida (no bloqueante) después de la puerta inicial ----
 function leanVertebralStatus(c,stage){
   const plan=leanEnsurePlan(c);
+  // Si el frente corresponde a una actividad principal con subpasos, usar sus ids reales (no el fr nativo de cada uno).
+  const grp=LEAN_GRUPOS.find(g=>g.car===stage.car&&g.fr===stage.fr);
+  const idSet=grp?new Set(grp.subIds):null;
   const rows=Object.keys(plan.items).map(k=>({id:parseInt(k,10),item:plan.items[k],cat:leanCatalogById(parseInt(k,10))}))
-    .filter(r=>r.cat&&r.cat.car===stage.car&&(!stage.fr||r.cat.fr===stage.fr));
+    .filter(r=>r.cat&&(idSet?idSet.has(r.id):(r.cat.car===stage.car&&(!stage.fr||r.cat.fr===stage.fr))));
   if(!rows.length)return 'vacio';
   const applicable=rows.filter(r=>(r.item.status||'pendiente')!=='na');
   if(!applicable.length)return 'vacio';
@@ -1428,6 +1474,7 @@ function leanEnsurePlan(c){
 // ---- Acciones de mejora (A3/PDCA/Kaizen/Quick Win): se crean desde cualquier actividad, se guardan una sola vez ----
 function leanAccionesEnsure(c){const plan=leanEnsurePlan(c);return plan.acciones;}
 function leanAccionOrigenLabel(cid,ref,isCustom){
+  if(ref==='vsm_brechas')return 'Convertir brechas del VSM en acciones de mejora';
   const c=contacts.find(x=>x.id===cid);if(!c)return '';
   const plan=leanEnsurePlan(c);
   if(isCustom){const it=(plan.custom||[]).find(x=>x.id===ref);return it?it.texto:'';}
@@ -1435,6 +1482,7 @@ function leanAccionOrigenLabel(cid,ref,isCustom){
   return (item&&item.snapTexto)||(cat&&cat.a)||'';
 }
 function leanOrigenFrenteOf(cid,ref,isCustom){
+  if(ref==='vsm_brechas')return 'Operación y procesos';
   const c=contacts.find(x=>x.id===cid);if(!c)return '';
   if(isCustom){const plan=leanEnsurePlan(c);const it=(plan.custom||[]).find(x=>x.id===ref);return it?it.frente:'';}
   const cat=leanCatalogById(ref);return cat?cat.car:'';
@@ -1514,6 +1562,14 @@ function leanAccionFormHtml(cid,idArg,ref,isCustom){
       '<div class="field" style="align-self:end"><button type="button" class="mini-btn" onclick="leanCreateAccionFromBtn(this,'+cid+','+idArg+','+(isCustom?'true':'false')+')">+ Crear acción</button></div>'+
     '</div>'+
     leanAccionChipsHtml(cid,ref,isCustom)+
+  '</div>';
+}
+// ---- Punto único para convertir brechas del VSM en acciones de mejora (A3/PDCA/Kaizen/Quick Win/SMED/Kanban/5S/Poka-Yoke/...) ----
+function leanVsmAccionesHubHtml(c){
+  return '<div class="lean-vsm-hub">'+
+    '<div class="lean-vsm-hub-hdr">🔧 Convertir brechas del VSM en acciones de mejora</div>'+
+    '<div style="font-size:11px;color:#94a3b8;margin-bottom:6px">Quick Win, Kaizen, A3, PDCA, SMED, Kanban, 5S, Poka-Yoke, mejora de layout o estandarización — se guarda una sola vez y se ve también en el frente afectado y en Resultados.</div>'+
+    leanAccionFormHtml(c.id,"'vsm_brechas'",'vsm_brechas',true)+
   '</div>';
 }
 function leanBlankItem(){return {status:'pendiente',responsable:'',fecha:'',entregable:'',evidencia:'',notas:''};}
@@ -1695,6 +1751,83 @@ function leanItemRow(cid,refId,label,item,isCustom,removable,cat){
     leanItemMetaPanel(cid,idArg,item,isCustom,refId)+
   '</div>';
 }
+// ---- Tarjeta de actividad principal con subpasos (checklist): estado siempre calculado, nunca guardado ----
+function leanGroupRowHtml(cid,row){
+  const st=row.item.status||'pendiente';
+  const open=leanOpenGroups.has(row.grupo.id);
+  const doneSub=row.subRows.filter(r=>r.item.status==='hecho').length;
+  const condTag=row.grupo.condicional?' <span class="li-dep-badge" title="Herramienta condicional: úsala solo si el VSM detecta que aplica">⚙️ condicional</span>':'';
+  const subsHtml=open?'<div class="lean-group-subs">'+row.subRows.map(r=>leanItemRow(cid,r.ref,r.label,r.item,r.isCustom,false,r.cat)).join('')+'</div>':'';
+  return '<div class="lean-item lean-group-item">'+
+    '<div class="lean-step lean-group-hdr '+st+'" onclick="toggleLeanGroup(\''+row.grupo.id+'\')">'+
+      '<span class="chev">'+(open?'▾':'▸')+'</span><span class="ls-txt">'+esc(row.label)+condTag+'</span>'+
+      '<span class="ls-badge">'+doneSub+'/'+row.subRows.length+' subpasos · '+LEAN_STATUS_LABEL[st]+'</span>'+
+    '</div>'+
+    subsHtml+
+  '</div>';
+}
+function leanRowHtml(cid,r){
+  return r.isGroup?leanGroupRowHtml(cid,r):leanItemRow(cid,r.ref,r.label,r.item,r.isCustom,true,r.cat);
+}
+// ---- Agrupación por carril (frentes en paralelo), agrupando actividades principales con subpasos ----
+function leanBuildCarriles(c,plan,gateIds){
+  const groups={};const carrilOrder=[];
+  const groupRowOf={};
+  Object.keys(plan.items).forEach(k=>{
+    const id=parseInt(k,10);
+    if(gateIds.includes(id))return;
+    const cat=leanCatalogById(id);if(!cat)return;
+    const item=plan.items[k];
+    const grp=leanGrupoOf(id);
+    if(grp){
+      const car=grp.car;
+      if(!groups[car]){groups[car]=[];carrilOrder.push(car);}
+      let row=groupRowOf[grp.id];
+      if(!row){
+        row={ref:grp.id,isGroup:true,grupo:grp,label:grp.label,isCustom:false,
+          cat:{id:grp.id,car:grp.car,fr:grp.fr,pr:null},subRows:[]};
+        groupRowOf[grp.id]=row;
+        groups[car].push(row);
+      }
+      row.subRows.push({ref:id,label:item.snapTexto||cat.a,item,isCustom:false,cat});
+      return;
+    }
+    const car=cat.car||'Otros';
+    if(!groups[car]){groups[car]=[];carrilOrder.push(car);}
+    groups[car].push({ref:id,label:item.snapTexto||cat.a,item,isCustom:false,cat});
+  });
+  (plan.custom||[]).forEach(cu=>{
+    const car=cu.frente;
+    if(!groups[car]){groups[car]=[];carrilOrder.push(car);}
+    groups[car].push({ref:cu.id,label:cu.texto,item:cu,isCustom:true,cat:null});
+  });
+  Object.values(groupRowOf).forEach(row=>{
+    row.subRows.sort((a,b)=>row.grupo.subIds.indexOf(a.ref)-row.grupo.subIds.indexOf(b.ref));
+    row.item=leanGroupStatusItem(row.subRows);
+  });
+  carrilOrder.sort(leanCarrilSort);
+
+  return carrilOrder.map(car=>{
+    const rows=groups[car];
+    const applicable=rows.filter(r=>(r.item.status||'pendiente')!=='na');
+    const doneCount=applicable.filter(r=>r.item.status==='hecho').length;
+    const pct=applicable.length?Math.round(doneCount/applicable.length*100):0;
+    // subagrupar por frente (para diferenciar de dónde viene cada actividad dentro del carril)
+    const frGroups={};const frOrder=[];
+    rows.forEach(r=>{
+      const fr=r.cat?r.cat.fr:(r.item.frente||'Otros');
+      if(!frGroups[fr]){frGroups[fr]=[];frOrder.push(fr);}
+      frGroups[fr].push(r);
+    });
+    frOrder.sort(leanFrenteSort);
+    frOrder.forEach(fr=>frGroups[fr].sort((a,b)=>{
+      const ra=a.isGroup?a.grupo.subIds[0]:(typeof a.ref==='number'?a.ref:1e9);
+      const rb=b.isGroup?b.grupo.subIds[0]:(typeof b.ref==='number'?b.ref:1e9);
+      return ra-rb;
+    }));
+    return {car,rows,frOrder,frGroups,applicable,doneCount,pct};
+  });
+}
 function renderLeanPlan(c){
   const box=document.getElementById('lean-body');
   const plan=leanEnsurePlan(c);
@@ -1718,39 +1851,7 @@ function renderLeanPlan(c){
   }).join('');
 
   // ---- Agrupación por carril (frentes en paralelo) ----
-  const groups={};const carrilOrder=[];
-  Object.keys(plan.items).forEach(k=>{
-    const id=parseInt(k,10);
-    if(gateIds.includes(id))return;
-    const cat=leanCatalogById(id);if(!cat)return;
-    const item=plan.items[k];
-    const car=cat.car||'Otros';
-    if(!groups[car]){groups[car]=[];carrilOrder.push(car);}
-    groups[car].push({ref:id,label:item.snapTexto||cat.a,item,isCustom:false,cat});
-  });
-  (plan.custom||[]).forEach(cu=>{
-    const car=cu.frente;
-    if(!groups[car]){groups[car]=[];carrilOrder.push(car);}
-    groups[car].push({ref:cu.id,label:cu.texto,item:cu,isCustom:true,cat:null});
-  });
-  carrilOrder.sort(leanCarrilSort);
-
-  const carriles=carrilOrder.map(car=>{
-    const rows=groups[car];
-    const applicable=rows.filter(r=>(r.item.status||'pendiente')!=='na');
-    const doneCount=applicable.filter(r=>r.item.status==='hecho').length;
-    const pct=applicable.length?Math.round(doneCount/applicable.length*100):0;
-    // subagrupar por frente (para diferenciar de dónde viene cada actividad dentro del carril)
-    const frGroups={};const frOrder=[];
-    rows.forEach(r=>{
-      const fr=r.cat?r.cat.fr:(r.item.frente||'Otros');
-      if(!frGroups[fr]){frGroups[fr]=[];frOrder.push(fr);}
-      frGroups[fr].push(r);
-    });
-    frOrder.sort(leanFrenteSort);
-    frOrder.forEach(fr=>frGroups[fr].sort((a,b)=>(typeof a.ref==='number'?a.ref:1e9)-(typeof b.ref==='number'?b.ref:1e9)));
-    return {car,rows,frOrder,frGroups,applicable,doneCount,pct};
-  });
+  const carriles=leanBuildCarriles(c,plan,gateIds);
 
   const vocRows=c.vocActive?vocRowsOf(c,false):[];
   const vocDoneCount=vocRows.filter(r=>(r.item.status||'pendiente')==='hecho').length;
@@ -1775,8 +1876,8 @@ function renderLeanPlan(c){
     const bodyHtml=locked?'<div class="lean-lock-msg">🔒 Se desbloquea cuando el PIT esté aprobado</div>':
       '<div class="lean-card-list" data-scroll-key="'+scrollKey+'">'+g.frOrder.map(fr=>
         '<div class="lean-card-sub-hdr">'+esc(fr)+'</div>'+
-        g.frGroups[fr].map(r=>leanItemRow(c.id,r.ref,r.label,r.item,r.isCustom,true,r.cat)).join('')
-      ).join('')+'</div>';
+        g.frGroups[fr].map(r=>leanRowHtml(c.id,r)).join('')
+      ).join('')+(g.car==='Operación y procesos'?leanVsmAccionesHubHtml(c):'')+'</div>';
     return '<div class="lean-card'+(locked?' locked':'')+'">'+
       '<div class="lean-card-hdr"><div class="lean-card-icon">'+leanCarrilIcon(g.car)+'</div><div class="txt"><div class="t">'+esc(leanCarrilLabel(g.car))+'</div></div><div class="cnt">'+g.doneCount+'/'+g.applicable.length+'</div></div>'+
       bodyHtml+
@@ -1841,37 +1942,7 @@ function renderLeanFlujo(c){
     return i<gateEntries.length-1?box2+'<div class="lean-gate2-arrow">→</div>':box2;
   }).join('');
 
-  const groups={};const carrilOrder=[];
-  Object.keys(plan.items).forEach(k=>{
-    const id=parseInt(k,10);
-    if(gateIds.includes(id))return;
-    const cat=leanCatalogById(id);if(!cat)return;
-    const item=plan.items[k];
-    const car=cat.car||'Otros';
-    if(!groups[car]){groups[car]=[];carrilOrder.push(car);}
-    groups[car].push({ref:id,label:item.snapTexto||cat.a,item,isCustom:false,cat});
-  });
-  (plan.custom||[]).forEach(cu=>{
-    const car=cu.frente;
-    if(!groups[car]){groups[car]=[];carrilOrder.push(car);}
-    groups[car].push({ref:cu.id,label:cu.texto,item:cu,isCustom:true,cat:null});
-  });
-  carrilOrder.sort(leanCarrilSort);
-
-  const carriles=carrilOrder.map(car=>{
-    const rows=groups[car];
-    const applicable=rows.filter(r=>(r.item.status||'pendiente')!=='na');
-    const doneCount=applicable.filter(r=>r.item.status==='hecho').length;
-    const pct=applicable.length?Math.round(doneCount/applicable.length*100):0;
-    const frGroups={};const frOrder=[];
-    rows.forEach(r=>{
-      const fr=r.cat?r.cat.fr:(r.item.frente||'Otros');
-      if(!frGroups[fr]){frGroups[fr]=[];frOrder.push(fr);}
-      frGroups[fr].push(r);
-    });
-    frOrder.sort(leanFrenteSort);
-    return {car,rows,frOrder,frGroups,applicable,doneCount,pct};
-  });
+  const carriles=leanBuildCarriles(c,plan,gateIds);
 
   const vocRowsFlujo=c.vocActive?vocRowsOf(c,false):[];
   const vocDoneCountFlujo=vocRowsFlujo.filter(r=>(r.item.status||'pendiente')==='hecho').length;
@@ -1907,7 +1978,21 @@ function renderLeanFlujo(c){
   // ---- Clasificación visual de relaciones: independiente / convergencia / recurrente (secuencia = flechas ya existentes) ----
   const succCountOf=id=>LEAN_CATALOG.filter(x=>x.pr&&x.pr.includes(id)&&plan.items[x.id]).length;
   const predsPresentOf=cat=>(cat&&cat.pr?cat.pr.filter(pid=>plan.items[pid]):[]);
+  const leanFlowGroupNode=r=>{
+    const st=r.item.status||'pendiente';
+    const open=leanOpenGroups.has(r.grupo.id);
+    const doneSub=r.subRows.filter(x=>x.item.status==='hecho').length;
+    const condTag=r.grupo.condicional?'<span class="lf-tag rec" title="Herramienta condicional: úsala solo si el VSM detecta que aplica">⚙️ condicional</span>':'';
+    const subsHtml=open?'<div class="lean-flow-group-subs">'+r.subRows.map(sr=>leanItemRow(c.id,sr.ref,sr.label,sr.item,sr.isCustom,false,sr.cat)).join('')+'</div>':'';
+    return '<div class="lean-flow-node lean-flow-group '+st+(open?' open':'')+'" title="'+esc(r.label)+'">'+
+      '<div class="lf-grp-hdr" onclick="toggleLeanGroup(\''+r.grupo.id+'\')"><span class="chev">'+(open?'▾':'▸')+'</span><div class="txt">'+esc(r.label)+'</div></div>'+
+      '<div class="lf-tags">'+condTag+'</div>'+
+      '<div class="badge">'+doneSub+'/'+r.subRows.length+' subpasos · '+LEAN_STATUS_LABEL[st]+'</div>'+
+      subsHtml+
+    '</div>';
+  };
   const leanFlowNode=(r,suggestedRef)=>{
+    if(r.isGroup)return leanFlowGroupNode(r);
     const st=r.item.status||'pendiente';
     const state=nodeState(r);
     const suggested=r.ref===suggestedRef&&!r.isCustom;
@@ -1955,7 +2040,7 @@ function renderLeanFlujo(c){
         '<div class="lean-flow-frente-hdr" onclick="toggleLeanFlowFrente(\''+frJs+'\')"><span class="chev">'+(frClosed?'▸':'▾')+'</span>'+esc(fr)+'</div>'+
         laneHtml+
       '</div>';
-    }).join('');
+    }).join('')+(g.car==='Operación y procesos'&&!closed?leanVsmAccionesHubHtml(c):'');
     const io=LEAN_CARRIL_IO[g.car];
     const ioHtml=(io&&!closed)?'<div class="lean-flow-io"><span class="lf-io-in">◀ '+esc(io.entrada)+'</span><span class="lf-io-arrow">→ '+esc(leanCarrilLabel(g.car))+' →</span><span class="lf-io-out">'+esc(io.salida)+' ▶</span></div>':'';
     const continuaHtml=(io&&!closed&&g.car!==LEAN_CARRIL_RESULTADOS)?'<div class="lean-flow-continua" onclick="leanVertebralClick('+c.id+',{car:LEAN_CARRIL_RESULTADOS,fr:null})">↳ El flujo continúa en <strong>'+esc(leanCarrilLabel(LEAN_CARRIL_RESULTADOS))+'</strong></div>':'';
