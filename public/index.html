@@ -1498,6 +1498,7 @@ function setPilarCell(cid,pilar,idx,field,value){
   if(!pilares[pilar]||!pilares[pilar][idx])return;
   pilares[pilar][idx][field]=value;
   persist();
+  if(field==='realizada')renderPilares();
 }
 function renderPilares(){
   const wrap=document.getElementById('pilar-client-wrap');
@@ -1520,13 +1521,14 @@ function renderPilares(){
   let tableHtml='';
   if(pilarActivo){
     const rows=pilares[pilarActivo]||[];
-    tableHtml='<div class="table-wrap" style="padding:0.9rem;margin-top:12px"><table class="pilar-table"><thead><tr><th style="width:90px">Semana</th><th style="width:150px">Foco</th><th>Actividades</th><th style="width:170px">Responsable</th><th style="width:190px">Entregable</th><th style="width:24px"></th></tr></thead><tbody>'+
-      rows.map((r,idx)=>'<tr>'+
+    tableHtml='<div class="table-wrap" style="padding:0.9rem;margin-top:12px"><table class="pilar-table"><thead><tr><th style="width:90px">Semana</th><th style="width:150px">Foco</th><th>Actividades</th><th style="width:170px">Responsable</th><th style="width:190px">Entregable</th><th style="width:60px">Realizada</th><th style="width:24px"></th></tr></thead><tbody>'+
+      rows.map((r,idx)=>'<tr'+(r.realizada?' style="background:#f0fdf4"':'')+'>'+
         '<td><textarea rows="2" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'semana\',this.value)">'+esc(r.semana||'')+'</textarea></td>'+
         '<td><textarea rows="3" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'foco\',this.value)">'+esc(r.foco||'')+'</textarea></td>'+
         '<td><textarea rows="4" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'actividades\',this.value)">'+esc(r.actividades||'')+'</textarea></td>'+
         '<td><textarea rows="3" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'responsable\',this.value)">'+esc(r.responsable||'')+'</textarea></td>'+
         '<td><textarea rows="3" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'entregable\',this.value)">'+esc(r.entregable||'')+'</textarea></td>'+
+        '<td style="text-align:center;vertical-align:top;padding-top:10px"><input type="checkbox" style="width:18px;height:18px;cursor:pointer"'+(r.realizada?' checked':'')+' onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'realizada\',this.checked)" title="Realizada"></td>'+
         '<td style="text-align:center;vertical-align:top;padding-top:10px"><span style="cursor:pointer;color:#cbd5e1" onclick="delPilarSemana('+c.id+',\''+esc(pilarActivo)+'\','+idx+')" title="Eliminar fila">✕</span></td>'+
         '</tr>').join('')+
       '</tbody></table></div>'+
