@@ -280,6 +280,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
   .lean-flow-arrow{align-self:flex-start;padding:2px 0 2px 12px;transform:rotate(90deg)}
   .lean-flow-node{width:100%}
 }
+.voc-summary-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media(max-width:700px){.voc-summary-grid{grid-template-columns:repeat(2,1fr)}}
+.voc-accion{border-bottom:1px solid #f8fafc;padding-bottom:4px;margin-bottom:2px}
+.voc-accion-meta{display:flex;gap:6px;margin:2px 0 6px 21px}
+.voc-accion-meta input{flex:1;min-width:0;font-size:10.5px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-family:var(--sans);background:white;box-sizing:border-box}
 .pilar-table{width:100%;border-collapse:collapse;font-size:12.5px}
 .pilar-table th{background:#f1f5f9;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;padding:6px 8px;text-align:left;border-bottom:1px solid var(--border)}
 .pilar-table td{padding:4px;vertical-align:top;border-bottom:1px solid #f1f5f9}
@@ -407,6 +412,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
       <div style="display:flex;gap:6px;margin-left:auto">
         <button class="fb on" id="planmode-lean-btn" onclick="setPlanMode('lean')">🎯 Ruta Lean</button>
         <button class="fb" id="planmode-pilares-btn" onclick="setPlanMode('pilares')">📋 Plan por pilares</button>
+        <button class="fb" id="planmode-voc-btn" onclick="setPlanMode('voc')">🗣️ Voz del cliente</button>
       </div>
     </div>
 
@@ -430,6 +436,17 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
       </div>
       <div id="pilar-body"></div>
       <p style="font-size:11px;color:#94a3b8;margin-top:8px">Plan de trabajo libre por pilares (sin catálogo ni dependencias) — para clientes donde se avanza por proyecto puntual en vez de la metodología Lean completa.</p>
+    </div>
+
+    <div id="planmode-voc-wrap" style="display:none">
+      <div class="section-hdr">
+        <div id="voc-client-wrap" style="display:flex;align-items:center;gap:8px;margin-left:auto">
+          <span style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px">Cliente</span>
+          <select id="voc-client-select" class="hist-sel" onchange="setVocClient(this.value)"></select>
+        </div>
+      </div>
+      <div id="voc-body"></div>
+      <p style="font-size:11px;color:#94a3b8;margin-top:8px">Frente independiente de Voz y experiencia del cliente: una sola instancia por cliente, sin importar si además usa Ruta Lean, Plan por pilares, ambos o ninguno.</p>
     </div>
   </div>
 </div>
@@ -550,7 +567,7 @@ const SEED=[
 {id:49,emp:'Alemán Experto',cont:'(vía Sofi)',cargo:'Dueño',status:'Por contactar',canal:'Referido',accion:'Contactar por Sofi/Berna',notas:'Sofi es esposa del dueño'},
 {id:50,emp:'Ferreterías Lonza',cont:'Simón Lonza',cargo:'Ejecutivo',status:'Contactado',canal:'Email',accion:'Seguimiento en 5 días',notas:'Referido de Luzma. Perfil emprendedor, ecoturismo.',fechaContacto:'2026-06-06',historial:[{fecha:'2026-06-06',tipo:'Email',texto:'Correo personalizado enviado vía Luzma.'}]}
 ];
-function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,com:20,accion:'',notas:'',email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:'',fechaTermino:'',franJugada:'',bitacora:[],leanActive:false,metodologia:'',leanPlan:{pitAprobado:false,items:{},custom:[]},pilares:{}},c);}
+function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,com:20,accion:'',notas:'',email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:'',fechaTermino:'',franJugada:'',bitacora:[],leanActive:false,metodologia:'',leanPlan:{pitAprobado:false,items:{},custom:[]},pilares:{},vocActive:false,voc:{objetivo:'',alcance:'',segmentos:'',participantes:'',responsable:'',fechaPlan:'',fechaReal:'',guiaEntrevista:'',encuestaUsada:'',evidencia:'',hallazgosEntrevistas:'',hallazgosEncuesta:'',brechas:'',resultadoBase:'',resultadoPosterior:'',fechaNuevaMedicion:'',entrevistasPlan:0,entrevistasReal:0,encuestasEnviadas:0,encuestasRespondidas:0,items:{},custom:[],acciones:[]}},c);}
 
 let contacts=[],nextId=60,activeFilter='todos',ownerFilter='todos',detailId=null,sortCol='default',sortDesc=true,loaded=false;
 let ufValorClp=40820.31;
@@ -1055,7 +1072,7 @@ function renderTips(){
   box.innerHTML=tips.map(t=>'<div class="tip-item'+(t.id?' clickable" onclick="openDetail('+t.id+')':'"')+'"><div class="tip-ico">'+t.icono+'</div><div><div class="tip-label">'+t.label+'</div><div class="tip-text">'+t.texto+'</div></div></div>').join('');
 }
 
-function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderTips();renderBitacora();renderCalendario();renderSocios();renderLean();renderPilares();}
+function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderTips();renderBitacora();renderCalendario();renderSocios();renderLean();renderPilares();renderVoc();}
 let currentView='pipeline',bitaClient=null,bitaMes='todos',bitaSem='todos',bitaShowTerm=false,bitaEditIdx=null;
 let socView='rc';
 function setSocView(v){socView=v;renderSocios();}
@@ -1074,7 +1091,7 @@ function setView(v){
   if(v==='bitacora')renderBitacora();
   if(v==='calendario')renderCalendario();
   if(v==='socios')renderSocios();
-  if(v==='lean'){if(planMode==='pilares')renderPilares();else renderLean();}
+  if(v==='lean'){if(planMode==='pilares')renderPilares();else if(planMode==='voc')renderVoc();else renderLean();}
 }
 function isoWeek(dstr){
   const d=new Date(dstr+'T00:00:00');if(isNaN(d))return '';
@@ -1826,9 +1843,11 @@ function setPlanMode(m){
   planMode=m;
   document.getElementById('planmode-lean-wrap').style.display=m==='lean'?'block':'none';
   document.getElementById('planmode-pilares-wrap').style.display=m==='pilares'?'block':'none';
+  document.getElementById('planmode-voc-wrap').style.display=m==='voc'?'block':'none';
   document.getElementById('planmode-lean-btn').classList.toggle('on',m==='lean');
   document.getElementById('planmode-pilares-btn').classList.toggle('on',m==='pilares');
-  if(m==='pilares')renderPilares();else renderLean();
+  document.getElementById('planmode-voc-btn').classList.toggle('on',m==='voc');
+  if(m==='pilares')renderPilares();else if(m==='voc')renderVoc();else renderLean();
 }
 function pilarEnsure(c){if(!c.pilares)c.pilares={};return c.pilares;}
 function setPilarClient(id){pilarClient=parseInt(id,10);pilarActivo=null;renderPilares();}
@@ -1968,6 +1987,270 @@ function renderPilares(){
   box.innerHTML='<div class="tips-box"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong style="font-size:12px;color:#64748b">Pilares de '+esc(c.emp)+':</strong>'+chips+addForm+'</div>'+
     (names.length===0?'<div style="color:#94a3b8;font-size:13px;margin-top:8px">Este cliente todavía no tiene ningún pilar. Crea el primero arriba.</div>':'')+
     '</div>'+tableHtml;
+  });
+}
+// ---- Voz y experiencia del cliente: frente independiente (no depende de metodología), instancia única por cliente ----
+const VOC_ACTIVITIES=[
+  {id:1,a:'Definir objetivo y alcance',pr:[]},
+  {id:2,a:'Seleccionar clientes y segmentos',pr:[1]},
+  {id:3,a:'Preparar entrevista',pr:[2]},
+  {id:4,a:'Realizar entrevista',pr:[3]},
+  {id:5,a:'Consolidar hallazgos de entrevistas',pr:[4]},
+  {id:6,a:'Preparar encuesta',pr:[5]},
+  {id:7,a:'Realizar encuesta',pr:[6]},
+  {id:8,a:'Consolidar hallazgos de encuesta',pr:[7]},
+  {id:9,a:'Analizar experiencia y brechas',pr:[8]},
+  {id:10,a:'Convertir hallazgos en acciones',pr:[9]},
+  {id:11,a:'Volver a medir y cerrar el ciclo',pr:[10]}
+];
+function vocCatalogById(id){return VOC_ACTIVITIES.find(x=>x.id===id);}
+function vocEnsure(c){
+  if(!c.voc)c.voc={};
+  const d=c.voc;
+  if(!d.items)d.items={};
+  if(!d.custom)d.custom=[];
+  if(!d.acciones)d.acciones=[];
+  ['objetivo','alcance','segmentos','participantes','responsable','fechaPlan','fechaReal','guiaEntrevista','encuestaUsada','evidencia','hallazgosEntrevistas','hallazgosEncuesta','brechas','resultadoBase','resultadoPosterior','fechaNuevaMedicion'].forEach(k=>{if(d[k]==null)d[k]='';});
+  ['entrevistasPlan','entrevistasReal','encuestasEnviadas','encuestasRespondidas'].forEach(k=>{if(d[k]==null)d[k]=0;});
+  VOC_ACTIVITIES.forEach(a=>{if(!d.items[a.id])d.items[a.id]={status:'pendiente',responsable:'',fecha:'',fechaReal:'',evidencia:'',notas:'',vinculo:''};});
+  return d;
+}
+function vocBlockedReason(cid,id){
+  const cat=vocCatalogById(id);if(!cat||!cat.pr||!cat.pr.length)return null;
+  const c=contacts.find(x=>x.id===cid);if(!c)return null;
+  const d=vocEnsure(c);
+  const open=cat.pr.filter(pid=>{const p=d.items[pid];return p&&p.status!=='hecho'&&p.status!=='na';});
+  if(!open.length)return null;
+  return 'Falta: '+open.map(pid=>{const pc=vocCatalogById(pid);return pc?pc.a:('#'+pid);}).join('; ');
+}
+function vocCycle(cid,id){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const d=vocEnsure(c);
+  const it=d.items[id];if(!it)return;
+  const seq=['pendiente','curso','hecho','na'];
+  const i=seq.indexOf(it.status||'pendiente');
+  it.status=seq[(i+1)%seq.length];
+  persist();renderVoc();
+}
+function vocCycleCustom(cid,customId){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const d=vocEnsure(c);
+  const it=d.custom.find(x=>x.id===customId);if(!it)return;
+  const seq=['pendiente','curso','hecho','na'];
+  const i=seq.indexOf(it.status||'pendiente');
+  it.status=seq[(i+1)%seq.length];
+  persist();renderVoc();
+}
+function vocSetMeta(cid,id,field,value){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const d=vocEnsure(c);
+  const it=d.items[id];if(!it)return;
+  it[field]=value;persist();
+}
+function vocSetMetaCustom(cid,customId,field,value){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const d=vocEnsure(c);
+  const it=d.custom.find(x=>x.id===customId);if(!it)return;
+  it[field]=value;persist();
+}
+function vocSetField(cid,field,value){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const d=vocEnsure(c);
+  d[field]=value;persist();
+}
+function vocAddCustom(cid){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const input=document.getElementById('voc-custom-texto');if(!input)return;
+  const texto=(input.value||'').trim();
+  if(!texto){showToast('Escribe la actividad');return;}
+  const d=vocEnsure(c);
+  d.custom.push({id:'vc'+Date.now(),texto,status:'pendiente',responsable:'',fecha:'',fechaReal:'',evidencia:'',notas:'',vinculo:''});
+  input.value='';
+  persist();renderVoc();
+}
+function vocDelCustom(cid,customId){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  if(!confirm('¿Eliminar esta actividad?'))return;
+  const d=vocEnsure(c);
+  d.custom=d.custom.filter(x=>x.id!==customId);
+  persist();renderVoc();
+}
+function vocAccionAdd(cid,texto){
+  texto=(texto||'').trim();if(!texto)return;
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const d=vocEnsure(c);
+  d.acciones.push({texto,responsable:'',fecha:'',vinculo:'',done:false});
+  persist();renderVoc();
+}
+function vocAccionToggle(cid,idx){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const d=vocEnsure(c);
+  const a=d.acciones[idx];if(!a)return;
+  a.done=!a.done;
+  persist();renderVoc();
+}
+function vocAccionSet(cid,idx,field,value){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const d=vocEnsure(c);
+  const a=d.acciones[idx];if(!a)return;
+  if(field==='texto'&&!(value||'').trim()){d.acciones.splice(idx,1);persist();renderVoc();return;}
+  a[field]=value;persist();
+  if(field!=='texto')renderVoc();
+}
+function vocAccionDel(cid,idx){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  if(!confirm('¿Eliminar esta acción?'))return;
+  const d=vocEnsure(c);
+  d.acciones.splice(idx,1);
+  persist();renderVoc();
+}
+let vocClient=null,vocFlowSelected=null;
+function setVocClient(id){vocClient=parseInt(id,10);vocFlowSelected=null;renderVoc();}
+function vocFlowNodeClick(cid,ref,isCustom){
+  vocFlowSelected={ref,isCustom:!!isCustom};
+  if(isCustom)vocCycleCustom(cid,ref);else vocCycle(cid,ref);
+}
+function setVocFlowClose(){vocFlowSelected=null;renderVoc();}
+function vocFlowNode(cid,r,suggestedRef){
+  const st=r.item.status||'pendiente';
+  const isSel=vocFlowSelected&&r.ref===vocFlowSelected.ref&&!!r.isCustom===!!vocFlowSelected.isCustom;
+  const suggested=!r.isCustom&&r.ref===suggestedRef;
+  const idArg=r.isCustom?"'"+r.ref+"'":r.ref;
+  const cls=['lean-flow-node',st,isSel?'sel':'',suggested?'suggested':''].filter(Boolean).join(' ');
+  return '<div class="'+cls+'" title="'+esc(r.label)+'" onclick="vocFlowNodeClick('+cid+','+idArg+','+(r.isCustom?'true':'false')+')">'+
+    '<div class="txt">'+esc(r.label)+'</div>'+
+    '<div class="badge">'+LEAN_STATUS_LABEL[st]+'</div>'+
+  '</div>';
+}
+function vocFieldHtml(cid,field,label,value,type){
+  const id='voc-f-'+field;
+  if(type==='select')return '<div class="field"><label>'+label+'</label><select id="'+id+'" onchange="vocSetField('+cid+',\''+field+'\',this.value)"><option value="">—</option>'+['Jael','Rafa','Cliente','Ambos'].map(o=>'<option'+(value===o?' selected':'')+'>'+o+'</option>').join('')+'</select></div>';
+  if(type==='date')return '<div class="field"><label>'+label+'</label><input type="date" id="'+id+'" value="'+esc(value||'')+'" onchange="vocSetField('+cid+',\''+field+'\',this.value)"></div>';
+  if(type==='text')return '<div class="field"><label>'+label+'</label><input type="text" id="'+id+'" value="'+esc(value||'')+'" onchange="vocSetField('+cid+',\''+field+'\',this.value)"></div>';
+  return '<div class="field"><label>'+label+'</label><textarea id="'+id+'" onchange="vocSetField('+cid+',\''+field+'\',this.value)">'+esc(value||'')+'</textarea></div>';
+}
+function renderVoc(){
+  const wrap=document.getElementById('voc-client-wrap');
+  const box=document.getElementById('voc-body');if(!box)return;
+  const clients=contacts.filter(c=>c.vocActive).sort((a,b)=>a.emp.localeCompare(b.emp));
+  if(!clients.length){
+    wrap.style.display='none';
+    box.innerHTML='<div class="tips-box" style="color:#94a3b8;font-size:13px;padding:1rem">Ningún cliente tiene activado el frente de Voz y experiencia del cliente todavía. Actívalo en <strong>Pipeline → ficha del cliente → Datos del contacto → Voz y experiencia del cliente</strong>.</div>';
+    return;
+  }
+  wrap.style.display='flex';
+  if(!vocClient||!clients.some(c=>c.id===vocClient))vocClient=clients[0].id;
+  document.getElementById('voc-client-select').innerHTML=clients.map(c=>'<option value="'+c.id+'"'+(c.id===vocClient?' selected':'')+'>'+esc(c.emp)+'</option>').join('');
+  const c=contacts.find(x=>x.id===vocClient);if(!c)return;
+  preserveScroll(()=>{
+    const d=vocEnsure(c);
+    const rows=VOC_ACTIVITIES.map(a=>({ref:a.id,label:a.a,item:d.items[a.id],isCustom:false,cat:a}))
+      .concat(d.custom.map(cu=>({ref:cu.id,label:cu.texto,item:cu,isCustom:true,cat:null})));
+    const doneCount=rows.filter(r=>(r.item.status||'pendiente')==='hecho').length;
+    const totalCount=rows.length;
+    const sortedRows=rows.slice().sort((a,b)=>(typeof a.ref==='number'?a.ref:1e9)-(typeof b.ref==='number'?b.ref:1e9));
+    const suggestedRow=sortedRows.find(r=>{
+      const st=r.item.status||'pendiente';
+      if(st==='hecho'||st==='na'||r.isCustom)return false;
+      return !vocBlockedReason(c.id,r.ref);
+    });
+    const suggestedRef=suggestedRow?suggestedRow.ref:null;
+    const stages=leanFlowStages(rows);
+    const laneHtml='<div class="lean-flow-lane">'+stages.map((stageItems,si)=>{
+      const nodesHtml=stageItems.map(r=>vocFlowNode(c.id,r,suggestedRef)).join('');
+      const stageBox='<div class="lean-flow-stage">'+nodesHtml+'</div>';
+      return si<stages.length-1?stageBox+'<div class="lean-flow-arrow">→</div>':stageBox;
+    }).join('')+'</div>';
+
+    let detailHtml='';
+    if(vocFlowSelected){
+      const isCustom=vocFlowSelected.isCustom;
+      const item=isCustom?d.custom.find(x=>x.id===vocFlowSelected.ref):d.items[vocFlowSelected.ref];
+      const cat=isCustom?null:vocCatalogById(vocFlowSelected.ref);
+      const label=isCustom?(item&&item.texto):(cat&&cat.a);
+      if(item){
+        const st=item.status||'pendiente';
+        const idArg=isCustom?"'"+vocFlowSelected.ref+"'":vocFlowSelected.ref;
+        const setFn=isCustom?'vocSetMetaCustom':'vocSetMeta';
+        const depReason=isCustom?null:vocBlockedReason(c.id,vocFlowSelected.ref);
+        detailHtml='<div class="lean-flow-detail">'+
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><strong style="font-size:13.5px">'+esc(label||'')+'</strong><span class="ls-badge" style="font-size:11px">'+LEAN_STATUS_LABEL[st]+'</span><span style="margin-left:auto;font-size:11px;color:#94a3b8;cursor:pointer" onclick="setVocFlowClose()">✕ Cerrar</span></div>'+
+          (depReason?'<div style="font-size:11px;color:#94a3b8;margin-bottom:8px">🔗 '+esc(depReason)+' (no bloquea, solo referencia)</div>':'')+
+          '<div class="field-row3">'+
+            '<div class="field"><label>Responsable</label><select onchange="'+setFn+'('+c.id+','+idArg+',\'responsable\',this.value)"><option value="">—</option>'+['Jael','Rafa','Cliente','Ambos'].map(o=>'<option'+(item.responsable===o?' selected':'')+'>'+o+'</option>').join('')+'</select></div>'+
+            '<div class="field"><label>Fecha planificada</label><input type="date" value="'+(item.fecha||'')+'" onchange="'+setFn+'('+c.id+','+idArg+',\'fecha\',this.value)"></div>'+
+            '<div class="field"><label>Fecha realizada</label><input type="date" value="'+(item.fechaReal||'')+'" onchange="'+setFn+'('+c.id+','+idArg+',\'fechaReal\',this.value)"></div>'+
+          '</div>'+
+          '<div class="field"><label>Evidencia (link o descripción)</label><input type="text" value="'+esc(item.evidencia||'')+'" onchange="'+setFn+'('+c.id+','+idArg+',\'evidencia\',this.value)"></div>'+
+          '<div class="field"><label>Vínculo con PIT / A3 / PDCA / Kaizen / Ruta Lean / Plan por pilares (opcional)</label><input type="text" value="'+esc(item.vinculo||'')+'" placeholder="ej: PIT acción 3, A3 Bodega, Ruta Lean #24" onchange="'+setFn+'('+c.id+','+idArg+',\'vinculo\',this.value)"></div>'+
+          '<div class="field"><label>Notas</label><textarea rows="2" onchange="'+setFn+'('+c.id+','+idArg+',\'notas\',this.value)">'+esc(item.notas||'')+'</textarea></div>'+
+        '</div>';
+      }
+    }
+
+    const abiertas=d.acciones.filter(a=>!a.done).length;
+    const cerradas=d.acciones.filter(a=>a.done).length;
+    const accionesHtml='<div class="pilar-checklist">'+d.acciones.map((a,ai)=>
+      '<div class="voc-accion">'+
+        '<div class="pilar-task'+(a.done?' done':'')+'">'+
+          '<input type="checkbox" class="pt-chk"'+(a.done?' checked':'')+' onchange="vocAccionToggle('+c.id+','+ai+')">'+
+          '<span class="pt-text" contenteditable="true" onblur="vocAccionSet('+c.id+','+ai+',\'texto\',this.textContent)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}">'+esc(a.texto)+'</span>'+
+          '<span class="pt-del" title="Eliminar" onclick="event.stopPropagation();vocAccionDel('+c.id+','+ai+')">✕</span>'+
+        '</div>'+
+        '<div class="voc-accion-meta">'+
+          '<input placeholder="Responsable" value="'+esc(a.responsable||'')+'" onchange="vocAccionSet('+c.id+','+ai+',\'responsable\',this.value)">'+
+          '<input type="date" value="'+(a.fecha||'')+'" onchange="vocAccionSet('+c.id+','+ai+',\'fecha\',this.value)">'+
+          '<input placeholder="Vínculo (PIT/A3/Lean/Pilares)" value="'+esc(a.vinculo||'')+'" onchange="vocAccionSet('+c.id+','+ai+',\'vinculo\',this.value)">'+
+        '</div>'+
+      '</div>'
+    ).join('')+
+    '<div class="pilar-task-add"><span class="pt-text pt-new" contenteditable="true" data-placeholder="+ agregar acción de mejora" onblur="vocAccionAdd('+c.id+',this.textContent);this.textContent=\'\';" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}"></span></div>'+
+    '</div>';
+
+    box.innerHTML=
+      '<div class="lean-summary">'+
+        '<div><div class="t">'+esc(c.emp)+' · Voz y experiencia del cliente</div><div class="s">'+doneCount+'/'+totalCount+' actividades realizadas</div></div>'+
+        '<div class="lean-summary-pct"><div class="lbl">Avance '+(totalCount?Math.round(doneCount/totalCount*100):0)+'%</div><div class="lean-pbar"><div style="width:'+(totalCount?Math.round(doneCount/totalCount*100):0)+'%"></div></div></div>'+
+      '</div>'+
+      '<div class="tips-box">'+
+        '<div style="font-weight:700;font-size:12px;color:#64748b;margin-bottom:8px">Definición de la medición</div>'+
+        '<div class="field-row">'+vocFieldHtml(c.id,'objetivo','Objetivo de la medición',d.objetivo)+vocFieldHtml(c.id,'alcance','Alcance o proceso a evaluar',d.alcance)+'</div>'+
+        '<div class="field-row">'+vocFieldHtml(c.id,'segmentos','Segmentos de clientes',d.segmentos)+vocFieldHtml(c.id,'participantes','Clientes o participantes seleccionados',d.participantes)+'</div>'+
+        '<div class="field-row3">'+vocFieldHtml(c.id,'responsable','Responsable',d.responsable,'select')+vocFieldHtml(c.id,'fechaPlan','Fecha planificada',d.fechaPlan,'date')+vocFieldHtml(c.id,'fechaReal','Fecha realizada',d.fechaReal,'date')+'</div>'+
+        '<div class="field-row">'+vocFieldHtml(c.id,'guiaEntrevista','Guía de entrevista utilizada',d.guiaEntrevista)+vocFieldHtml(c.id,'encuestaUsada','Encuesta utilizada',d.encuestaUsada)+'</div>'+
+        vocFieldHtml(c.id,'evidencia','Enlaces o archivos de evidencia',d.evidencia)+
+      '</div>'+
+      '<div class="tips-box">'+
+        '<div style="font-weight:700;font-size:12px;color:#64748b;margin-bottom:8px">Resumen</div>'+
+        '<div class="voc-summary-grid">'+
+          '<div class="field"><label>Entrevistas planificadas</label><input type="number" min="0" value="'+(d.entrevistasPlan||0)+'" onchange="vocSetField('+c.id+',\'entrevistasPlan\',parseFloat(this.value)||0)"></div>'+
+          '<div class="field"><label>Entrevistas realizadas</label><input type="number" min="0" value="'+(d.entrevistasReal||0)+'" onchange="vocSetField('+c.id+',\'entrevistasReal\',parseFloat(this.value)||0)"></div>'+
+          '<div class="field"><label>Encuestas enviadas</label><input type="number" min="0" value="'+(d.encuestasEnviadas||0)+'" onchange="vocSetField('+c.id+',\'encuestasEnviadas\',parseFloat(this.value)||0)"></div>'+
+          '<div class="field"><label>Encuestas respondidas</label><input type="number" min="0" value="'+(d.encuestasRespondidas||0)+'" onchange="vocSetField('+c.id+',\'encuestasRespondidas\',parseFloat(this.value)||0)"></div>'+
+          '<div class="field"><label>Próxima medición</label><input type="date" value="'+(d.fechaNuevaMedicion||'')+'" onchange="vocSetField('+c.id+',\'fechaNuevaMedicion\',this.value)"></div>'+
+        '</div>'+
+        '<div style="display:flex;gap:24px;margin-top:8px;font-size:12px;color:#64748b"><span><strong style="color:#1e293b">'+abiertas+'</strong> acciones abiertas</span><span><strong style="color:#1e293b">'+cerradas+'</strong> acciones terminadas</span></div>'+
+        (d.resultadoBase||d.resultadoPosterior?'<div style="margin-top:8px;font-size:12px;color:#64748b"><strong style="color:#1e293b">Evaluación:</strong> '+esc(d.resultadoBase||'—')+' → '+esc(d.resultadoPosterior||'—')+'</div>':'')+
+        (d.brechas?'<div style="margin-top:6px;font-size:12px;color:#64748b"><strong style="color:#1e293b">Principales brechas:</strong> '+esc(d.brechas)+'</div>':'')+
+      '</div>'+
+      '<div class="section-hdr" style="margin-bottom:2px"><div class="section-title" style="font-size:14px">Actividades</div></div>'+
+      '<div style="font-size:12px;color:#94a3b8;margin-bottom:8px">Click en una actividad para pasar de estado y ver su detalle — borde azul = siguiente sugerida (no bloquea el resto)</div>'+
+      laneHtml+
+      detailHtml+
+      '<div style="margin:10px 0 18px;display:flex;gap:8px"><input id="voc-custom-texto" placeholder="+ actividad propia de este cliente" style="flex:1;font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-family:var(--sans)" onkeydown="if(event.key===\'Enter\')vocAddCustom('+c.id+')"><button class="mini-btn" onclick="vocAddCustom('+c.id+')">+ Agregar</button></div>'+
+      '<div class="tips-box">'+
+        '<div style="font-weight:700;font-size:12px;color:#64748b;margin-bottom:8px">Hallazgos</div>'+
+        '<div class="field-row">'+vocFieldHtml(c.id,'hallazgosEntrevistas','Hallazgos de entrevistas',d.hallazgosEntrevistas)+vocFieldHtml(c.id,'hallazgosEncuesta','Hallazgos de encuesta',d.hallazgosEncuesta)+'</div>'+
+        vocFieldHtml(c.id,'brechas','Principales brechas',d.brechas)+
+      '</div>'+
+      '<div class="tips-box">'+
+        '<div style="font-weight:700;font-size:12px;color:#64748b;margin-bottom:8px">Acciones de mejora acordadas</div>'+
+        accionesHtml+
+      '</div>'+
+      '<div class="tips-box">'+
+        '<div style="font-weight:700;font-size:12px;color:#64748b;margin-bottom:8px">Resultado y cierre del ciclo</div>'+
+        '<div class="field-row">'+vocFieldHtml(c.id,'resultadoBase','Resultado o línea base',d.resultadoBase)+vocFieldHtml(c.id,'resultadoPosterior','Resultado posterior',d.resultadoPosterior)+'</div>'+
+      '</div>';
   });
 }
 function entryUf(e,contactUf){return parseFloat(e.ufHora)||contactUf||0;}
@@ -2425,6 +2708,7 @@ function openDetail(id){
       '<div class="field-row"><div class="field"><label>Canal</label><select id="d-canal">'+['','Email','LinkedIn','WhatsApp','Llamada','Referido','Reunión'].map(x=>'<option value="'+x+'"'+(c.canal===x?' selected':'')+'>'+(x||'-')+'</option>').join('')+'</select></div><div class="field"><label>Ciudad</label><input id="d-ciudad" value="'+esc(c.ciudad)+'"></div></div>'+
       '<div class="field"><label>Cliente de</label><select id="d-owner">'+['','Jael','Rafa'].map(x=>'<option value="'+x+'"'+(c.owner===x?' selected':'')+'>'+(x||'Sin asignar')+'</option>').join('')+'</select></div>'+
       '<div class="field"><label>Metodología (define en qué pestaña de Planes aparece este cliente)</label><select id="d-metodologia">'+[['','Ninguna'],['lean','Ruta Lean'],['pilares','Plan por pilares'],['ambos','Ambos']].map(o=>'<option value="'+o[0]+'"'+(c.metodologia===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input id="d-voc" type="checkbox" style="width:auto"'+(c.vocActive?' checked':'')+'> Voz y experiencia del cliente (frente independiente, no depende de la metodología)</label></div>'+
       '<div class="field-row3"><div class="field"><label>UF/hora</label><input id="d-uf" type="number" step="0.1" value="'+(c.uf||'')+'"></div><div class="field"><label>Horas est.</label><input id="d-horas" type="number" value="'+(c.horas||'')+'"></div><div class="field"><label>Comisión mensual (%)</label><input id="d-com" type="number" step="1" min="0" max="100" value="'+(c.com??20)+'" title="% que gana el dueño de este cliente sobre la base 50/50 entre Jael y Rafa"></div></div>'+
       '<div class="field"><label>Email</label><input id="d-email" value="'+esc(c.email)+'"></div>'+
       '<div class="field"><label>Próxima acción</label><input id="d-accion" value="'+esc(c.accion)+'"></div>'+
@@ -2508,6 +2792,7 @@ function saveDetail(){
   c.metodologia=document.getElementById('d-metodologia').value;
   c.leanActive=c.metodologia==='lean'||c.metodologia==='ambos';
   if(c.leanActive)leanSeedFaseInicial(c);
+  c.vocActive=document.getElementById('d-voc').checked;
   c.uf=parseFloat(gv('d-uf'))||0;c.horas=parseInt(gv('d-horas'))||0;c.com=parseFloat(gv('d-com'))||0;
   c.email=gv('d-email');c.accion=gv('d-accion');c.notas=gv('d-notas');
   c.contexto=gv('d-contexto');c.diagDolor=gv('d-dolor');
