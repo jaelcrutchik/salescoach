@@ -251,22 +251,17 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .pilar-table td{padding:4px;vertical-align:top;border-bottom:1px solid #f1f5f9}
 .pilar-table textarea{width:100%;box-sizing:border-box;border:1px solid transparent;border-radius:6px;padding:5px 7px;font-family:var(--sans);font-size:12.5px;line-height:1.4;resize:vertical;background:transparent}
 .pilar-table textarea:hover,.pilar-table textarea:focus{border-color:var(--border);background:white}
-.pilar-table tr.pilar-done{background:#bbf7d0}
-.pilar-table tr.pilar-done textarea{background:transparent}
-.pilar-table tr.pilar-done textarea:hover,.pilar-table tr.pilar-done textarea:focus{background:white}
 .pilar-checklist{display:flex;flex-direction:column;gap:2px}
-.pilar-task{display:flex;align-items:center;gap:5px;border-radius:6px;padding:2px 3px}
-.pilar-task.done{background:#bbf7d0}
-.pilar-task .pt-chk{width:14px;height:14px;flex-shrink:0;cursor:pointer}
-.pilar-task .pt-text{flex:1;min-width:0;border:1px solid transparent;border-radius:5px;padding:3px 5px;font-family:var(--sans);font-size:12px;background:transparent}
-.pilar-task .pt-text:hover,.pilar-task .pt-text:focus{border-color:var(--border);background:white}
-.pilar-task.done .pt-text{text-decoration:line-through;color:#166534}
-.pilar-task .pt-pencil,.pilar-task .pt-del{font-size:10.5px;color:#cbd5e1;cursor:pointer;flex-shrink:0}
+.pilar-task{display:flex;align-items:flex-start;gap:6px;border-radius:6px;padding:3px}
+.pilar-task .pt-chk{width:15px;height:15px;flex-shrink:0;cursor:pointer;margin-top:1px;accent-color:#22c55e}
+.pilar-task .pt-text{flex:1;min-width:0;border:1px solid transparent;border-radius:5px;padding:2px 5px;font-family:var(--sans);font-size:12px;white-space:pre-wrap;overflow-wrap:break-word}
+.pilar-task .pt-text:hover,.pilar-task .pt-text:focus{border-color:var(--border);background:white;outline:none}
+.pilar-task .pt-del{font-size:10.5px;color:#cbd5e1;cursor:pointer;flex-shrink:0;margin-top:3px}
 .pilar-task .pt-del:hover{color:#ef4444}
-.pilar-task .pt-pencil:hover{color:#64748b}
 .pilar-task-add{margin-top:2px}
-.pilar-task-add input{width:100%;box-sizing:border-box;border:1px dashed var(--border);border-radius:5px;padding:3px 6px;font-family:var(--sans);font-size:11.5px;color:#94a3b8;background:transparent}
-.pilar-task-add input:hover,.pilar-task-add input:focus{border-style:solid;color:#1e293b;background:white}
+.pilar-task-add .pt-new{display:block;width:100%;box-sizing:border-box;border:1px dashed var(--border);border-radius:5px;padding:3px 6px;font-family:var(--sans);font-size:11.5px;min-height:22px}
+.pilar-task-add .pt-new:hover,.pilar-task-add .pt-new:focus{border-style:solid;background:white;outline:none}
+.pilar-task-add .pt-new:empty:before{content:attr(data-placeholder);color:#94a3b8}
 </style>
 </head>
 <body>
@@ -1650,7 +1645,6 @@ function setPilarCell(cid,pilar,idx,field,value){
   if(!pilares[pilar]||!pilares[pilar][idx])return;
   pilares[pilar][idx][field]=value;
   persist();
-  if(field==='realizada')renderPilares();
 }
 // ---- Checklist de tareas dentro de Actividades / Entregable ----
 function pilarTaskList(row,field){
@@ -1700,13 +1694,12 @@ function pilarChecklistHtml(cid,pilar,idx,field,row){
   const rows=list.map((t,ti)=>
     '<div class="pilar-task'+(t.done?' done':'')+'">'+
       '<input type="checkbox" class="pt-chk"'+(t.done?' checked':'')+' onchange="pilarTaskToggle('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+')">'+
-      '<input type="text" class="pt-text" value="'+esc(t.texto)+'" title="'+esc(t.texto)+'" onchange="pilarTaskEditSave('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+',this.value)">'+
-      '<span class="pt-pencil" title="Editar" onclick="event.stopPropagation();this.parentElement.querySelector(\'.pt-text\').focus()">✏️</span>'+
+      '<span class="pt-text" contenteditable="true" onblur="pilarTaskEditSave('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+',this.textContent)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}">'+esc(t.texto)+'</span>'+
       '<span class="pt-del" title="Eliminar tarea" onclick="event.stopPropagation();pilarTaskDel('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+')">✕</span>'+
     '</div>'
   ).join('');
   return '<div class="pilar-checklist">'+rows+
-    '<div class="pilar-task-add"><input type="text" placeholder="+ agregar tarea" onkeydown="if(event.key===\'Enter\'){event.preventDefault();pilarTaskAdd('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\',this.value);this.value=\'\';}"></div>'+
+    '<div class="pilar-task-add"><span class="pt-text pt-new" contenteditable="true" data-placeholder="+ agregar tarea" onblur="pilarTaskAdd('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\',this.textContent);this.textContent=\'\';" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}"></span></div>'+
   '</div>';
 }
 function renderPilares(){
@@ -1731,14 +1724,13 @@ function renderPilares(){
   let tableHtml='';
   if(pilarActivo){
     const rows=pilares[pilarActivo]||[];
-    tableHtml='<div class="table-wrap" style="padding:0.9rem;margin-top:12px"><table class="pilar-table"><thead><tr><th style="width:90px">Semana</th><th style="width:120px">Foco</th><th style="min-width:280px">Actividades</th><th style="width:130px">Responsable</th><th style="min-width:230px">Entregable</th><th style="width:60px">Realizada</th><th style="width:24px"></th></tr></thead><tbody>'+
-      rows.map((r,idx)=>'<tr'+(r.realizada?' class="pilar-done"':'')+'>'+
+    tableHtml='<div class="table-wrap" style="padding:0.9rem;margin-top:12px"><table class="pilar-table"><thead><tr><th style="width:90px">Semana</th><th style="width:120px">Foco</th><th>Actividades</th><th>Entregable</th><th style="width:130px">Responsable</th><th style="width:24px"></th></tr></thead><tbody>'+
+      rows.map((r,idx)=>'<tr>'+
         '<td><textarea rows="2" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'semana\',this.value)">'+esc(r.semana||'')+'</textarea></td>'+
         '<td><textarea rows="3" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'foco\',this.value)">'+esc(r.foco||'')+'</textarea></td>'+
         '<td>'+pilarChecklistHtml(c.id,pilarActivo,idx,'actividades',r)+'</td>'+
-        '<td><textarea rows="3" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'responsable\',this.value)">'+esc(r.responsable||'')+'</textarea></td>'+
         '<td>'+pilarChecklistHtml(c.id,pilarActivo,idx,'entregable',r)+'</td>'+
-        '<td style="text-align:center;vertical-align:top;padding-top:10px"><input type="checkbox" style="width:18px;height:18px;cursor:pointer"'+(r.realizada?' checked':'')+' onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'realizada\',this.checked)" title="Realizada"></td>'+
+        '<td><textarea rows="3" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'responsable\',this.value)">'+esc(r.responsable||'')+'</textarea></td>'+
         '<td style="text-align:center;vertical-align:top;padding-top:10px"><span style="cursor:pointer;color:#cbd5e1" onclick="delPilarSemana('+c.id+',\''+esc(pilarActivo)+'\','+idx+')" title="Eliminar fila">✕</span></td>'+
         '</tr>').join('')+
       '</tbody></table></div>'+
