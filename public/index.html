@@ -173,18 +173,35 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
   #print-report{display:block!important}
 }
 .lean-track{margin-bottom:16px}
+.lean-track.locked{opacity:.6}
 .lean-track-hdr{font-size:13px;font-weight:700;color:#1e293b;margin:0 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
 .lean-group{font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px}
+.lean-item{border-bottom:1px solid #f8fafc}
 .lean-step{display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:8px;cursor:pointer;font-size:13px}
 .lean-step:hover{background:#f8fafc}
 .lean-step .ls-dot{width:15px;height:15px;border-radius:50%;flex-shrink:0;border:2px solid #cbd5e1;box-sizing:border-box}
 .lean-step.curso .ls-dot{background:#f59e0b;border-color:#f59e0b}
 .lean-step.hecho .ls-dot{background:#22c55e;border-color:#22c55e}
-.lean-step.na{opacity:.4}
-.lean-step.na .ls-dot{border-style:dashed}
 .lean-step .ls-txt{flex:1}
 .lean-step.hecho .ls-txt{text-decoration:line-through;color:#94a3b8}
 .lean-step .ls-badge{font-size:10px;font-weight:600;color:#94a3b8;white-space:nowrap}
+.lean-step .li-dot-meta{color:#2563eb;font-size:9px}
+.lean-step .li-meta-toggle{color:#cbd5e1;padding:0 4px;font-weight:700;cursor:pointer}
+.lean-step .li-meta-toggle:hover{color:#64748b}
+.lean-step .li-x{color:#cbd5e1;padding:0 2px;cursor:pointer}
+.lean-step .li-x:hover{color:#ef4444}
+.lean-meta{padding:8px 8px 10px 32px;background:#f8fafc;border-radius:0 0 8px 8px;margin-bottom:2px}
+.lean-meta textarea{width:100%;box-sizing:border-box;font-family:var(--sans);font-size:12px;border:1px solid var(--border);border-radius:6px;padding:6px 8px;resize:vertical}
+.lean-gate{margin:10px 0 18px;padding:12px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.lean-gate.on{background:#f0fdf4;color:#166534;border-color:#bbf7d0}
+.lean-lock-msg{font-size:12px;color:#94a3b8;padding:8px}
+.lean-addbar{margin:14px 0}
+.lean-cat-frente{margin-bottom:10px}
+.lean-cat-row{display:flex;align-items:center;gap:8px;padding:5px 8px;font-size:12.5px;border-radius:6px}
+.lean-cat-row:hover{background:#f8fafc}
+.lean-cat-row .lc-txt{flex:1}
+.lean-cat-row .lc-tag{font-size:9.5px;color:#7c3aed;background:#ede9fe;padding:1px 7px;border-radius:99px;white-space:nowrap}
+.lean-cat-row .lc-inplan{font-size:11px;color:#16a34a;font-weight:600;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -293,7 +310,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
       </div>
     </div>
     <div id="lean-body"></div>
-    <p style="font-size:11px;color:#94a3b8;margin-top:8px">Cada cliente puede trabajar por bloques distintos, no necesariamente en orden ni todos los pasos — marca "No aplica" en lo que no corresponda para este cliente.</p>
+    <p style="font-size:11px;color:#94a3b8;margin-top:8px">El catálogo maestro no se modifica: cada cliente tiene su propio Plan (una selección de actividades) armado desde ahí, más las que agregues manualmente. Los frentes se desbloquean recién cuando el PIT está aprobado.</p>
   </div>
 </div>
 
@@ -413,7 +430,7 @@ const SEED=[
 {id:49,emp:'Alemán Experto',cont:'(vía Sofi)',cargo:'Dueño',status:'Por contactar',canal:'Referido',accion:'Contactar por Sofi/Berna',notas:'Sofi es esposa del dueño'},
 {id:50,emp:'Ferreterías Lonza',cont:'Simón Lonza',cargo:'Ejecutivo',status:'Contactado',canal:'Email',accion:'Seguimiento en 5 días',notas:'Referido de Luzma. Perfil emprendedor, ecoturismo.',fechaContacto:'2026-06-06',historial:[{fecha:'2026-06-06',tipo:'Email',texto:'Correo personalizado enviado vía Luzma.'}]}
 ];
-function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,com:20,accion:'',notas:'',email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:'',fechaTermino:'',franJugada:'',bitacora:[],leanActive:false,leanSteps:{},leanCustom:{}},c);}
+function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,com:20,accion:'',notas:'',email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:'',fechaTermino:'',franJugada:'',bitacora:[],leanActive:false,leanPlan:{pitAprobado:false,items:{},custom:[]}},c);}
 
 let contacts=[],nextId=60,activeFilter='todos',ownerFilter='todos',detailId=null,sortCol='default',sortDesc=true,loaded=false;
 let ufValorClp=40820.31;
@@ -907,109 +924,387 @@ const MESES_L={'01':'Enero','02':'Febrero','03':'Marzo','04':'Abril','05':'Mayo'
 function mesLabel(ym){return ym==='todos'?'Total':(MESES_L[ym.slice(5,7)]||ym)+' '+ym.slice(0,4);}
 function mesLabelShort(ym){return (MESES_L[ym.slice(5,7)]||ym).slice(0,3).toUpperCase();}
 
-// ---- Ruta Lean: plantilla estándar (basada en el flujo de trabajo real) ----
-const LEAN_TEMPLATE=[
-  {id:'previo',label:'Fase inicial / Venta',steps:[
-    {id:'presentacion',texto:'Presentación de Lean en tu empresa'},
-    {id:'propuesta',texto:'Envío de propuesta'},
-    {id:'entrevistas',texto:'Entrevistas'},
-    {id:'diag_entrevistas',texto:'Diagnóstico entrevistas'},
-    {id:'encuesta_clima',texto:'Encuesta de Clima Laboral'},
-    {id:'diag_clima',texto:'Diagnóstico Clima laboral'},
-    {id:'pit',texto:'Plan de implementación táctico (PIT)'},
-    {id:'objetivos_comunes',texto:'Objetivos comunes (kickoff de las 4 líneas)'},
-  ]},
-  {id:'cultura',label:'Cultura y cambio',steps:[
-    {id:'taller_mvv',group:'Misión y Visión',texto:'Taller de Misión y Visión'},
-    {id:'def_mvv',group:'Misión y Visión',texto:'Definición de Misión y Visión de la empresa'},
-    {id:'plan_comunicacion',group:'Gestión del cambio',texto:'Plan de comunicación interna'},
-    {id:'gestion_resistencias',group:'Gestión del cambio',texto:'Gestión de resistencias'},
-    {id:'embajadores',group:'Gestión del cambio',texto:'Rol de embajadores Lean / agentes de cambio'},
-    {id:'kickoff',group:'Gestión del cambio',texto:'Realización de Kick Off'},
-  ]},
-  {id:'indicadores',label:'Indicadores y procesos',steps:[
-    {id:'taller_kpi',group:'KPI',texto:'Taller de indicadores (KPI)'},
-    {id:'kpi_n1',group:'KPI',texto:'Definición de KPI a medir por área N1'},
-    {id:'kpi_n2',group:'KPI',texto:'Definición de KPI a medir por área N2'},
-    {id:'tableros',group:'Gestión visual',texto:'Definición de tableros de control (KPIs visuales, etc)'},
-    {id:'tableros2',group:'Gestión visual',texto:'Gestión visual en tableros'},
-    {id:'pit_ciclico',group:'Mejora continua',texto:'Planes de implementación táctica (cíclicos)'},
-    {id:'quick_wins_rev',group:'Mejora continua',texto:'Revisión de Quick Wins implementados'},
-    {id:'vsm',group:'Procesos eficientes — mapeo',texto:'Mapeo de flujo de valor por familia'},
-    {id:'armado_flujos',group:'Procesos eficientes — mapeo',texto:'Armado de flujos de trabajo'},
-    {id:'revision_flujos',group:'Procesos eficientes — mapeo',texto:'Revisión de flujos de trabajo'},
-    {id:'def_flujos_eficientes',group:'Procesos eficientes — mapeo',texto:'Definición de flujos eficientes'},
-    {id:'estandarizacion',group:'Procesos eficientes — estandarización',texto:'Estandarización de procesos'},
-    {id:'implementacion_estandarizados',group:'Procesos eficientes — estandarización',texto:'Implementación de flujos estandarizados'},
-    {id:'revision_feedback',group:'Procesos eficientes — estandarización',texto:'Revisión y feedback de mejoras'},
-    {id:'auditoria_roles',group:'Cierre',texto:'Auditoría de roles y responsabilidades'},
-    {id:'kaizen_ciclo',group:'Cierre',texto:'Ciclo de Kaizen mensual/trimestral'},
-    {id:'reconocimiento',group:'Cierre',texto:'Mecanismos de reconocimiento'},
-    {id:'revision_resultados_pit',group:'Cierre',texto:'Revisión de resultados obtenidos en base al PIT'},
-    {id:'lecciones',group:'Cierre',texto:'Lecciones aprendidas'},
-    {id:'pct_quick_wins',group:'Cierre',texto:'% de Quick Wins implementados'},
-    {id:'pct_procesos_estandarizados',group:'Cierre',texto:'% de procesos estandarizados'},
-    {id:'niveles_satisfaccion',group:'Cierre',texto:'Niveles de satisfacción del empleado (barómetro)'},
-  ]},
-  {id:'personas',label:'Personas y estructura',steps:[
-    {id:'rev_actividades',group:'Rutina y actividades',texto:'Revisión de actividades diarias'},
-    {id:'rev_distribucion',group:'Rutina y actividades',texto:'Revisión de distribución de tareas'},
-    {id:'taller_mejora_continua',group:'Mejora continua',texto:'Taller de Mejora continua'},
-    {id:'resolucion_estructurada',group:'Mejora continua',texto:'Resolución estructurada de problemas (A3, PDCA, Kaizen)'},
-    {id:'rev_estructura_org',group:'Estructura organizacional',texto:'Revisión estructura organizacional'},
-    {id:'matriz_habilidades',group:'Estructura organizacional',texto:'Definición de matriz de habilidades'},
-    {id:'taller_roles',group:'Estructura organizacional',texto:'Taller de estructura de roles y definición de cargo'},
-    {id:'def_estructura_org',group:'Estructura organizacional',texto:'Definición de estructura organizacional'},
-    {id:'taller_feedback',group:'Desarrollo de personas',texto:'Taller de Feedback / Coaching'},
-    {id:'disc',group:'Desarrollo de personas',texto:'Gestión de liderazgo: realización de DISC'},
-  ]},
-  {id:'rutinas',label:'Rutinas diarias',steps:[
-    {id:'agenda',texto:'Organización de agenda semanal/mensual'},
-    {id:'taller_reuniones',texto:'Taller de reuniones'},
-    {id:'gestion_visual',texto:'Gestión visual'},
-    {id:'ddd',texto:'Implementación de DdD (Dirección diaria)'},
-  ]},
+// ---- Ruta Lean: catálogo maestro (fijo) + Plan Cliente (snapshot por empresa) ----
+const LEAN_CATALOG=[
+{id:1,o:'existente',fa:'Ruta existente',fr:'Fase Inicial',a:'Entrevistas',t:'Transversal'},
+{id:2,o:'existente',fa:'Ruta existente',fr:'Fase Inicial',a:'Diagnóstico entrevistas',t:'Transversal'},
+{id:3,o:'existente',fa:'Ruta existente',fr:'Fase Inicial',a:'Encuesta de Clima Laboral',t:'Transversal'},
+{id:4,o:'existente',fa:'Ruta existente',fr:'Fase Inicial',a:'Diagnóstico Clima laboral',t:'Transversal'},
+{id:5,o:'existente',fa:'Ruta existente',fr:'Fase Inicial',a:'Plan de implementación táctico',t:'Transversal'},
+{id:6,o:'existente',fa:'Ruta existente',fr:'Objetivos comunes',a:'Taller de Misión y Visión',t:'Transversal'},
+{id:7,o:'existente',fa:'Ruta existente',fr:'Objetivos comunes',a:'Definición de Misión y Visión de la empresa',t:'Transversal'},
+{id:8,o:'existente',fa:'Ruta existente',fr:'Objetivos comunes',a:'Taller de indicadores (KPI)',t:'Transversal'},
+{id:9,o:'existente',fa:'Ruta existente',fr:'Objetivos comunes',a:'Definición de KPI a medir por área N1',t:'Transversal'},
+{id:10,o:'existente',fa:'Ruta existente',fr:'Objetivos comunes',a:'Definición de KPI a medir por área N2',t:'Transversal'},
+{id:11,o:'existente',fa:'Ruta existente',fr:'Objetivos comunes',a:'Revisión de actividades diarias',t:'Transversal'},
+{id:12,o:'existente',fa:'Ruta existente',fr:'Objetivos comunes',a:'Revisión de distribución de tareas',t:'Transversal'},
+{id:13,o:'existente',fa:'Ruta existente',fr:'Objetivos comunes',a:'Organización de agenda semanal/mensual',t:'Transversal'},
+{id:14,o:'existente',fa:'Ruta existente',fr:'Objetivos comunes',a:'Taller de reuniones',t:'Transversal'},
+{id:15,o:'existente',fa:'Ruta existente',fr:'Gestión visual',a:'Definición de tableros de control (KPIs visuales, etc)',t:'Transversal'},
+{id:16,o:'existente',fa:'Ruta existente',fr:'Gestión visual',a:'Implementación de DdD',t:'Transversal'},
+{id:17,o:'existente',fa:'Ruta existente',fr:'Gestión visual',a:'Gestión visual en tableros',t:'Transversal'},
+{id:18,o:'existente',fa:'Ruta existente',fr:'Plan de Medios',a:'Taller Plan de Medios',t:'Transversal'},
+{id:19,o:'existente',fa:'Ruta existente',fr:'Plan de Medios',a:'Armado de plan de medios',t:'Transversal'},
+{id:20,o:'existente',fa:'Ruta existente',fr:'Plan de Medios',a:'Fijar reunión de Plan de Medios',t:'Transversal'},
+{id:21,o:'existente',fa:'Ruta existente',fr:'Gestión del cambio',a:'Plan de comunicación interna',t:'Transversal'},
+{id:22,o:'existente',fa:'Ruta existente',fr:'Gestión del cambio',a:'Gestión de resistencias',t:'Transversal'},
+{id:23,o:'existente',fa:'Ruta existente',fr:'Gestión del cambio',a:'Rol de embajadores Lean / agentes de cambio',t:'Transversal'},
+{id:24,o:'existente',fa:'Ruta existente',fr:'Gestión del cambio',a:'Realización de Kick Off',t:'Transversal'},
+{id:25,o:'existente',fa:'Ruta existente',fr:'Mejora continua',a:'Taller de Mejora continua',t:'Transversal'},
+{id:26,o:'existente',fa:'Ruta existente',fr:'Mejora continua',a:'Resolución estructurada de problemas (A3, PDCA, Kaizen)',t:'Transversal'},
+{id:27,o:'existente',fa:'Ruta existente',fr:'Mejora continua',a:'Planes de implementación táctica (cíclicos)',t:'Transversal'},
+{id:28,o:'existente',fa:'Ruta existente',fr:'Mejora continua',a:'Revisión de Quick Wins implementados',t:'Transversal'},
+{id:29,o:'existente',fa:'Ruta existente',fr:'Procesos eficientes',a:'Revisión estructura organizacional',t:'Transversal'},
+{id:30,o:'existente',fa:'Ruta existente',fr:'Procesos eficientes',a:'Definición de estructura organizacional',t:'Transversal'},
+{id:31,o:'existente',fa:'Ruta existente',fr:'Procesos eficientes',a:'Mapeo de flujo de valor por familia de producto o servicio',t:'Transversal'},
+{id:32,o:'existente',fa:'Ruta existente',fr:'Procesos eficientes',a:'Armado de flujos de trabajo',t:'Transversal'},
+{id:33,o:'existente',fa:'Ruta existente',fr:'Procesos eficientes',a:'Revisión de flujos de procesos',t:'Transversal'},
+{id:34,o:'existente',fa:'Ruta existente',fr:'Procesos eficientes',a:'Definición de flujos de procesos eficiente',t:'Transversal'},
+{id:35,o:'existente',fa:'Ruta existente',fr:'Procesos eficientes',a:'Estandarización de procesos',t:'Transversal'},
+{id:36,o:'existente',fa:'Ruta existente',fr:'Procesos eficientes',a:'Implementación de flujos estandarizados',t:'Transversal'},
+{id:37,o:'existente',fa:'Ruta existente',fr:'Procesos eficientes',a:'Revisión y feedback de mejoras',t:'Transversal'},
+{id:38,o:'existente',fa:'Ruta existente',fr:'Desarrollo de personas',a:'Definición de matriz de habilidades',t:'Transversal'},
+{id:39,o:'existente',fa:'Ruta existente',fr:'Desarrollo de personas',a:'Taller de estructura de roles y definición de cargo',t:'Transversal'},
+{id:40,o:'existente',fa:'Ruta existente',fr:'Desarrollo de personas',a:'Taller de Feedback / Coaching',t:'Transversal'},
+{id:41,o:'existente',fa:'Ruta existente',fr:'Desarrollo de personas',a:'Desarrollo humano',t:'Transversal'},
+{id:42,o:'existente',fa:'Ruta existente',fr:'Desarrollo de personas',a:'Gestión de liderazgo: realización de DISC',t:'Transversal'},
+{id:43,o:'existente',fa:'Ruta existente',fr:'Sostenibilidad',a:'Auditoría de roles y responsabilidades',t:'Transversal'},
+{id:44,o:'existente',fa:'Ruta existente',fr:'Sostenibilidad',a:'Ciclo de Kaizen mensual/trimestral',t:'Transversal'},
+{id:45,o:'existente',fa:'Ruta existente',fr:'Sostenibilidad',a:'Mecanismos de reconocimiento',t:'Transversal'},
+{id:46,o:'existente',fa:'Ruta existente',fr:'Cierre del proyecto',a:'Revisión de resultados obtenidos en base al PIT',t:'Transversal'},
+{id:47,o:'existente',fa:'Ruta existente',fr:'Cierre del proyecto',a:'Lecciones aprendidas',t:'Transversal'},
+{id:48,o:'existente',fa:'Ruta existente',fr:'Cierre del proyecto',a:'% de Quick Wins implementados',t:'Transversal'},
+{id:49,o:'existente',fa:'Ruta existente',fr:'Cierre del proyecto',a:'% de procesos estandarizados',t:'Transversal'},
+{id:50,o:'existente',fa:'Ruta existente',fr:'Cierre del proyecto',a:'Crear  celula de Lean interna',t:'Transversal'},
+{id:51,o:'existente',fa:'Ruta existente',fr:'Cierre del proyecto',a:'Niveles de satisfacción del empleado (barómetro)',t:'Transversal'},
+{id:52,o:'existente',fa:'Ruta existente',fr:'Planning',a:'Taller de Planning',t:'Funcional'},
+{id:53,o:'existente',fa:'Ruta existente',fr:'Planning',a:'Análisis, gestión y preparación de información',t:'Funcional'},
+{id:54,o:'existente',fa:'Ruta existente',fr:'Planning',a:'Planillas de fcst',t:'Funcional'},
+{id:55,o:'existente',fa:'Ruta existente',fr:'Planning',a:'Planillas de Abastecimiento (Traffic Light)',t:'Funcional'},
+{id:56,o:'existente',fa:'Ruta existente',fr:'Planning',a:'Planillas de Gestión de stock',t:'Funcional'},
+{id:57,o:'existente',fa:'Ruta existente',fr:'Planning',a:'Definición de Días de Stock target',t:'Funcional'},
+{id:58,o:'existente',fa:'Ruta existente',fr:'Planning',a:'Taller de Gestión y análisis de data',t:'Funcional'},
+{id:59,o:'existente',fa:'Ruta existente',fr:'Planning',a:'Seguimiento avance de ventas vs Stock',t:'Funcional'},
+{id:60,o:'existente',fa:'Ruta existente',fr:'Planning',a:'KPI de Planning',t:'Funcional'},
+{id:61,o:'existente',fa:'Ruta existente',fr:'Operaciones',a:'Taller de Operaciones',t:'Funcional'},
+{id:62,o:'existente',fa:'Ruta existente',fr:'Operaciones',a:'Capacidad de utilización',t:'Funcional'},
+{id:63,o:'existente',fa:'Ruta existente',fr:'Operaciones',a:'Calculo de necesidad de Head Counts',t:'Funcional'},
+{id:64,o:'existente',fa:'Ruta existente',fr:'Operaciones',a:'Realización de Layout',t:'Funcional'},
+{id:65,o:'existente',fa:'Ruta existente',fr:'Operaciones',a:'Definición de Layout con cliente',t:'Funcional'},
+{id:66,o:'existente',fa:'Ruta existente',fr:'Operaciones',a:'Manejo de Inventario',t:'Funcional'},
+{id:67,o:'existente',fa:'Ruta existente',fr:'Operaciones',a:'Estándar de despacho',t:'Funcional'},
+{id:68,o:'existente',fa:'Ruta existente',fr:'Operaciones',a:'Estándar de cotizaciones; flujo y órden',t:'Funcional'},
+{id:69,o:'existente',fa:'Ruta existente',fr:'Operaciones',a:'Revisión de seguro',t:'Funcional'},
+{id:70,o:'existente',fa:'Ruta existente',fr:'Operaciones',a:'KPI de Operaciones',t:'Funcional'},
+{id:71,o:'existente',fa:'Ruta existente',fr:'Transportes',a:'Taller de Transportes',t:'Funcional'},
+{id:72,o:'existente',fa:'Ruta existente',fr:'Transportes',a:'Necesidad de número de transportes',t:'Funcional'},
+{id:73,o:'existente',fa:'Ruta existente',fr:'Transportes',a:'KPI de Transportes',t:'Funcional'},
+{id:74,o:'existente',fa:'Ruta existente',fr:'Producción',a:'Taller de Planificación de producción',t:'Funcional'},
+{id:75,o:'existente',fa:'Ruta existente',fr:'Producción',a:'Capacidad de utilización',t:'Funcional'},
+{id:76,o:'existente',fa:'Ruta existente',fr:'Producción',a:'Plan de producción',t:'Funcional'},
+{id:77,o:'existente',fa:'Ruta existente',fr:'Producción',a:'Abastecimiento de materiales',t:'Funcional'},
+{id:78,o:'existente',fa:'Ruta existente',fr:'Producción',a:'Gestión con prooveedores',t:'Funcional'},
+{id:79,o:'existente',fa:'Ruta existente',fr:'Producción',a:'KPI de Producción',t:'Funcional'},
+{id:80,o:'shingo_ls',fa:'1. Alineamiento',fr:'Valor desde el cliente',a:'Definir el valor estrictamente desde la perspectiva del cliente',t:'Lean/Shingo'},
+{id:81,o:'shingo_ls',fa:'1. Alineamiento',fr:'Valor desde el cliente',a:'Precisar el problema concreto que el cliente busca resolver',t:'Lean/Shingo'},
+{id:82,o:'shingo_ls',fa:'1. Alineamiento',fr:'Valor desde el cliente',a:'Contrastar la perspectiva del productor con la perspectiva del cliente',t:'Lean/Shingo'},
+{id:83,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Cadena de valor',a:'Mapear el estado actual de la cadena de valor',t:'Lean/Shingo'},
+{id:84,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Cadena de valor',a:'Distinguir actividades de valor agregado y tiempos de espera',t:'Lean/Shingo'},
+{id:85,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Flujo',a:'Identificar lotes, interrupciones y transferencias que impiden el flujo',t:'Lean/Shingo'},
+{id:86,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Sistema pull',a:'Revisar inventarios y producción sin demanda concreta',t:'Lean/Shingo'},
+{id:87,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Muri · Mura · Muda',a:'Identificar condiciones de sobrecarga (Muri)',t:'Lean/Shingo'},
+{id:88,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Muri · Mura · Muda',a:'Identificar variabilidad e irregularidad (Mura)',t:'Lean/Shingo'},
+{id:89,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Muri · Mura · Muda',a:'Identificar desperdicio visible (Muda)',t:'Lean/Shingo'},
+{id:90,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar transporte innecesario',t:'Lean/Shingo'},
+{id:91,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar exceso de inventario',t:'Lean/Shingo'},
+{id:92,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar movimientos innecesarios',t:'Lean/Shingo'},
+{id:93,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar esperas de personas o equipos',t:'Lean/Shingo'},
+{id:94,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar sobreproducción',t:'Lean/Shingo'},
+{id:95,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar sobreprocesamiento',t:'Lean/Shingo'},
+{id:96,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar defectos y reprocesos',t:'Lean/Shingo'},
+{id:97,o:'shingo_ls',fa:'2. Diagnóstico sistémico',fr:'Ocho desperdicios',a:'Revisar talento no aprovechado',t:'Lean/Shingo'},
+{id:98,o:'shingo_ls',fa:'3. Diseño del sistema',fr:'Estado futuro',a:'Diseñar un estado futuro con menos esperas y traspasos',t:'Lean/Shingo'},
+{id:99,o:'shingo_ls',fa:'3. Diseño del sistema',fr:'Flujo',a:'Definir oportunidades de flujo continuo',t:'Lean/Shingo'},
+{id:100,o:'shingo_ls',fa:'3. Diseño del sistema',fr:'Sistema pull',a:'Definir señales de consumo y reposición',t:'Lean/Shingo'},
+{id:101,o:'shingo_ls',fa:'3. Diseño del sistema',fr:'Selección de herramientas',a:'Seleccionar herramientas según el problema diagnosticado',t:'Lean/Shingo'},
+{id:102,o:'shingo_ls',fa:'4. Implementación',fr:'5S',a:'Clasificar elementos necesarios e innecesarios',t:'Lean/Shingo'},
+{id:103,o:'shingo_ls',fa:'4. Implementación',fr:'5S',a:'Ordenar y definir ubicación visible',t:'Lean/Shingo'},
+{id:104,o:'shingo_ls',fa:'4. Implementación',fr:'5S',a:'Limpiar y eliminar fuentes de desorden',t:'Lean/Shingo'},
+{id:105,o:'shingo_ls',fa:'4. Implementación',fr:'5S',a:'Estandarizar condiciones visibles',t:'Lean/Shingo'},
+{id:106,o:'shingo_ls',fa:'4. Implementación',fr:'5S',a:'Sostener la disciplina del sistema',t:'Lean/Shingo'},
+{id:107,o:'shingo_ls',fa:'4. Implementación',fr:'Kaizen',a:'Ejecutar mejoras pequeñas, rápidas y de bajo costo',t:'Lean/Shingo'},
+{id:108,o:'shingo_ls',fa:'4. Implementación',fr:'Kanban',a:'Implementar una señal visual de reposición por consumo',t:'Lean/Shingo'},
+{id:109,o:'shingo_ls',fa:'4. Implementación',fr:'SMED',a:'Identificar actividades de preparación interna y externa',t:'Lean/Shingo'},
+{id:110,o:'shingo_ls',fa:'4. Implementación',fr:'SMED',a:'Mover fuera de la detención las preparaciones externas',t:'Lean/Shingo'},
+{id:111,o:'shingo_ls',fa:'4. Implementación',fr:'SMED',a:'Reducir la preparación interna restante',t:'Lean/Shingo'},
+{id:112,o:'shingo_ls',fa:'4. Implementación',fr:'Poka‑Yoke',a:'Definir el error que se debe impedir o evidenciar',t:'Lean/Shingo'},
+{id:113,o:'shingo_ls',fa:'4. Implementación',fr:'Poka‑Yoke',a:'Diseñar un mecanismo físico, lógico o de diseño',t:'Lean/Shingo'},
+{id:114,o:'shingo_ls',fa:'4. Implementación',fr:'Poka‑Yoke',a:'Verificar detección o prevención en el origen',t:'Lean/Shingo'},
+{id:115,o:'shingo_ls',fa:'5. Cultura Shingo',fr:'Principios y sistemas',a:'Revisar si los sistemas reflejan los principios declarados',t:'Lean/Shingo'},
+{id:116,o:'shingo_ls',fa:'5. Cultura Shingo',fr:'Comportamientos',a:'Definir comportamientos ideales que sostienen el sistema',t:'Lean/Shingo'},
+{id:117,o:'shingo_ls',fa:'5. Cultura Shingo',fr:'Liderazgo',a:'Revisar liderazgo con humildad y respeto por cada individuo',t:'Lean/Shingo'},
+{id:118,o:'shingo_ls',fa:'5. Cultura Shingo',fr:'Alineamiento',a:'Revisar constancia de propósito y pensamiento sistémico',t:'Lean/Shingo'},
+{id:119,o:'shingo_ls',fa:'5. Cultura Shingo',fr:'Resultados',a:'Conectar resultados con sistemas y comportamientos',t:'Lean/Shingo'},
+{id:120,o:'shingo_ls',fa:'6. Sostenibilidad',fr:'Indicadores',a:'Definir indicadores de comportamiento además de KPIs de resultado',t:'Lean/Shingo'},
+{id:121,o:'shingo_ls',fa:'6. Sostenibilidad',fr:'Alertas',a:'Verificar que Lean no se use solo para recortar personal',t:'Lean/Shingo'},
+{id:122,o:'shingo_ls',fa:'6. Sostenibilidad',fr:'Alertas',a:'Verificar que el liderazgo enseñe y no actúe como policía Lean',t:'Lean/Shingo'},
+{id:123,o:'shingo_ls',fa:'6. Sostenibilidad',fr:'Alertas',a:'Evitar eficiencia local que ignore complejidad o sobrecarga',t:'Lean/Shingo'},
+{id:124,o:'shingo_ls',fa:'6. Sostenibilidad',fr:'Perfección',a:'Establecer un ciclo periódico de mejora hacia la perfección',t:'Lean/Shingo'},
+{id:125,o:'shingo_ls',fa:'6. Sostenibilidad',fr:'Cierre',a:'Revisar aprendizajes, resultados y siguiente ciclo',t:'Lean/Shingo'},
+{id:126,o:'shingo_hb',fa:'0. Preparación Shingo',fr:'Transformación',a:'Realizar reflexión personal del equipo líder sobre los diez principios rectores',t:'Shingo Handbook',p:'Pensar sistémicamente',r:'Liderazgo'},
+{id:127,o:'shingo_hb',fa:'0. Preparación Shingo',fr:'Transformación',a:'Alinear al equipo en los cinco cambios fundamentales de paradigma',t:'Shingo Handbook',p:'Pensar sistémicamente',r:'Liderazgo'},
+{id:128,o:'shingo_hb',fa:'0. Preparación Shingo',fr:'Transformación',a:'Definir responsabilidad personal del liderazgo sobre la cultura',t:'Shingo Handbook',p:'Liderar con humildad',r:'Liderazgo'},
+{id:129,o:'shingo_hb',fa:'0. Preparación Shingo',fr:'Transformación',a:'Enseñar la relación entre principios, sistemas, herramientas, comportamientos y resultados',t:'Shingo Handbook',p:'Pensar sistémicamente',r:'Todos'},
+{id:130,o:'shingo_hb',fa:'1. Facilitadores culturales',fr:'Respeto',a:'Evaluar respeto por empleados, clientes, proveedores, comunidad y sociedad',t:'Shingo Handbook',p:'Respetar a cada individuo',r:'Todos'},
+{id:131,o:'shingo_hb',fa:'1. Facilitadores culturales',fr:'Seguridad',a:'Evaluar seguridad física, psicológica y ambiental',t:'Shingo Handbook',p:'Respetar a cada individuo',r:'Todos'},
+{id:132,o:'shingo_hb',fa:'1. Facilitadores culturales',fr:'Empoderamiento',a:'Revisar autonomía e información disponible para tomar decisiones',t:'Shingo Handbook',p:'Respetar a cada individuo',r:'Gerentes'},
+{id:133,o:'shingo_hb',fa:'1. Facilitadores culturales',fr:'Humildad',a:'Observar escucha, búsqueda de aportes y apertura al aprendizaje',t:'Shingo Handbook',p:'Liderar con humildad',r:'Líderes'},
+{id:134,o:'shingo_hb',fa:'1. Facilitadores culturales',fr:'Desarrollo',a:'Revisar habilidades y competencias requeridas por rol',t:'Shingo Handbook',p:'Respetar a cada individuo',r:'Gerentes'},
+{id:135,o:'shingo_hb',fa:'1. Facilitadores culturales',fr:'Desarrollo',a:'Diseñar experiencias prácticas para desarrollar personas',t:'Shingo Handbook',p:'Respetar a cada individuo',r:'Gerentes'},
+{id:136,o:'shingo_hb',fa:'1. Facilitadores culturales',fr:'Comportamientos',a:'Definir comportamientos ideales para líderes, gerentes y asociados',t:'Shingo Handbook',p:'Liderar con humildad',r:'Todos'},
+{id:137,o:'shingo_hb',fa:'1. Facilitadores culturales',fr:'Comportamientos',a:'Crear retroalimentación periódica sobre comportamientos de liderazgo',t:'Shingo Handbook',p:'Liderar con humildad',r:'Líderes'},
+{id:138,o:'shingo_hb',fa:'2. Mejora continua',fr:'Valor',a:'Definir valor considerando innovación, calidad, costo, flexibilidad, entrega, seguridad y ambiente',t:'Shingo Handbook',p:'Crear valor para el cliente',r:'Todos'},
+{id:139,o:'shingo_hb',fa:'2. Mejora continua',fr:'Estándar',a:'Definir qué significa un resultado bueno y qué hacer cuando no lo es',t:'Shingo Handbook',p:'Asegurar la calidad desde el inicio',r:'Todos'},
+{id:140,o:'shingo_hb',fa:'2. Mejora continua',fr:'Perfección',a:'Buscar oportunidades incluso cuando el proceso aparenta funcionar',t:'Shingo Handbook',p:'Buscar la perfección',r:'Todos'},
+{id:141,o:'shingo_hb',fa:'2. Mejora continua',fr:'Proceso',a:'Redirigir problemas desde la culpa individual hacia el proceso',t:'Shingo Handbook',p:'Enfocarse en los procesos',r:'Todos'},
+{id:142,o:'shingo_hb',fa:'2. Mejora continua',fr:'Pensamiento científico',a:'Definir condición actual, resultado deseado e hipótesis',t:'Shingo Handbook',p:'Adoptar el pensamiento científico',r:'Todos'},
+{id:143,o:'shingo_hb',fa:'2. Mejora continua',fr:'Pensamiento científico',a:'Ejecutar experimento y comparar resultado previsto versus real',t:'Shingo Handbook',p:'Adoptar el pensamiento científico',r:'Todos'},
+{id:144,o:'shingo_hb',fa:'2. Mejora continua',fr:'Flow & Pull',a:'Medir plazo total y barreras que interrumpen el flujo de valor',t:'Shingo Handbook',p:'Hacer fluir y traer valor',r:'Todos'},
+{id:145,o:'shingo_hb',fa:'2. Mejora continua',fr:'Flow & Pull',a:'Ajustar la tasa de producción o servicio al nivel de demanda',t:'Shingo Handbook',p:'Hacer fluir y traer valor',r:'Todos'},
+{id:146,o:'shingo_hb',fa:'2. Mejora continua',fr:'Calidad en la fuente',a:'Definir regla de no dejar pasar defectos al proceso siguiente',t:'Shingo Handbook',p:'Asegurar la calidad desde el inicio',r:'Todos'},
+{id:147,o:'shingo_hb',fa:'2. Mejora continua',fr:'Calidad en la fuente',a:'Definir autoridad para detener, corregir y analizar el problema',t:'Shingo Handbook',p:'Asegurar la calidad desde el inicio',r:'Todos'},
+{id:148,o:'shingo_hb',fa:'2. Mejora continua',fr:'Estabilidad',a:'Evaluar estabilidad y fuentes de variación del proceso',t:'Shingo Handbook',p:'Enfocarse en los procesos',r:'Todos'},
+{id:149,o:'shingo_hb',fa:'2. Mejora continua',fr:'Observación directa',a:'Realizar observación directa en el lugar real de trabajo',t:'Shingo Handbook',p:'Adoptar el pensamiento científico',r:'Todos'},
+{id:150,o:'shingo_hb',fa:'2. Mejora continua',fr:'Estandarización',a:'Crear o actualizar trabajo estandarizado para mantener la mejora',t:'Shingo Handbook',p:'Enfocarse en los procesos',r:'Todos'},
+{id:151,o:'shingo_hb',fa:'2. Mejora continua',fr:'Gestión visual',a:'Simplificar y hacer visual la información necesaria',t:'Shingo Handbook',p:'Enfocarse en los procesos',r:'Todos'},
+{id:152,o:'shingo_hb',fa:'2. Mejora continua',fr:'Trabajo diario',a:'Integrar la mejora al trabajo diario de cada rol',t:'Shingo Handbook',p:'Buscar la perfección',r:'Todos'},
+{id:153,o:'shingo_hb',fa:'2. Mejora continua',fr:'Datos',a:'Definir datos correctos y reconciliar predicción con resultado real',t:'Shingo Handbook',p:'Adoptar el pensamiento científico',r:'Todos'},
+{id:154,o:'shingo_hb',fa:'3. Alineamiento',fr:'Sistemas',a:'Inventariar los sistemas empresariales, de gestión y de trabajo',t:'Shingo Handbook',p:'Pensar sistémicamente',r:'Gerentes'},
+{id:155,o:'shingo_hb',fa:'3. Alineamiento',fr:'Sistemas',a:'Evaluar qué comportamientos produce cada sistema',t:'Shingo Handbook',p:'Pensar sistémicamente',r:'Gerentes'},
+{id:156,o:'shingo_hb',fa:'3. Alineamiento',fr:'Sistemas',a:'Rediseñar sistemas que generan comportamientos no ideales',t:'Shingo Handbook',p:'Pensar sistémicamente',r:'Gerentes'},
+{id:157,o:'shingo_hb',fa:'3. Alineamiento',fr:'Pensamiento sistémico',a:'Revisar interacciones, efectos laterales y optimización local',t:'Shingo Handbook',p:'Pensar sistémicamente',r:'Todos'},
+{id:158,o:'shingo_hb',fa:'3. Alineamiento',fr:'Propósito',a:'Definir propósito de largo plazo y principios guía',t:'Shingo Handbook',p:'Crear constancia de propósito',r:'Líderes'},
+{id:159,o:'shingo_hb',fa:'3. Alineamiento',fr:'Estrategia',a:'Desplegar estrategia mediante consenso, rendición de cuentas y ciclos de aprendizaje',t:'Shingo Handbook',p:'Crear constancia de propósito',r:'Líderes'},
+{id:160,o:'shingo_hb',fa:'3. Alineamiento',fr:'Realidad',a:'Crear mecanismos para ver y comunicar la realidad sin distorsiones',t:'Shingo Handbook',p:'Pensar sistémicamente',r:'Líderes'},
+{id:161,o:'shingo_hb',fa:'3. Alineamiento',fr:'Largo plazo',a:'Revisar decisiones de corto plazo frente a seguridad, calidad, entrega y costo de largo plazo',t:'Shingo Handbook',p:'Crear constancia de propósito',r:'Líderes'},
+{id:162,o:'shingo_hb',fa:'3. Alineamiento',fr:'Gestión diaria',a:'Definir trabajo estandarizado diario para líderes y gerentes',t:'Shingo Handbook',p:'Crear constancia de propósito',r:'Líderes'},
+{id:163,o:'shingo_hb',fa:'3. Alineamiento',fr:'Métricas',a:'Alinear estrategia, trabajo, decisiones y métricas en todos los niveles',t:'Shingo Handbook',p:'Crear constancia de propósito',r:'Todos'},
+{id:164,o:'shingo_hb',fa:'4. Resultados',fr:'Voz del cliente',a:'Crear un sistema para escuchar y compartir la voz del cliente',t:'Shingo Handbook',p:'Crear valor para el cliente',r:'Todos'},
+{id:165,o:'shingo_hb',fa:'4. Resultados',fr:'Métricas',a:'Definir métricas simples, oportunas y vinculadas al ciclo de trabajo',t:'Shingo Handbook',p:'Crear valor para el cliente',r:'Todos'},
+{id:166,o:'shingo_hb',fa:'4. Resultados',fr:'Métricas',a:'Equilibrar indicadores de comportamiento y resultados',t:'Shingo Handbook',p:'Crear valor para el cliente',r:'Líderes'},
+{id:167,o:'shingo_hb',fa:'4. Resultados',fr:'Causa y efecto',a:'Trazar relaciones entre principios, sistemas, comportamientos y resultados',t:'Shingo Handbook',p:'Crear valor para el cliente',r:'Todos'},
+{id:168,o:'shingo_hb',fa:'4. Resultados',fr:'Revisión',a:'Revisar resultados con las personas y discutir los sistemas que los generan',t:'Shingo Handbook',p:'Crear valor para el cliente',r:'Gerentes'},
+{id:169,o:'shingo_hb',fa:'5. Alcance empresarial',fr:'Relación con clientes',a:'Evaluar ventas, promoción, pedidos, facturación, garantías y entrega',t:'Shingo Handbook',p:'Crear valor para el cliente',r:'Gerentes'},
+{id:170,o:'shingo_hb',fa:'5. Alcance empresarial',fr:'Productos y servicios',a:'Evaluar desarrollo de productos, servicios y procesos',t:'Shingo Handbook',p:'Pensar sistémicamente',r:'Gerentes'},
+{id:171,o:'shingo_hb',fa:'5. Alcance empresarial',fr:'Operaciones',a:'Evaluar materiales, ingeniería, mantenimiento, calidad y pruebas',t:'Shingo Handbook',p:'Pensar sistémicamente',r:'Gerentes'},
+{id:172,o:'shingo_hb',fa:'5. Alcance empresarial',fr:'Suministro',a:'Evaluar selección, calificación y desarrollo de proveedores',t:'Shingo Handbook',p:'Pensar sistémicamente',r:'Gerentes'},
+{id:173,o:'shingo_hb',fa:'5. Alcance empresarial',fr:'Administración',a:'Evaluar personas, finanzas, activos, tecnología y procesos de soporte',t:'Shingo Handbook',p:'Pensar sistémicamente',r:'Gerentes'},
+{id:174,o:'shingo_hb',fa:'6. Evaluación y sostenibilidad',fr:'Autoevaluación',a:'Realizar autoevaluación honesta del Modelo Shingo',t:'Shingo Handbook',p:'Pensar sistémicamente',r:'Todos'},
+{id:175,o:'shingo_hb',fa:'6. Evaluación y sostenibilidad',fr:'Plan de mejora',a:'Priorizar brechas y construir plan de mejora cultural',t:'Shingo Handbook',p:'Buscar la perfección',r:'Líderes'},
+{id:176,o:'shingo_hb',fa:'6. Evaluación y sostenibilidad',fr:'Reevaluación',a:'Repetir evaluación y comparar madurez, comportamientos y resultados',t:'Shingo Handbook',p:'Buscar la perfección',r:'Todos'}
 ];
-const LEAN_STATUS_LABEL={pendiente:'Pendiente',curso:'En curso',hecho:'Hecho',na:'No aplica'};
-const LEAN_NEXT_STATUS={pendiente:'curso',curso:'hecho',hecho:'na',na:'pendiente'};
-let leanClient=null;
-function leanStatus(c,trackId,stepId){
-  return (c.leanSteps&&c.leanSteps[trackId+'.'+stepId])||'pendiente';
+const LEAN_ORIGEN_LABEL={existente:'Ruta de consultoría (actual)',shingo_ls:'Lean/Shingo — Desperdicios y herramientas',shingo_hb:'Shingo Handbook — Principios rectores'};
+const LEAN_FASE_INICIAL_IDS=[1,2,3,4,5];
+const LEAN_STATUS_LABEL={pendiente:'Pendiente',curso:'En curso',hecho:'Hecho'};
+const LEAN_NEXT_STATUS={pendiente:'curso',curso:'hecho',hecho:'pendiente'};
+let leanClient=null,leanView='plan',leanCatOrigen='existente';
+function leanCatalogById(id){return LEAN_CATALOG.find(x=>x.id===id);}
+function leanEnsurePlan(c){
+  if(!c.leanPlan)c.leanPlan={pitAprobado:false,items:{},custom:[]};
+  if(!c.leanPlan.items)c.leanPlan.items={};
+  if(!c.leanPlan.custom)c.leanPlan.custom=[];
+  return c.leanPlan;
 }
-function cycleLean(cid,trackId,stepId){
+function leanBlankItem(){return {status:'pendiente',responsable:'',fecha:'',entregable:'',evidencia:'',notas:''};}
+function leanSeedFaseInicial(c){
+  const plan=leanEnsurePlan(c);
+  LEAN_FASE_INICIAL_IDS.forEach(id=>{if(!plan.items[id])plan.items[id]=leanBlankItem();});
+}
+function toggleLeanPit(cid){
   const c=contacts.find(x=>x.id===cid);if(!c)return;
-  if(!c.leanSteps)c.leanSteps={};
-  const key=trackId+'.'+stepId;
-  c.leanSteps[key]=LEAN_NEXT_STATUS[c.leanSteps[key]||'pendiente'];
+  const plan=leanEnsurePlan(c);
+  plan.pitAprobado=!plan.pitAprobado;
   persist();renderLean();
 }
-function cycleLeanCustom(cid,trackId,stepId){
-  const c=contacts.find(x=>x.id===cid);if(!c||!c.leanCustom||!c.leanCustom[trackId])return;
-  const item=c.leanCustom[trackId].find(s=>s.id===stepId);if(!item)return;
-  item.status=LEAN_NEXT_STATUS[item.status||'pendiente'];
-  persist();renderLean();
-}
-function addLeanCustom(cid,trackId){
+function leanAddToPlan(cid,catId){
   const c=contacts.find(x=>x.id===cid);if(!c)return;
-  const input=document.getElementById('lean-add-'+trackId);if(!input)return;
-  const texto=(input.value||'').trim();if(!texto)return;
-  if(!c.leanCustom)c.leanCustom={};
-  if(!c.leanCustom[trackId])c.leanCustom[trackId]=[];
-  c.leanCustom[trackId].push({id:'c'+Date.now(),texto,status:'pendiente'});
-  input.value='';
+  const plan=leanEnsurePlan(c);
+  if(!plan.items[catId])plan.items[catId]=leanBlankItem();
+  persist();renderLean();showToast('✅ Agregada al plan');
+}
+function leanRemoveFromPlan(cid,catId){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  if(!confirm('¿Quitar esta actividad del plan de este cliente?'))return;
+  const plan=leanEnsurePlan(c);
+  delete plan.items[catId];
   persist();renderLean();
 }
-function delLeanCustom(cid,trackId,stepId){
-  const c=contacts.find(x=>x.id===cid);if(!c||!c.leanCustom||!c.leanCustom[trackId])return;
-  if(!confirm('¿Eliminar este paso?'))return;
-  c.leanCustom[trackId]=c.leanCustom[trackId].filter(s=>s.id!==stepId);
+function leanCycle(cid,catId){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const plan=leanEnsurePlan(c);
+  const it=plan.items[catId];if(!it)return;
+  it.status=LEAN_NEXT_STATUS[it.status||'pendiente'];
   persist();renderLean();
 }
-function setLeanClient(id){leanClient=parseInt(id,10);renderLean();}
-function leanStepRow(cid,trackId,stepId,texto,status,isCustom){
-  const fn=isCustom?'cycleLeanCustom':'cycleLean';
-  return '<div class="lean-step '+status+'" onclick="'+fn+'('+cid+',\''+trackId+'\',\''+stepId+'\')"><span class="ls-dot"></span><span class="ls-txt">'+esc(texto)+'</span><span class="ls-badge">'+LEAN_STATUS_LABEL[status]+'</span>'+
-    (isCustom?'<span onclick="event.stopPropagation();delLeanCustom('+cid+',\''+trackId+'\',\''+stepId+'\')" title="Eliminar paso" style="color:#cbd5e1;padding:0 2px 0 6px">✕</span>':'')+'</div>';
+function leanCycleCustom(cid,customId){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const plan=leanEnsurePlan(c);
+  const it=plan.custom.find(x=>x.id===customId);if(!it)return;
+  it.status=LEAN_NEXT_STATUS[it.status||'pendiente'];
+  persist();renderLean();
+}
+function leanSetMeta(cid,catId,field,value){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const plan=leanEnsurePlan(c);
+  const it=plan.items[catId];if(!it)return;
+  it[field]=value;persist();
+}
+function leanSetMetaCustom(cid,customId,field,value){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const plan=leanEnsurePlan(c);
+  const it=plan.custom.find(x=>x.id===customId);if(!it)return;
+  it[field]=value;persist();
+}
+function leanAddCustom(cid){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const frenteInput=document.getElementById('lean-custom-frente');
+  const textoInput=document.getElementById('lean-custom-texto');
+  const frente=(frenteInput.value||'').trim(),texto=(textoInput.value||'').trim();
+  if(!frente||!texto){showToast('Completa frente y actividad');return;}
+  const plan=leanEnsurePlan(c);
+  const item=leanBlankItem();item.id='c'+Date.now();item.frente=frente;item.texto=texto;
+  plan.custom.push(item);
+  frenteInput.value='';textoInput.value='';
+  persist();renderLean();
+}
+function leanDelCustom(cid,customId){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  if(!confirm('¿Eliminar esta actividad personalizada?'))return;
+  const plan=leanEnsurePlan(c);
+  plan.custom=plan.custom.filter(x=>x.id!==customId);
+  persist();renderLean();
+}
+function leanToggleMeta(btn){
+  const row=btn.closest('.lean-item');if(!row)return;
+  const panel=row.querySelector('.lean-meta');if(panel)panel.hidden=!panel.hidden;
+}
+function leanFilterCatalogo(v){
+  const q=v.toLowerCase();
+  document.querySelectorAll('#lean-body .lean-cat-row').forEach(el=>{
+    const txt=el.getAttribute('data-search')||'';
+    el.style.display=(!q||txt.includes(q))?'':'none';
+  });
+  document.querySelectorAll('#lean-body .lean-cat-frente').forEach(el=>{
+    const any=[...el.querySelectorAll('.lean-cat-row')].some(r=>r.style.display!=='none');
+    el.style.display=any?'':'none';
+  });
+}
+function setLeanView(v){leanView=v;renderLean();}
+function setLeanCatOrigen(o){leanCatOrigen=o;renderLean();}
+function setLeanClient(id){leanClient=parseInt(id,10);leanView='plan';renderLean();}
+function leanItemMetaPanel(cid,idArg,item,isCustom){
+  const setFn=isCustom?'leanSetMetaCustom':'leanSetMeta';
+  return '<div class="lean-meta" hidden>'+
+    '<div class="field-row3">'+
+      '<div class="field"><label>Responsable</label><select onchange="'+setFn+'('+cid+','+idArg+',\'responsable\',this.value)"><option value="">—</option>'+['Jael','Rafa','Cliente','Ambos'].map(o=>'<option'+(item.responsable===o?' selected':'')+'>'+o+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label>Fecha</label><input type="date" value="'+(item.fecha||'')+'" onchange="'+setFn+'('+cid+','+idArg+',\'fecha\',this.value)"></div>'+
+      '<div class="field"><label>Entregable</label><input type="text" value="'+esc(item.entregable||'')+'" placeholder="ej: PPT, Excel, informe" onchange="'+setFn+'('+cid+','+idArg+',\'entregable\',this.value)"></div>'+
+    '</div>'+
+    '<div class="field"><label>Evidencia</label><input type="text" value="'+esc(item.evidencia||'')+'" placeholder="link o descripción de la evidencia" onchange="'+setFn+'('+cid+','+idArg+',\'evidencia\',this.value)"></div>'+
+    '<div class="field"><label>Notas</label><textarea onchange="'+setFn+'('+cid+','+idArg+',\'notas\',this.value)" rows="2">'+esc(item.notas||'')+'</textarea></div>'+
+  '</div>';
+}
+function leanItemRow(cid,refId,label,item,isCustom,removable){
+  const st=item.status||'pendiente';
+  const cycleFn=isCustom?'leanCycleCustom':'leanCycle';
+  const idArg=isCustom?"'"+refId+"'":refId;
+  const hasMeta=!!(item.responsable||item.fecha||item.entregable||item.evidencia||item.notas);
+  const removeFn=isCustom?'leanDelCustom':'leanRemoveFromPlan';
+  return '<div class="lean-item">'+
+    '<div class="lean-step '+st+'" onclick="'+cycleFn+'('+cid+','+idArg+')">'+
+      '<span class="ls-dot"></span><span class="ls-txt">'+esc(label)+'</span>'+
+      (hasMeta?'<span class="li-dot-meta" title="Tiene datos registrados">●</span>':'')+
+      '<span class="ls-badge">'+LEAN_STATUS_LABEL[st]+'</span>'+
+      '<span class="li-meta-toggle" onclick="event.stopPropagation();leanToggleMeta(this)" title="Responsable / fecha / entregable / evidencia">⋯</span>'+
+      (removable!==false?'<span class="li-x" onclick="event.stopPropagation();'+removeFn+'('+cid+','+idArg+')" title="Quitar del plan">✕</span>':'')+
+    '</div>'+
+    leanItemMetaPanel(cid,idArg,item,isCustom)+
+  '</div>';
+}
+function renderLeanPlan(c){
+  const box=document.getElementById('lean-body');
+  const plan=leanEnsurePlan(c);
+  const faseHtml=LEAN_FASE_INICIAL_IDS.map(id=>{
+    const cat=leanCatalogById(id);
+    const item=plan.items[id]||leanBlankItem();
+    return leanItemRow(c.id,id,cat.a,item,false,false);
+  }).join('');
+  const faseDone=LEAN_FASE_INICIAL_IDS.filter(id=>(plan.items[id]||{}).status==='hecho').length;
+
+  const groups={};const frenteOrder=[];
+  Object.keys(plan.items).forEach(k=>{
+    const id=parseInt(k,10);
+    if(LEAN_FASE_INICIAL_IDS.includes(id))return;
+    const cat=leanCatalogById(id);if(!cat)return;
+    if(!groups[cat.fr]){groups[cat.fr]=[];frenteOrder.push(cat.fr);}
+    groups[cat.fr].push({ref:id,label:cat.a,item:plan.items[k],isCustom:false});
+  });
+  (plan.custom||[]).forEach(cu=>{
+    if(!groups[cu.frente]){groups[cu.frente]=[];frenteOrder.push(cu.frente);}
+    groups[cu.frente].push({ref:cu.id,label:cu.texto,item:cu,isCustom:true});
+  });
+  frenteOrder.sort((a,b)=>a.localeCompare(b));
+
+  let totalDone=faseDone,totalCount=LEAN_FASE_INICIAL_IDS.length;
+  const frentesHtml=frenteOrder.map(fr=>{
+    const rows=groups[fr];
+    const done=rows.filter(r=>(r.item.status||'pendiente')==='hecho').length;
+    totalDone+=done;totalCount+=rows.length;
+    const pct=rows.length?Math.round(done/rows.length*100):0;
+    const rowsHtml=plan.pitAprobado?rows.map(r=>leanItemRow(c.id,r.ref,r.label,r.item,r.isCustom,true)).join(''):'<div class="lean-lock-msg">🔒 Se desbloquea cuando el PIT esté aprobado</div>';
+    return '<div class="lean-track'+(plan.pitAprobado?'':' locked')+'"><div class="lean-track-hdr">'+esc(fr)+' <span style="font-weight:400;color:#94a3b8">— '+done+'/'+rows.length+' ('+pct+'%)</span></div>'+rowsHtml+'</div>';
+  }).join('');
+
+  const overallPct=totalCount?Math.round(totalDone/totalCount*100):0;
+  box.innerHTML=
+    '<div class="tips-box" style="margin-bottom:14px"><strong>'+esc(c.emp)+'</strong> · Progreso general: <strong>'+totalDone+'/'+totalCount+'</strong> ('+overallPct+'%) <span style="color:#94a3b8;font-size:11px">— click en una actividad para pasar Pendiente → En curso → Hecho. El ⋯ abre responsable/fecha/entregable/evidencia.</span></div>'+
+    '<div class="lean-track"><div class="lean-track-hdr">Fase inicial / Venta <span style="font-weight:400;color:#94a3b8">— '+faseDone+'/'+LEAN_FASE_INICIAL_IDS.length+'</span></div>'+faseHtml+'</div>'+
+    '<div class="lean-gate'+(plan.pitAprobado?' on':'')+'" onclick="toggleLeanPit('+c.id+')">'+(plan.pitAprobado?'🔓 PIT aprobado — frentes desbloqueados (click para revertir)':'🔒 PIT pendiente de aprobación — click aquí cuando el PIT esté aprobado para desbloquear los frentes')+'</div>'+
+    frentesHtml+
+    (frenteOrder.length===0?'<div class="tips-box" style="color:#94a3b8;font-size:13px;margin-top:8px">Aún no hay actividades en el plan de este cliente (fuera de la fase inicial). Agrégalas desde el catálogo.</div>':'')+
+    '<div class="lean-addbar"><button class="mini-btn primary" onclick="setLeanView(\'catalogo\')">📚 Agregar actividades desde el catálogo</button></div>'+
+    '<div class="lean-track"><div class="lean-track-hdr">+ Actividad personalizada (fuera del catálogo)</div>'+
+      '<div class="field-row"><div class="field"><label>Frente</label><input id="lean-custom-frente" placeholder="ej: Bodega"></div><div class="field"><label>Actividad</label><input id="lean-custom-texto" placeholder="ej: Rediseño de picking"></div></div>'+
+      '<button class="mini-btn" onclick="leanAddCustom('+c.id+')">+ Agregar</button></div>';
+}
+function renderLeanCatalogo(c){
+  const box=document.getElementById('lean-body');
+  const plan=leanEnsurePlan(c);
+  const origenTabs=['existente','shingo_ls','shingo_hb'].map(o=>'<button class="fb'+(leanCatOrigen===o?' on':'')+'" onclick="setLeanCatOrigen(\''+o+'\')">'+LEAN_ORIGEN_LABEL[o]+'</button>').join('');
+  const items=LEAN_CATALOG.filter(x=>x.o===leanCatOrigen);
+  const faseOrder=[];const byFase={};
+  items.forEach(x=>{if(!byFase[x.fa]){byFase[x.fa]=[];faseOrder.push(x.fa);}byFase[x.fa].push(x);});
+  const bodyHtml=faseOrder.map(fa=>{
+    const rows=byFase[fa];
+    const byFrente={};const frOrder=[];
+    rows.forEach(x=>{if(!byFrente[x.fr]){byFrente[x.fr]=[];frOrder.push(x.fr);}byFrente[x.fr].push(x);});
+    const frentesHtml=frOrder.map(fr=>{
+      const rowsHtml=byFrente[fr].map(x=>{
+        const inPlan=!!plan.items[x.id];
+        const search=(x.a+' '+x.fr).toLowerCase();
+        return '<div class="lean-cat-row" data-search="'+esc(search)+'"><span class="lc-txt">'+esc(x.a)+'</span>'+
+          (x.p?'<span class="lc-tag" title="Principio rector Shingo">'+esc(x.p)+'</span>':'')+
+          (inPlan?'<span class="lc-inplan">✓ En el plan</span>':'<button class="mini-btn" onclick="leanAddToPlan('+c.id+','+x.id+')">+ Agregar</button>')+
+          '</div>';
+      }).join('');
+      return '<div class="lean-cat-frente"><div class="lean-group">'+esc(fr)+'</div>'+rowsHtml+'</div>';
+    }).join('');
+    return (leanCatOrigen==='existente'?'':'<div class="lean-track-hdr" style="margin-top:16px">'+esc(fa)+'</div>')+frentesHtml;
+  }).join('');
+  box.innerHTML=
+    '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px"><div style="display:flex;gap:6px;flex-wrap:wrap">'+origenTabs+'</div><button class="mini-btn" onclick="setLeanView(\'plan\')">← Volver al plan de '+esc(c.emp)+'</button></div>'+
+    '<input placeholder="Buscar actividad o frente…" oninput="leanFilterCatalogo(this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;margin-bottom:12px;font-family:var(--sans);box-sizing:border-box">'+
+    '<div class="tips-box" style="max-height:65vh;overflow-y:auto">'+bodyHtml+'</div>';
 }
 function renderLean(){
   const box=document.getElementById('lean-body');if(!box)return;
@@ -1024,27 +1319,8 @@ function renderLean(){
   if(!leanClient||!clients.some(c=>c.id===leanClient))leanClient=clients[0].id;
   document.getElementById('lean-client-select').innerHTML=clients.map(c=>'<option value="'+c.id+'"'+(c.id===leanClient?' selected':'')+'>'+esc(c.emp)+'</option>').join('');
   const c=contacts.find(x=>x.id===leanClient);if(!c)return;
-  let totalDone=0,totalCount=0;
-  const trackHtml=LEAN_TEMPLATE.map(track=>{
-    let lastGroup,stepsHtml='',doneT=0,countT=0;
-    track.steps.forEach(s=>{
-      const st=leanStatus(c,track.id,s.id);
-      if(st!=='na'){countT++;if(st==='hecho')doneT++;}
-      if(s.group&&s.group!==lastGroup){stepsHtml+='<div class="lean-group">'+esc(s.group)+'</div>';lastGroup=s.group;}
-      stepsHtml+=leanStepRow(c.id,track.id,s.id,s.texto,st,false);
-    });
-    (c.leanCustom&&c.leanCustom[track.id]||[]).forEach(s=>{
-      const st=s.status||'pendiente';
-      if(st!=='na'){countT++;if(st==='hecho')doneT++;}
-      stepsHtml+=leanStepRow(c.id,track.id,s.id,s.texto,st,true);
-    });
-    totalDone+=doneT;totalCount+=countT;
-    const pct=countT?Math.round(doneT/countT*100):0;
-    return '<div class="lean-track"><div class="lean-track-hdr">'+esc(track.label)+' <span style="font-weight:400;color:#94a3b8">— '+doneT+'/'+countT+' ('+pct+'%)</span></div>'+stepsHtml+
-      '<div style="display:flex;gap:6px;margin-top:8px"><input id="lean-add-'+track.id+'" placeholder="+ agregar paso propio de este cliente" style="flex:1;font-size:12px;padding:6px 9px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans)" onkeydown="if(event.key===\'Enter\')addLeanCustom('+c.id+',\''+track.id+'\')"><button class="mini-btn" onclick="addLeanCustom('+c.id+',\''+track.id+'\')">+</button></div></div>';
-  }).join('');
-  const overallPct=totalCount?Math.round(totalDone/totalCount*100):0;
-  box.innerHTML='<div class="tips-box" style="margin-bottom:14px"><strong>'+esc(c.emp)+'</strong> · Progreso general: <strong>'+totalDone+'/'+totalCount+'</strong> pasos hechos ('+overallPct+'%) <span style="color:#94a3b8;font-size:11px">— haz click en un paso para pasar Pendiente → En curso → Hecho → No aplica</span></div>'+trackHtml;
+  leanSeedFaseInicial(c);
+  if(leanView==='catalogo')renderLeanCatalogo(c);else renderLeanPlan(c);
 }
 function entryUf(e,contactUf){return parseFloat(e.ufHora)||contactUf||0;}
 function bitaClientList(){
@@ -1527,6 +1803,7 @@ function saveDetail(){
   c.cont=gv('d-cont');c.cargo=gv('d-cargo');c.canal=document.getElementById('d-canal').value;
   c.ciudad=gv('d-ciudad');c.owner=document.getElementById('d-owner').value;
   c.leanActive=document.getElementById('d-lean').checked;
+  if(c.leanActive)leanSeedFaseInicial(c);
   c.uf=parseFloat(gv('d-uf'))||0;c.horas=parseInt(gv('d-horas'))||0;c.com=parseFloat(gv('d-com'))||0;
   c.email=gv('d-email');c.accion=gv('d-accion');c.notas=gv('d-notas');
   c.contexto=gv('d-contexto');c.diagDolor=gv('d-dolor');
