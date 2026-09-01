@@ -185,12 +185,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-step.hecho .ls-dot{background:#22c55e;border-color:#22c55e}
 .lean-step.na{opacity:.45}
 .lean-step.na .ls-dot{border-style:dashed}
-.lean-step.blocked{cursor:not-allowed}
-.lean-step.blocked .ls-txt{color:#94a3b8}
-.lean-step .ls-txt{flex:1}
+.lean-step .ls-txt{flex:1;min-width:0;overflow-wrap:break-word}
 .lean-step.hecho .ls-txt{text-decoration:line-through;color:#94a3b8}
 .lean-step .ls-badge{font-size:10px;font-weight:600;color:#94a3b8;white-space:nowrap}
-.lean-step .li-blocked-badge{color:#dc2626}
+.lean-step .li-dep-badge{font-size:9px;cursor:help}
 .lean-step .li-approval{font-size:9px;color:#8b5cf6}
 .lean-step .li-dot-meta{color:#2563eb;font-size:9px}
 .lean-step .li-meta-toggle{color:#cbd5e1;padding:0 4px;font-weight:700;cursor:pointer}
@@ -228,14 +226,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-gate2-step.hecho{background:#dcfce7}
 .lean-gate2-step.curso{background:#fef3c7}
 .lean-gate2-step.pendiente{background:#f8fafc}
-.lean-gate2-step.blocked{cursor:not-allowed;opacity:.7}
 .lean-gate2-step .t{font-size:13px;font-weight:700;color:#1e293b;margin-bottom:3px}
 .lean-gate2-step .s{font-size:12px;color:#64748b}
 .lean-gate2-arrow{display:flex;align-items:center;color:#94a3b8;font-size:16px;flex:0 0 auto}
-.lean-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-@media(max-width:1000px){.lean-cards{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.lean-cards{grid-template-columns:1fr}}
-.lean-card{border:1px solid var(--border);border-radius:10px;padding:10px 11px;background:white}
+.lean-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
+@media(max-width:1000px){.lean-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.lean-cards{grid-template-columns:minmax(0,1fr)}}
+.lean-card{border:1px solid var(--border);border-radius:10px;padding:10px 11px;background:white;min-width:0}
 .lean-card.locked{opacity:.6}
 .lean-card-hdr{display:flex;align-items:center;gap:7px;margin-bottom:6px}
 .lean-card-icon{width:22px;height:22px;border-radius:6px;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
@@ -1255,7 +1252,6 @@ function leanBlockedReason(cid,cat){
   if(!open.length)return null;
   return 'Falta: '+open.map(pid=>{const pc=leanCatalogById(pid);return pc?pc.a:('#'+pid);}).join('; ');
 }
-function leanBlockedToast(reason){showToast('🔒 Bloqueada — '+reason);}
 function toggleLeanPit(cid){
   const c=contacts.find(x=>x.id===cid);if(!c)return;
   const plan=leanEnsurePlan(c);
@@ -1307,8 +1303,6 @@ function leanCycle(cid,catId){
   const plan=leanEnsurePlan(c);
   const it=plan.items[catId];if(!it)return;
   const cur=it.status||'pendiente';
-  const reason=leanBlockedReason(cid,cat);
-  if(reason&&cur!=='hecho'&&cur!=='na'){leanBlockedToast(reason);return;}
   const seq=cat.ap?['pendiente','curso','revision','hecho','na']:['pendiente','curso','hecho','na'];
   const i=seq.indexOf(cur);
   it.status=seq[(i+1)%seq.length];
@@ -1387,19 +1381,18 @@ function leanItemMetaPanel(cid,idArg,item,isCustom){
 }
 function leanItemRow(cid,refId,label,item,isCustom,removable,cat){
   const st=item.status||'pendiente';
-  const blockedReason=(!isCustom&&cat)?leanBlockedReason(cid,cat):null;
-  const isBlocked=!!blockedReason&&st!=='hecho'&&st!=='na';
+  const depReason=(!isCustom&&cat)?leanBlockedReason(cid,cat):null;
+  const hasDep=!!depReason&&st!=='hecho'&&st!=='na';
   const cycleFn=isCustom?'leanCycleCustom':'leanCycle';
   const idArg=isCustom?"'"+refId+"'":refId;
   const hasMeta=!!(item.responsable||item.fecha||item.entregable||item.evidencia||item.notas);
   const removeFn=isCustom?'leanDelCustom':'leanRemoveFromPlan';
-  const reasonJs=blockedReason?blockedReason.replace(/\\/g,'\\\\').replace(/'/g,"\\'"):'';
-  const clickHandler=isBlocked?"leanBlockedToast('"+reasonJs+"')":(cycleFn+'('+cid+','+idArg+')');
+  const clickHandler=cycleFn+'('+cid+','+idArg+')';
   return '<div class="lean-item">'+
-    '<div class="lean-step '+st+(isBlocked?' blocked':'')+'" onclick="'+clickHandler+'">'+
-      '<span class="ls-dot"></span><span class="ls-txt">'+esc(label)+(cat&&cat.ap?' <span class="li-approval" title="Requiere aprobación formal">✓</span>':'')+'</span>'+
+    '<div class="lean-step '+st+'" onclick="'+clickHandler+'">'+
+      '<span class="ls-dot"></span><span class="ls-txt">'+esc(label)+(cat&&cat.ap?' <span class="li-approval" title="Requiere aprobación formal">✓</span>':'')+(hasDep?' <span class="li-dep-badge" title="'+esc(depReason)+'">🔗</span>':'')+'</span>'+
       (hasMeta?'<span class="li-dot-meta" title="Tiene datos registrados">●</span>':'')+
-      (isBlocked?'<span class="ls-badge li-blocked-badge" title="'+esc(blockedReason)+'">🔒 Bloqueada</span>':'<span class="ls-badge">'+LEAN_STATUS_LABEL[st]+'</span>')+
+      '<span class="ls-badge">'+LEAN_STATUS_LABEL[st]+'</span>'+
       '<span class="li-meta-toggle" onclick="event.stopPropagation();leanToggleMeta(this)" title="Responsable / fecha / entregable / evidencia">⋯</span>'+
       (removable!==false?'<span class="li-x" onclick="event.stopPropagation();'+removeFn+'('+cid+','+idArg+')" title="Quitar del plan">✕</span>':'')+
     '</div>'+
@@ -1420,13 +1413,11 @@ function renderLeanPlan(c){
   const gateDone=gateEntries.filter(g=>g.item.status==='hecho').length;
   const gateHtml=gateEntries.map((g,i)=>{
     const st=g.item.status||'pendiente';
-    const blockedReason=leanBlockedReason(c.id,g.cat);
-    const isBlocked=!!blockedReason&&st!=='hecho'&&st!=='na';
-    const reasonJs=blockedReason?blockedReason.replace(/\\/g,'\\\\').replace(/'/g,"\\'"):'';
-    const clickHandler=isBlocked?"leanBlockedToast('"+reasonJs+"')":('leanCycle('+c.id+','+g.ref+')');
-    let caption=isBlocked?'Bloqueada':LEAN_STATUS_LABEL[st];
+    const depReason=leanBlockedReason(c.id,g.cat);
+    const hasDep=!!depReason&&st!=='hecho'&&st!=='na';
+    let caption=LEAN_STATUS_LABEL[st];
     if(st==='hecho'&&g.item.evidencia)caption='Hecho · evidencia registrada';
-    const box2='<div class="lean-gate2-step '+(isBlocked?'blocked':st)+'" onclick="'+clickHandler+'"><div class="t">'+esc(g.label)+'</div><div class="s">'+esc(caption)+'</div></div>';
+    const box2='<div class="lean-gate2-step '+st+'" onclick="leanCycle('+c.id+','+g.ref+')"><div class="t">'+esc(g.label)+(hasDep?' <span class="li-dep-badge" title="'+esc(depReason)+'">🔗</span>':'')+'</div><div class="s">'+esc(caption)+'</div></div>';
     return i<gateEntries.length-1?box2+'<div class="lean-gate2-arrow">→</div>':box2;
   }).join('');
 
@@ -1487,7 +1478,7 @@ function renderLeanPlan(c){
       '<div class="lean-gate2-hdr"><div class="t">Puerta inicial '+(gateDone>=gateEntries.length?'completada':'en curso')+'</div><button class="lean-gate2-badge '+(plan.pitAprobado?'on':'off')+'" onclick="toggleLeanPit('+c.id+')">'+(plan.pitAprobado?'PIT aprobado':'PIT pendiente')+'</button></div>'+
       '<div class="lean-gate2-steps">'+gateHtml+'</div>'+
     '</div>'+
-    '<div class="section-hdr" style="margin-bottom:8px"><div class="section-title" style="font-size:14px">Frentes en paralelo</div><span style="font-size:12px;color:#94a3b8;margin-left:auto">Click en una actividad para pasar de estado — 🔒 = bloqueada por una predecesora</span></div>'+
+    '<div class="section-hdr" style="margin-bottom:8px"><div class="section-title" style="font-size:14px">Frentes en paralelo</div><span style="font-size:12px;color:#94a3b8;margin-left:auto">Click en una actividad para pasar de estado — 🔗 = depende de otra actividad sin terminar</span></div>'+
     (carriles.length?('<div class="lean-cards">'+cardsHtml+'</div>'):'<div class="tips-box" style="color:#94a3b8;font-size:13px;margin-bottom:14px">Aún no hay actividades en el plan de este cliente (fuera de la puerta inicial). Agrégalas desde el catálogo.</div>')+
     '<div class="lean-addbar"><button class="mini-btn primary" onclick="setLeanView(\'catalogo\')">📚 Agregar actividades desde el catálogo</button></div>'+
     '<div class="lean-track"><div class="lean-track-hdr">+ Actividad personalizada (fuera del catálogo)</div>'+
