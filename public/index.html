@@ -246,6 +246,40 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-card-list .lean-step{padding:4px 4px;font-size:11.5px;gap:6px}
 .lean-card-list .lean-step .ls-dot{width:11px;height:11px}
 .lean-card-list .lean-meta{padding:6px 6px 8px 24px}
+.lean-flow-carril{border:1px solid var(--border);border-radius:12px;margin-bottom:10px;background:white;overflow:hidden}
+.lean-flow-carril-hdr{display:flex;align-items:center;gap:7px;padding:9px 12px;cursor:pointer;background:#f8fafc;font-size:12.5px}
+.lean-flow-carril-hdr:hover{background:#f1f5f9}
+.lean-flow-carril-hdr .t{font-weight:700;color:#1e293b}
+.lean-flow-carril-hdr .cnt{margin-left:auto;font-size:11px;color:#94a3b8;font-weight:600}
+.lean-flow-carril-hdr .chev{color:#94a3b8;font-size:10px;width:10px;display:inline-block}
+.lean-flow-carril-body{padding:10px 12px}
+.lean-flow-frente{margin-bottom:12px}
+.lean-flow-frente:last-child{margin-bottom:0}
+.lean-flow-frente-hdr{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.3px;padding:2px 0;margin-bottom:6px}
+.lean-flow-frente-hdr:hover{color:#475569}
+.lean-flow-frente-hdr .chev{font-size:9px;width:9px;display:inline-block}
+.lean-flow-lane{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:6px}
+.lean-flow-stage{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.lean-flow-arrow{display:flex;align-items:center;color:#cbd5e1;font-size:15px;padding:0 6px;flex-shrink:0;align-self:center}
+.lean-flow-node{width:150px;flex-shrink:0;border-radius:8px;padding:7px 9px;font-size:11px;cursor:pointer;border:2px solid transparent;background:#f8fafc;line-height:1.3}
+.lean-flow-node:hover{filter:brightness(0.97)}
+.lean-flow-node.curso{background:#fef3c7}
+.lean-flow-node.hecho{background:#dcfce7}
+.lean-flow-node.na{background:#f1f5f9;opacity:.5}
+.lean-flow-node.suggested{border-color:#2563eb}
+.lean-flow-node.sel{box-shadow:0 0 0 2px #7c3aed;border-color:#7c3aed}
+.lean-flow-node.pred,.lean-flow-node.succ{background:#ede9fe}
+.lean-flow-node .txt{font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.lean-flow-node.hecho .txt{color:#166534}
+.lean-flow-node .badge{font-size:9px;color:#94a3b8;margin-top:3px;text-transform:uppercase;letter-spacing:.3px}
+.lean-flow-detail{border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:4px;margin-bottom:14px;background:white}
+.lean-flow-detail .lean-meta{padding:0;background:transparent}
+@media(max-width:700px){
+  .lean-flow-lane{flex-direction:column;align-items:stretch;overflow-x:visible}
+  .lean-flow-stage{flex-direction:row;flex-wrap:wrap}
+  .lean-flow-arrow{align-self:flex-start;padding:2px 0 2px 12px;transform:rotate(90deg)}
+  .lean-flow-node{width:100%}
+}
 .pilar-table{width:100%;border-collapse:collapse;font-size:12.5px}
 .pilar-table th{background:#f1f5f9;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;padding:6px 8px;text-align:left;border-bottom:1px solid var(--border)}
 .pilar-table td{padding:4px;vertical-align:top;border-bottom:1px solid #f1f5f9}
@@ -1273,7 +1307,8 @@ function leanFrenteSort(a,b){
   if(ib!==-1)return 1;
   return a.localeCompare(b);
 }
-let leanClient=null,leanView='plan',leanCatOrigen='salescoach';
+let leanClient=null,leanView='plan',leanCatOrigen='salescoach',leanFlowMode='seguimiento',leanFlowSelected=null;
+const leanFlowClosedCarriles=new Set(),leanFlowClosedFrentes=new Set();
 function leanCatalogById(id){return LEAN_CATALOG.find(x=>x.id===id);}
 function leanEnsurePlan(c){
   if(!c.leanPlan)c.leanPlan={pitAprobado:false,items:{},custom:[]};
@@ -1409,7 +1444,21 @@ function leanFilterCatalogo(v){
 }
 function setLeanView(v){leanView=v;renderLean();}
 function setLeanCatOrigen(o){leanCatOrigen=o;renderLean();}
-function setLeanClient(id){leanClient=parseInt(id,10);leanView='plan';renderLean();}
+function setLeanClient(id){leanClient=parseInt(id,10);leanView='plan';leanFlowSelected=null;renderLean();}
+function setLeanFlowMode(m){leanFlowMode=m;leanFlowSelected=null;renderLean();}
+function toggleLeanFlowCarril(car){
+  if(leanFlowClosedCarriles.has(car))leanFlowClosedCarriles.delete(car);else leanFlowClosedCarriles.add(car);
+  renderLean();
+}
+function toggleLeanFlowFrente(key){
+  if(leanFlowClosedFrentes.has(key))leanFlowClosedFrentes.delete(key);else leanFlowClosedFrentes.add(key);
+  renderLean();
+}
+function leanFlowNodeClick(cid,ref,isCustom){
+  leanFlowSelected={ref,isCustom:!!isCustom};
+  if(isCustom)leanCycleCustom(cid,ref);else leanCycle(cid,ref);
+}
+function setLeanFlowClose(){leanFlowSelected=null;renderLean();}
 function leanItemMetaPanel(cid,idArg,item,isCustom){
   const setFn=isCustom?'leanSetMetaCustom':'leanSetMeta';
   return '<div class="lean-meta" hidden>'+
@@ -1530,12 +1579,184 @@ function renderLeanPlan(c){
       '<div class="lean-gate2-hdr"><div class="t">Puerta inicial '+(gateDone>=gateEntries.length?'completada':'en curso')+'</div><button class="lean-gate2-badge '+(plan.pitAprobado?'on':'off')+'" onclick="toggleLeanPit('+c.id+')">'+(plan.pitAprobado?'PIT aprobado':'PIT pendiente')+'</button></div>'+
       '<div class="lean-gate2-steps">'+gateHtml+'</div>'+
     '</div>'+
-    '<div class="section-hdr" style="margin-bottom:8px"><div class="section-title" style="font-size:14px">Frentes en paralelo</div><span style="font-size:12px;color:#94a3b8;margin-left:auto">Click en una actividad para pasar de estado — 🔗 = depende de otra actividad sin terminar</span></div>'+
+    '<div class="section-hdr" style="margin-bottom:2px"><div class="section-title" style="font-size:14px">Frentes en paralelo</div><div style="display:flex;gap:6px;margin-left:auto"><button class="fb on" onclick="setLeanFlowMode(\'seguimiento\')">Seguimiento</button><button class="fb" onclick="setLeanFlowMode(\'flujo\')">Flujo</button></div></div>'+
+    '<div style="font-size:12px;color:#94a3b8;margin-bottom:8px">Click en una actividad para pasar de estado — 🔗 = depende de otra actividad sin terminar</div>'+
     (carriles.length?('<div class="lean-cards">'+cardsHtml+'</div>'):'<div class="tips-box" style="color:#94a3b8;font-size:13px;margin-bottom:14px">Aún no hay actividades en el plan de este cliente (fuera de la puerta inicial). Agrégalas desde el catálogo.</div>')+
     '<div class="lean-addbar"><button class="mini-btn primary" onclick="setLeanView(\'catalogo\')">📚 Agregar actividades desde el catálogo</button></div>'+
     '<div class="lean-track"><div class="lean-track-hdr">+ Actividad personalizada (fuera del catálogo)</div>'+
       '<div class="field-row"><div class="field"><label>Frente</label><input id="lean-custom-frente" placeholder="ej: Bodega"></div><div class="field"><label>Actividad</label><input id="lean-custom-texto" placeholder="ej: Rediseño de picking"></div></div>'+
       '<button class="mini-btn" onclick="leanAddCustom('+c.id+')">+ Agregar</button></div>';
+}
+// ---- Vista Flujo: mismos datos del plan, mostrados como carriles horizontales con flechas ----
+function leanFlowStages(rows){
+  const refSet=new Set(rows.map(r=>r.ref));
+  const sorted=rows.slice().sort((a,b)=>(typeof a.ref==='number'?a.ref:1e9)-(typeof b.ref==='number'?b.ref:1e9));
+  const stageOf=new Map();
+  sorted.forEach(r=>{
+    const preds=(r.cat&&r.cat.pr)?r.cat.pr.filter(pid=>refSet.has(pid)):[];
+    let stage=0;
+    preds.forEach(pid=>{const s=stageOf.get(pid);if(s!=null)stage=Math.max(stage,s+1);});
+    stageOf.set(r.ref,stage);
+  });
+  const stages=[];
+  sorted.forEach(r=>{const s=stageOf.get(r.ref);if(!stages[s])stages[s]=[];stages[s].push(r);});
+  return stages;
+}
+function renderLeanFlujo(c){
+  const box=document.getElementById('lean-body');
+  const plan=leanEnsurePlan(c);
+  const gateIds=leanGateIds();
+
+  const gateEntries=gateIds.map(id=>{
+    const cat=leanCatalogById(id);
+    const item=plan.items[id]||leanSnapshotOf(cat);
+    return {ref:id,label:item.snapTexto||cat.a,item,cat};
+  });
+  const gateDone=gateEntries.filter(g=>g.item.status==='hecho').length;
+  const gateHtml=gateEntries.map((g,i)=>{
+    const st=g.item.status||'pendiente';
+    const depReason=leanBlockedReason(c.id,g.cat);
+    const hasDep=!!depReason&&st!=='hecho'&&st!=='na';
+    let caption=LEAN_STATUS_LABEL[st];
+    if(st==='hecho'&&g.item.evidencia)caption='Hecho · evidencia registrada';
+    const box2='<div class="lean-gate2-step '+st+'" onclick="leanCycle('+c.id+','+g.ref+')"><div class="t">'+esc(g.label)+(hasDep?' <span class="li-dep-badge" title="'+esc(depReason)+'">🔗</span>':'')+'</div><div class="s">'+esc(caption)+'</div></div>';
+    return i<gateEntries.length-1?box2+'<div class="lean-gate2-arrow">→</div>':box2;
+  }).join('');
+
+  const groups={};const carrilOrder=[];
+  Object.keys(plan.items).forEach(k=>{
+    const id=parseInt(k,10);
+    if(gateIds.includes(id))return;
+    const cat=leanCatalogById(id);if(!cat)return;
+    const item=plan.items[k];
+    const car=cat.car||'Otros';
+    if(!groups[car]){groups[car]=[];carrilOrder.push(car);}
+    groups[car].push({ref:id,label:item.snapTexto||cat.a,item,isCustom:false,cat});
+  });
+  (plan.custom||[]).forEach(cu=>{
+    const car=cu.frente;
+    if(!groups[car]){groups[car]=[];carrilOrder.push(car);}
+    groups[car].push({ref:cu.id,label:cu.texto,item:cu,isCustom:true,cat:null});
+  });
+  carrilOrder.sort(leanCarrilSort);
+
+  const carriles=carrilOrder.map(car=>{
+    const rows=groups[car];
+    const applicable=rows.filter(r=>(r.item.status||'pendiente')!=='na');
+    const doneCount=applicable.filter(r=>r.item.status==='hecho').length;
+    const pct=applicable.length?Math.round(doneCount/applicable.length*100):0;
+    const frGroups={};const frOrder=[];
+    rows.forEach(r=>{
+      const fr=r.cat?r.cat.fr:(r.item.frente||'Otros');
+      if(!frGroups[fr]){frGroups[fr]=[];frOrder.push(fr);}
+      frGroups[fr].push(r);
+    });
+    frOrder.sort(leanFrenteSort);
+    return {car,rows,frOrder,frGroups,applicable,doneCount,pct};
+  });
+
+  let totalDone=gateDone,totalCount=gateEntries.filter(g=>g.item.status!=='na').length;
+  carriles.forEach(g=>{totalDone+=g.doneCount;totalCount+=g.applicable.length;});
+  const overallPct=totalCount?Math.round(totalDone/totalCount*100):0;
+  const activos=carriles.filter(g=>g.pct<100).length;
+  const paraleloTxt=carriles.length===0?'sin frentes activos todavía':(activos+' frente'+(activos===1?'':'s')+' avanzando en paralelo');
+  const estado=gateDone<gateEntries.length?'Puerta inicial en curso':(overallPct===100?'Implementación completa':'Implementación en curso');
+
+  // ---- Predecesoras/siguientes de la actividad seleccionada (para destacar, sin líneas cruzadas permanentes) ----
+  let selCat=null,predIds=[],succIds=[];
+  if(leanFlowSelected&&!leanFlowSelected.isCustom){
+    selCat=leanCatalogById(leanFlowSelected.ref);
+    if(selCat){
+      predIds=selCat.pr||[];
+      succIds=LEAN_CATALOG.filter(x=>x.pr&&x.pr.includes(selCat.id)).map(x=>x.id);
+    }
+  }
+  const nodeState=r=>{
+    if(leanFlowSelected&&r.ref===leanFlowSelected.ref&&!!r.isCustom===!!leanFlowSelected.isCustom)return 'sel';
+    if(!r.isCustom&&predIds.includes(r.ref))return 'pred';
+    if(!r.isCustom&&succIds.includes(r.ref))return 'succ';
+    return '';
+  };
+  const leanFlowNode=(r,suggestedRef)=>{
+    const st=r.item.status||'pendiente';
+    const state=nodeState(r);
+    const suggested=r.ref===suggestedRef&&!r.isCustom;
+    const idArg=r.isCustom?"'"+r.ref+"'":r.ref;
+    const cls=['lean-flow-node',st,state,suggested?'suggested':''].filter(Boolean).join(' ');
+    return '<div class="'+cls+'" title="'+esc(r.label)+'" onclick="leanFlowNodeClick('+c.id+','+idArg+','+(r.isCustom?'true':'false')+')">'+
+      '<div class="txt">'+esc(r.label)+(r.cat&&r.cat.ap?' <span class="li-approval" title="Requiere aprobación formal">✓</span>':'')+'</div>'+
+      '<div class="badge">'+LEAN_STATUS_LABEL[st]+'</div>'+
+    '</div>';
+  };
+
+  const carrilesHtml=carriles.map(g=>{
+    const closed=leanFlowClosedCarriles.has(g.car);
+    const carJs=esc(g.car).replace(/'/g,"\\'");
+    const bodyHtml=closed?'':g.frOrder.map(fr=>{
+      const frKey=g.car+'|'+fr;
+      const frClosed=leanFlowClosedFrentes.has(frKey);
+      const frJs=esc(frKey).replace(/'/g,"\\'");
+      const rows=g.frGroups[fr];
+      const sortedRows=rows.slice().sort((a,b)=>(typeof a.ref==='number'?a.ref:1e9)-(typeof b.ref==='number'?b.ref:1e9));
+      const suggestedRef=sortedRows.find(r=>{
+        const st=r.item.status||'pendiente';
+        if(st==='hecho'||st==='na')return false;
+        const reason=r.cat?leanBlockedReason(c.id,r.cat):null;
+        return !reason;
+      });
+      const laneHtml=frClosed?'':(()=>{
+        const stages=leanFlowStages(rows);
+        return '<div class="lean-flow-lane">'+stages.map((stageItems,si)=>{
+          const nodesHtml=stageItems.map(r=>leanFlowNode(r,suggestedRef?suggestedRef.ref:null)).join('');
+          const stageBox='<div class="lean-flow-stage">'+nodesHtml+'</div>';
+          return si<stages.length-1?stageBox+'<div class="lean-flow-arrow">→</div>':stageBox;
+        }).join('')+'</div>';
+      })();
+      return '<div class="lean-flow-frente">'+
+        '<div class="lean-flow-frente-hdr" onclick="toggleLeanFlowFrente(\''+frJs+'\')"><span class="chev">'+(frClosed?'▸':'▾')+'</span>'+esc(fr)+'</div>'+
+        laneHtml+
+      '</div>';
+    }).join('');
+    return '<div class="lean-flow-carril">'+
+      '<div class="lean-flow-carril-hdr" onclick="toggleLeanFlowCarril(\''+carJs+'\')"><span class="chev">'+(closed?'▸':'▾')+'</span><span>'+leanCarrilIcon(g.car)+'</span><span class="t">'+esc(leanCarrilLabel(g.car))+'</span><span class="cnt">'+g.doneCount+'/'+g.applicable.length+'</span></div>'+
+      (closed?'':'<div class="lean-flow-carril-body">'+bodyHtml+'</div>')+
+    '</div>';
+  }).join('');
+
+  // ---- Panel de detalle de la actividad seleccionada ----
+  let detailHtml='';
+  if(leanFlowSelected){
+    const isCustom=leanFlowSelected.isCustom;
+    const item=isCustom?(plan.custom||[]).find(x=>x.id===leanFlowSelected.ref):plan.items[leanFlowSelected.ref];
+    const label=isCustom?(item&&item.texto):(selCat&&(item&&item.snapTexto||selCat.a));
+    if(item){
+      const st=item.status||'pendiente';
+      const idArg=isCustom?"'"+leanFlowSelected.ref+"'":leanFlowSelected.ref;
+      const predTxt=predIds.length?predIds.map(pid=>{const p=leanCatalogById(pid);return p?p.a:'#'+pid;}).join(', '):'Ninguna';
+      const succTxt=succIds.length?succIds.map(sid=>{const s=leanCatalogById(sid);return s?s.a:'#'+sid;}).join(', '):'Ninguna';
+      detailHtml='<div class="lean-flow-detail">'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><strong style="font-size:13.5px">'+esc(label||'')+'</strong><span class="ls-badge" style="font-size:11px">'+LEAN_STATUS_LABEL[st]+'</span><span style="margin-left:auto;font-size:11px;color:#94a3b8;cursor:pointer" onclick="setLeanFlowClose()">✕ Cerrar</span></div>'+
+        (isCustom?'':'<div style="font-size:11.5px;color:#64748b;margin-bottom:3px"><strong>Viene antes:</strong> '+esc(predTxt)+'</div>'+
+        '<div style="font-size:11.5px;color:#64748b;margin-bottom:8px"><strong>Viene después:</strong> '+esc(succTxt)+'</div>')+
+        leanItemMetaPanel(c.id,idArg,item,isCustom).replace(' hidden','')+
+      '</div>';
+    }
+  }
+
+  box.innerHTML=
+    '<div class="lean-summary">'+
+      '<div><div class="t">'+esc(c.emp)+' · '+esc(estado)+'</div><div class="s">'+totalDone+' de '+totalCount+' pasos hechos · PIT '+(plan.pitAprobado?'aprobado':'pendiente')+' · '+esc(paraleloTxt)+'</div></div>'+
+      '<div class="lean-summary-pct"><div class="lbl">Avance general '+overallPct+'%</div><div class="lean-pbar"><div style="width:'+overallPct+'%"></div></div></div>'+
+    '</div>'+
+    '<div class="lean-gate2">'+
+      '<div class="lean-gate2-hdr"><div class="t">Puerta inicial '+(gateDone>=gateEntries.length?'completada':'en curso')+'</div><button class="lean-gate2-badge '+(plan.pitAprobado?'on':'off')+'" onclick="toggleLeanPit('+c.id+')">'+(plan.pitAprobado?'PIT aprobado':'PIT pendiente')+'</button></div>'+
+      '<div class="lean-gate2-steps">'+gateHtml+'</div>'+
+    '</div>'+
+    '<div class="section-hdr" style="margin-bottom:2px"><div class="section-title" style="font-size:14px">Frentes en paralelo</div><div style="display:flex;gap:6px;margin-left:auto"><button class="fb" onclick="setLeanFlowMode(\'seguimiento\')">Seguimiento</button><button class="fb on" onclick="setLeanFlowMode(\'flujo\')">Flujo</button></div></div>'+
+    '<div style="font-size:12px;color:#94a3b8;margin-bottom:8px">Click en una actividad para pasar de estado y ver de dónde viene / hacia dónde va — borde azul = siguiente sugerida (no bloquea el resto)</div>'+
+    (carriles.length?carrilesHtml:'<div class="tips-box" style="color:#94a3b8;font-size:13px;margin-bottom:14px">Aún no hay actividades en el plan de este cliente (fuera de la puerta inicial). Agrégalas desde el catálogo.</div>')+
+    detailHtml+
+    '<div class="lean-addbar"><button class="mini-btn primary" onclick="setLeanView(\'catalogo\')">📚 Agregar actividades desde el catálogo</button></div>';
 }
 function renderLeanCatalogo(c){
   const box=document.getElementById('lean-body');
@@ -1594,7 +1815,9 @@ function renderLean(){
   const c=contacts.find(x=>x.id===leanClient);if(!c)return;
   leanSeedFaseInicial(c);
   preserveScroll(()=>{
-    if(leanView==='catalogo')renderLeanCatalogo(c);else renderLeanPlan(c);
+    if(leanView==='catalogo')renderLeanCatalogo(c);
+    else if(leanFlowMode==='flujo')renderLeanFlujo(c);
+    else renderLeanPlan(c);
   });
 }
 // ---- Plan por pilares: plan de trabajo libre por cliente (sin catálogo ni dependencias) ----
