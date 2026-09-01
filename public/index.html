@@ -209,6 +209,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-cat-row .lc-txt{flex:1}
 .lean-cat-row .lc-tag{font-size:9.5px;color:#7c3aed;background:#ede9fe;padding:1px 7px;border-radius:99px;white-space:nowrap}
 .lean-cat-row .lc-inplan{font-size:11px;color:#16a34a;font-weight:600;white-space:nowrap}
+.pilar-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.pilar-table th{background:#f1f5f9;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;padding:6px 8px;text-align:left;border-bottom:1px solid var(--border)}
+.pilar-table td{padding:4px;vertical-align:top;border-bottom:1px solid #f1f5f9}
+.pilar-table textarea{width:100%;box-sizing:border-box;border:1px solid transparent;border-radius:6px;padding:5px 7px;font-family:var(--sans);font-size:12.5px;line-height:1.4;resize:vertical}
+.pilar-table textarea:hover,.pilar-table textarea:focus{border-color:var(--border);background:white}
 </style>
 </head>
 <body>
@@ -310,14 +315,34 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 
   <div id="view-lean" style="display:none">
     <div class="section-hdr">
-      <div class="section-title">Ruta Lean</div>
-      <div id="lean-client-wrap" style="display:flex;align-items:center;gap:8px;margin-left:auto">
-        <span style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px">Cliente</span>
-        <select id="lean-client-select" class="hist-sel" onchange="setLeanClient(this.value)"></select>
+      <div class="section-title">Planes</div>
+      <div style="display:flex;gap:6px;margin-left:auto">
+        <button class="fb on" id="planmode-lean-btn" onclick="setPlanMode('lean')">🎯 Ruta Lean</button>
+        <button class="fb" id="planmode-pilares-btn" onclick="setPlanMode('pilares')">📋 Plan por pilares</button>
       </div>
     </div>
-    <div id="lean-body"></div>
-    <p style="font-size:11px;color:#94a3b8;margin-top:8px">El catálogo maestro no se modifica: cada cliente tiene su propio Plan (una selección de actividades) armado desde ahí, más las que agregues manualmente. Los frentes se desbloquean recién cuando el PIT está aprobado.</p>
+
+    <div id="planmode-lean-wrap">
+      <div class="section-hdr">
+        <div id="lean-client-wrap" style="display:flex;align-items:center;gap:8px;margin-left:auto">
+          <span style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px">Cliente</span>
+          <select id="lean-client-select" class="hist-sel" onchange="setLeanClient(this.value)"></select>
+        </div>
+      </div>
+      <div id="lean-body"></div>
+      <p style="font-size:11px;color:#94a3b8;margin-top:8px">El catálogo maestro no se modifica: cada cliente tiene su propio Plan (una selección de actividades) armado desde ahí, más las que agregues manualmente. Los frentes se desbloquean recién cuando el PIT está aprobado.</p>
+    </div>
+
+    <div id="planmode-pilares-wrap" style="display:none">
+      <div class="section-hdr">
+        <div id="pilar-client-wrap" style="display:flex;align-items:center;gap:8px;margin-left:auto">
+          <span style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px">Cliente</span>
+          <select id="pilar-client-select" class="hist-sel" onchange="setPilarClient(this.value)"></select>
+        </div>
+      </div>
+      <div id="pilar-body"></div>
+      <p style="font-size:11px;color:#94a3b8;margin-top:8px">Plan de trabajo libre por pilares (sin catálogo ni dependencias) — para clientes donde se avanza por proyecto puntual en vez de la metodología Lean completa.</p>
+    </div>
   </div>
 </div>
 
@@ -437,7 +462,7 @@ const SEED=[
 {id:49,emp:'Alemán Experto',cont:'(vía Sofi)',cargo:'Dueño',status:'Por contactar',canal:'Referido',accion:'Contactar por Sofi/Berna',notas:'Sofi es esposa del dueño'},
 {id:50,emp:'Ferreterías Lonza',cont:'Simón Lonza',cargo:'Ejecutivo',status:'Contactado',canal:'Email',accion:'Seguimiento en 5 días',notas:'Referido de Luzma. Perfil emprendedor, ecoturismo.',fechaContacto:'2026-06-06',historial:[{fecha:'2026-06-06',tipo:'Email',texto:'Correo personalizado enviado vía Luzma.'}]}
 ];
-function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,com:20,accion:'',notas:'',email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:'',fechaTermino:'',franJugada:'',bitacora:[],leanActive:false,leanPlan:{pitAprobado:false,items:{},custom:[]}},c);}
+function normalize(c){return Object.assign({cont:'',cargo:'',status:'Por contactar',canal:'',dias:0,uf:0,horas:0,com:20,accion:'',notas:'',email:'',ciudad:'',region:'',fechaContacto:'',historial:[],diagReal:'',diagAccion:'',diagDolor:'',contexto:'',analisis:'',incentivo:'',stakeholders:'',owner:'',fechaTermino:'',franJugada:'',bitacora:[],leanActive:false,leanPlan:{pitAprobado:false,items:{},custom:[]},pilares:{}},c);}
 
 let contacts=[],nextId=60,activeFilter='todos',ownerFilter='todos',detailId=null,sortCol='default',sortDesc=true,loaded=false;
 let ufValorClp=40820.31;
@@ -538,9 +563,28 @@ function initMigStages2026(){
   migStages2026=true;
   return true;
 }
+let pilarSeedVictoria=false;
+function initPilarSeedVictoria(){
+  if(pilarSeedVictoria)return false;
+  const c=contacts.find(x=>/faenadora|carnes victoria/i.test(x.emp||''));
+  if(!c)return false;
+  pilarSeedVictoria=true;
+  if(!c.pilares)c.pilares={};
+  if(c.pilares['Control de Gestión'])return true;
+  c.pilares['Control de Gestión']=[
+    {semana:'Semana 1',foco:'Mapeo Inicial',actividades:'Revisar el flujo de procesos entregado. Organizar la información disponible. Mapear indicadores potenciales por etapa del flujo e identificar brechas iniciales de información.',responsable:'R&C',entregable:'Mapa preliminar de indicadores por proceso + brechas de información identificadas.'},
+    {semana:'Semana 2',foco:'Priorización y diseño de KPIs',actividades:'Depurar el mapa inicial y clasificar indicadores según nivel y utilidad. Seleccionar 8–12 KPIs críticos para la Torre de Control. Definir fórmula, unidad, frecuencia, fuente requerida y responsable. Consolidar requerimientos de información pendientes y solicitarla.',responsable:'R&C',entregable:'Matriz priorizada de KPIs + fichas de indicadores + requerimientos de información.'},
+    {semana:'Semana 3',foco:'Torre de control V1',actividades:'Recopilar y estructurar los datos disponibles. Construir primera versión del dashboard. Incorporar real, meta cuando esté disponible, tendencia y alertas. Identificar brechas de datos que impidan calcular algún KPI.',responsable:'R&C',entregable:'Dashboard V1 con datos reales disponibles + mapa de brechas.'},
+    {semana:'Semana 4',foco:'Validación y rutina de gestión',actividades:'Validar resultados y criterios con Sergio/Rodolfo. Ajustar KPIs y visualización. Definir frecuencia de revisión, responsables, alertas y acciones frente a desviaciones.',responsable:'R&C + Rodolfo + Sergio (en caso aplique)',entregable:'Dashboard V2 validado + rutina de gestión definida.'},
+    {semana:'Semana 5',foco:'Uso para mejora',actividades:'Analizar las primeras desviaciones visibles en el tablero. Seleccionar 1–2 problemas prioritarios y profundizar sus causas. Definir acciones, responsables, plazos y seguimiento.',responsable:'R&C + Rodolfo + Sergio (en caso aplique)',entregable:'Primer ciclo de mejora basado en datos + plan de acción.'},
+    {semana:'Semana 6',foco:'Transferencia y puesta en marcha',actividades:'Ejecución por parte de Faenadora Victoria del ciclo completo de actualización y revisión. Corregir brechas finales, documentar funcionamiento y ordenar oportunidades futuras.',responsable:'Sergio (R&C acompaña)',entregable:'Torre de Control operativa + backlog de mejoras.'},
+    {semana:'Semanas 7–10',foco:'Estabilización',actividades:'Acompañar el primer cierre mensual real. Validar consistencia de datos, resolver ajustes, reforzar la capacitación y comprobar el uso autónomo del tablero y de la rutina.',responsable:'Sergio + R&C',entregable:'Primer cierre validado + brechas corregidas o documentadas y cierre formal.'}
+  ];
+  return true;
+}
 const STORE_KEY='ryc_salescoach_v2';
 function persist(){
-  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,migStages2026,ufValorClp,ufPorMes,updatedAt:new Date().toISOString()});
+  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,migStages2026,pilarSeedVictoria,ufValorClp,ufPorMes,updatedAt:new Date().toISOString()});
   try{localStorage.setItem(STORE_KEY,payload);}
   catch(e){console.error('storage error',e);showToast('⚠️ No se pudo guardar — exporta un respaldo');}
 }
@@ -555,12 +599,12 @@ function loadData(){
   try{const p=localStorage.getItem(STORE_KEY);if(p)d=JSON.parse(p);}catch(e){console.error('load error',e);}
   if(d){
     contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;
-    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;migStages2026=!!d.migStages2026;ufValorClp=parseFloat(d.ufValorClp)||40820.31;ufPorMes=d.ufPorMes&&typeof d.ufPorMes==='object'?d.ufPorMes:{};
+    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;migStages2026=!!d.migStages2026;pilarSeedVictoria=!!d.pilarSeedVictoria;ufValorClp=parseFloat(d.ufValorClp)||40820.31;ufPorMes=d.ufPorMes&&typeof d.ufPorMes==='object'?d.ufPorMes:{};
   }else{
     contacts=SEED.map(normalize);nextId=60;
   }
   loaded=true;
-  const cambios=[initOwners(),initRafa(),initFix(),initBita(),initRestore0702(),initRestoreB(),initMigStages2026()].filter(Boolean).length;
+  const cambios=[initOwners(),initRafa(),initFix(),initBita(),initRestore0702(),initRestoreB(),initMigStages2026(),initPilarSeedVictoria()].filter(Boolean).length;
   if(cambios||!d){persist();if(fixJustRan||cambios)showToast('✅ Pipeline actualizado');}
 }
 
@@ -899,7 +943,7 @@ function renderTips(){
   box.innerHTML=tips.map(t=>'<div class="tip-item'+(t.id?' clickable" onclick="openDetail('+t.id+')':'"')+'"><div class="tip-ico">'+t.icono+'</div><div><div class="tip-label">'+t.label+'</div><div class="tip-text">'+t.texto+'</div></div></div>').join('');
 }
 
-function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderTips();renderBitacora();renderCalendario();renderSocios();renderLean();}
+function renderAll(){renderStats();renderFunnel();renderFilters();renderContacts();renderTips();renderBitacora();renderCalendario();renderSocios();renderLean();renderPilares();}
 let currentView='pipeline',bitaClient=null,bitaMes='todos',bitaSem='todos',bitaShowTerm=false,bitaEditIdx=null;
 let socView='rc';
 function setSocView(v){socView=v;renderSocios();}
@@ -918,7 +962,7 @@ function setView(v){
   if(v==='bitacora')renderBitacora();
   if(v==='calendario')renderCalendario();
   if(v==='socios')renderSocios();
-  if(v==='lean')renderLean();
+  if(v==='lean'){if(planMode==='pilares')renderPilares();else renderLean();}
 }
 function isoWeek(dstr){
   const d=new Date(dstr+'T00:00:00');if(isNaN(d))return '';
@@ -1387,6 +1431,94 @@ function renderLean(){
   const c=contacts.find(x=>x.id===leanClient);if(!c)return;
   leanSeedFaseInicial(c);
   if(leanView==='catalogo')renderLeanCatalogo(c);else renderLeanPlan(c);
+}
+// ---- Plan por pilares: plan de trabajo libre por cliente (sin catálogo ni dependencias) ----
+let planMode='lean',pilarClient=null,pilarActivo=null;
+function setPlanMode(m){
+  planMode=m;
+  document.getElementById('planmode-lean-wrap').style.display=m==='lean'?'block':'none';
+  document.getElementById('planmode-pilares-wrap').style.display=m==='pilares'?'block':'none';
+  document.getElementById('planmode-lean-btn').classList.toggle('on',m==='lean');
+  document.getElementById('planmode-pilares-btn').classList.toggle('on',m==='pilares');
+  if(m==='pilares')renderPilares();else renderLean();
+}
+function pilarEnsure(c){if(!c.pilares)c.pilares={};return c.pilares;}
+function setPilarClient(id){pilarClient=parseInt(id,10);pilarActivo=null;renderPilares();}
+function setPilarActivo(nombre){pilarActivo=nombre;renderPilares();}
+function addPilar(cid){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const input=document.getElementById('pilar-new-name');if(!input)return;
+  const nombre=(input.value||'').trim();
+  if(!nombre){showToast('Ingresa el nombre del pilar');return;}
+  const pilares=pilarEnsure(c);
+  if(pilares[nombre]){showToast('Ese pilar ya existe');return;}
+  pilares[nombre]=[];
+  input.value='';
+  pilarActivo=nombre;
+  persist();renderPilares();
+}
+function delPilar(cid,nombre){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  if(!confirm('¿Eliminar el pilar "'+nombre+'" completo, con todas sus semanas?'))return;
+  const pilares=pilarEnsure(c);
+  delete pilares[nombre];
+  if(pilarActivo===nombre)pilarActivo=null;
+  persist();renderPilares();
+}
+function addPilarSemana(cid,pilar){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const pilares=pilarEnsure(c);
+  if(!pilares[pilar])pilares[pilar]=[];
+  pilares[pilar].push({semana:'Semana '+(pilares[pilar].length+1),foco:'',actividades:'',responsable:'',entregable:''});
+  persist();renderPilares();
+}
+function delPilarSemana(cid,pilar,idx){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  if(!confirm('¿Eliminar esta fila?'))return;
+  const pilares=pilarEnsure(c);
+  if(!pilares[pilar])return;
+  pilares[pilar].splice(idx,1);
+  persist();renderPilares();
+}
+function setPilarCell(cid,pilar,idx,field,value){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const pilares=pilarEnsure(c);
+  if(!pilares[pilar]||!pilares[pilar][idx])return;
+  pilares[pilar][idx][field]=value;
+  persist();
+}
+function renderPilares(){
+  const wrap=document.getElementById('pilar-client-wrap');
+  const box=document.getElementById('pilar-body');if(!box)return;
+  const clients=contacts.slice().sort((a,b)=>a.emp.localeCompare(b.emp));
+  if(!clients.length){wrap.style.display='none';box.innerHTML='';return;}
+  wrap.style.display='flex';
+  if(!pilarClient||!clients.some(c=>c.id===pilarClient))pilarClient=clients[0].id;
+  document.getElementById('pilar-client-select').innerHTML=clients.map(c=>'<option value="'+c.id+'"'+(c.id===pilarClient?' selected':'')+'>'+esc(c.emp)+'</option>').join('');
+  const c=contacts.find(x=>x.id===pilarClient);if(!c)return;
+  const pilares=pilarEnsure(c);
+  const names=Object.keys(pilares).sort((a,b)=>a.localeCompare(b));
+  if(!pilarActivo||!names.includes(pilarActivo))pilarActivo=names[0]||null;
+  const chips=names.map(n=>'<button class="fb'+(n===pilarActivo?' on':'')+'" onclick="setPilarActivo(\''+esc(n)+'\')">'+esc(n)+'</button>').join('');
+  const addForm='<span style="display:inline-flex;gap:6px;align-items:center"><input id="pilar-new-name" placeholder="Nombre del pilar (ej: Control de Gestión)" style="font-size:12px;padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans)" onkeydown="if(event.key===\'Enter\')addPilar('+c.id+')"><button class="mini-btn" onclick="addPilar('+c.id+')">+ Nuevo pilar</button></span>';
+  let tableHtml='';
+  if(pilarActivo){
+    const rows=pilares[pilarActivo]||[];
+    tableHtml='<div class="table-wrap" style="padding:0.9rem;margin-top:12px"><table class="pilar-table"><thead><tr><th style="width:90px">Semana</th><th style="width:150px">Foco</th><th>Actividades</th><th style="width:170px">Responsable</th><th style="width:190px">Entregable</th><th style="width:24px"></th></tr></thead><tbody>'+
+      rows.map((r,idx)=>'<tr>'+
+        '<td><textarea rows="2" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'semana\',this.value)">'+esc(r.semana||'')+'</textarea></td>'+
+        '<td><textarea rows="3" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'foco\',this.value)">'+esc(r.foco||'')+'</textarea></td>'+
+        '<td><textarea rows="4" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'actividades\',this.value)">'+esc(r.actividades||'')+'</textarea></td>'+
+        '<td><textarea rows="3" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'responsable\',this.value)">'+esc(r.responsable||'')+'</textarea></td>'+
+        '<td><textarea rows="3" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'entregable\',this.value)">'+esc(r.entregable||'')+'</textarea></td>'+
+        '<td style="text-align:center;vertical-align:top;padding-top:10px"><span style="cursor:pointer;color:#cbd5e1" onclick="delPilarSemana('+c.id+',\''+esc(pilarActivo)+'\','+idx+')" title="Eliminar fila">✕</span></td>'+
+        '</tr>').join('')+
+      '</tbody></table></div>'+
+      '<div style="margin-top:8px;display:flex;gap:8px"><button class="mini-btn" onclick="addPilarSemana('+c.id+',\''+esc(pilarActivo)+'\')">+ Agregar semana</button><button class="mini-btn" style="color:#dc2626" onclick="delPilar('+c.id+',\''+esc(pilarActivo)+'\')">🗑 Eliminar pilar completo</button></div>';
+  }
+  box.innerHTML='<div class="tips-box"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong style="font-size:12px;color:#64748b">Pilares de '+esc(c.emp)+':</strong>'+chips+addForm+'</div>'+
+    (names.length===0?'<div style="color:#94a3b8;font-size:13px;margin-top:8px">Este cliente todavía no tiene ningún pilar. Crea el primero arriba.</div>':'')+
+    '</div>'+tableHtml;
 }
 function entryUf(e,contactUf){return parseFloat(e.ufHora)||contactUf||0;}
 function bitaClientList(){
