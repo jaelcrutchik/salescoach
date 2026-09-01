@@ -238,9 +238,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-card-icon{width:22px;height:22px;border-radius:6px;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
 .lean-card-hdr .txt{min-width:0}
 .lean-card-hdr .t{font-size:12px;font-weight:700;color:#1e293b}
-.lean-card-hdr .s{font-size:10px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lean-card-hdr .cnt{margin-left:auto;font-size:11px;color:#94a3b8;font-weight:600;flex-shrink:0}
-.lean-card-list{max-height:280px;overflow-y:auto;margin:0 -4px}
+.lean-card-list{max-height:320px;overflow-y:auto;margin:0 -4px}
+.lean-card-sub-hdr{font-size:9.5px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.3px;margin:8px 4px 3px;padding-top:6px;border-top:1px solid #f1f5f9}
+.lean-card-sub-hdr:first-child{margin-top:0;padding-top:0;border-top:none}
 .lean-card-list .lean-item{border-bottom:1px solid #f8fafc}
 .lean-card-list .lean-step{padding:4px 4px;font-size:11.5px;gap:6px}
 .lean-card-list .lean-step .ls-dot{width:11px;height:11px}
@@ -646,9 +647,21 @@ function initMigMetodologia(){
   migMetodologia=true;
   return true;
 }
+let migRemovePresale=false;
+function initMigRemovePresale(){
+  if(migRemovePresale)return false;
+  contacts.forEach(c=>{
+    if(c.leanPlan&&c.leanPlan.items){
+      delete c.leanPlan.items[177];
+      delete c.leanPlan.items[178];
+    }
+  });
+  migRemovePresale=true;
+  return true;
+}
 const STORE_KEY='ryc_salescoach_v2';
 function persist(){
-  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,migStages2026,pilarSeedVictoria,migMetodologia,ufValorClp,ufPorMes,updatedAt:new Date().toISOString()});
+  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,migStages2026,pilarSeedVictoria,migMetodologia,migRemovePresale,ufValorClp,ufPorMes,updatedAt:new Date().toISOString()});
   try{localStorage.setItem(STORE_KEY,payload);}
   catch(e){console.error('storage error',e);showToast('⚠️ No se pudo guardar — exporta un respaldo');}
 }
@@ -663,12 +676,12 @@ function loadData(){
   try{const p=localStorage.getItem(STORE_KEY);if(p)d=JSON.parse(p);}catch(e){console.error('load error',e);}
   if(d){
     contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;
-    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;migStages2026=!!d.migStages2026;pilarSeedVictoria=!!d.pilarSeedVictoria;migMetodologia=!!d.migMetodologia;ufValorClp=parseFloat(d.ufValorClp)||40820.31;ufPorMes=d.ufPorMes&&typeof d.ufPorMes==='object'?d.ufPorMes:{};
+    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;migStages2026=!!d.migStages2026;pilarSeedVictoria=!!d.pilarSeedVictoria;migMetodologia=!!d.migMetodologia;migRemovePresale=!!d.migRemovePresale;ufValorClp=parseFloat(d.ufValorClp)||40820.31;ufPorMes=d.ufPorMes&&typeof d.ufPorMes==='object'?d.ufPorMes:{};
   }else{
     contacts=SEED.map(normalize);nextId=60;
   }
   loaded=true;
-  const cambios=[initOwners(),initRafa(),initFix(),initBita(),initRestore0702(),initRestoreB(),initMigStages2026(),initPilarSeedVictoria(),initMigMetodologia()].filter(Boolean).length;
+  const cambios=[initOwners(),initRafa(),initFix(),initBita(),initRestore0702(),initRestoreB(),initMigStages2026(),initPilarSeedVictoria(),initMigMetodologia(),initMigRemovePresale()].filter(Boolean).length;
   if(cambios||!d){persist();if(fixJustRan||cambios)showToast('✅ Pipeline actualizado');}
 }
 
@@ -1223,7 +1236,7 @@ const LEAN_CATALOG=[
 ];
 const LEAN_ORIGEN_LABEL={existente:'Ruta de consultoría (actual)',salescoach:'Pre-implementación comercial',shingo_ls:'Lean/Shingo — Desperdicios y herramientas',shingo_hb:'Shingo Handbook — Principios rectores'};
 const LEAN_ORIGEN_ORDER=['salescoach','existente','shingo_ls','shingo_hb'];
-const LEAN_FASE_INICIAL_IDS=[177,178,1,2,3,4,5];
+const LEAN_FASE_INICIAL_IDS=[1,2,3,4,5];
 const LEAN_STATUS_LABEL={pendiente:'Pendiente',curso:'En curso',revision:'En revisión',hecho:'Hecho',na:'No aplica'};
 const LEAN_GATE_CARRIL='Diagnóstico y PIT';
 const LEAN_CARRIL_LABEL={'Diagnóstico y PIT':'Diagnóstico y PIT','Clima laboral':'Clima laboral','Estrategia y alineamiento':'Estrategia y alineamiento','Indicadores y gestión visual':'Indicadores y gestión','Cultura y cambio':'Cultura y cambio','Procesos y mejora continua':'Procesos eficientes','Personas y liderazgo':'Personas y liderazgo','Pre-implementación comercial':'Pre-implementación comercial','Alcance empresarial':'Alcance empresarial','Cadena operativa':'Cadena operativa','Resultados y sostenibilidad':'Resultados y sostenibilidad'};
@@ -1242,6 +1255,22 @@ function leanCarrilIcon(car){
   if(s.includes('cadena')||s.includes('operativa'))return '🔗';
   if(s.includes('resultado')||s.includes('sostenibilidad'))return '🏆';
   return '📁';
+}
+const LEAN_CARRIL_ORDER=['Estrategia y alineamiento','Indicadores y gestión visual','Personas y liderazgo','Procesos y mejora continua','Cultura y cambio','Alcance empresarial','Resultados y sostenibilidad'];
+function leanCarrilSort(a,b){
+  const ia=LEAN_CARRIL_ORDER.indexOf(a),ib=LEAN_CARRIL_ORDER.indexOf(b);
+  if(ia!==-1&&ib!==-1)return ia-ib;
+  if(ia!==-1)return -1;
+  if(ib!==-1)return 1;
+  return leanCarrilLabel(a).localeCompare(leanCarrilLabel(b));
+}
+const LEAN_FRENTE_ORDER=['Fase Inicial','Objetivos comunes','Gestión visual','Plan de Medios','Gestión del cambio','Mejora continua','Procesos eficientes','Desarrollo de personas','Sostenibilidad','Cierre del proyecto','Planning','Operaciones','Transportes','Producción'];
+function leanFrenteSort(a,b){
+  const ia=LEAN_FRENTE_ORDER.indexOf(a),ib=LEAN_FRENTE_ORDER.indexOf(b);
+  if(ia!==-1&&ib!==-1)return ia-ib;
+  if(ia!==-1)return -1;
+  if(ib!==-1)return 1;
+  return a.localeCompare(b);
 }
 let leanClient=null,leanView='plan',leanCatOrigen='salescoach';
 function leanCatalogById(id){return LEAN_CATALOG.find(x=>x.id===id);}
@@ -1450,18 +1479,23 @@ function renderLeanPlan(c){
     if(!groups[car]){groups[car]=[];carrilOrder.push(car);}
     groups[car].push({ref:cu.id,label:cu.texto,item:cu,isCustom:true,cat:null});
   });
-  carrilOrder.sort((a,b)=>leanCarrilLabel(a).localeCompare(leanCarrilLabel(b)));
+  carrilOrder.sort(leanCarrilSort);
 
   const carriles=carrilOrder.map(car=>{
     const rows=groups[car];
     const applicable=rows.filter(r=>(r.item.status||'pendiente')!=='na');
     const doneCount=applicable.filter(r=>r.item.status==='hecho').length;
     const pct=applicable.length?Math.round(doneCount/applicable.length*100):0;
-    const sorted=rows.slice().sort((a,b)=>(typeof a.ref==='number'?a.ref:1e9)-(typeof b.ref==='number'?b.ref:1e9));
-    let current=sorted.find(r=>(r.item.status||'pendiente')==='curso');
-    if(!current)current=sorted.find(r=>{const st=r.item.status||'pendiente';return st!=='hecho'&&st!=='na';});
-    const subFrentes=[...new Set(rows.map(r=>r.cat?r.cat.fr:r.item.frente).filter(Boolean))];
-    return {car,rows,sorted,applicable,doneCount,pct,current,subFrentes};
+    // subagrupar por frente (para diferenciar de dónde viene cada actividad dentro del carril)
+    const frGroups={};const frOrder=[];
+    rows.forEach(r=>{
+      const fr=r.cat?r.cat.fr:(r.item.frente||'Otros');
+      if(!frGroups[fr]){frGroups[fr]=[];frOrder.push(fr);}
+      frGroups[fr].push(r);
+    });
+    frOrder.sort(leanFrenteSort);
+    frOrder.forEach(fr=>frGroups[fr].sort((a,b)=>(typeof a.ref==='number'?a.ref:1e9)-(typeof b.ref==='number'?b.ref:1e9)));
+    return {car,rows,frOrder,frGroups,applicable,doneCount,pct};
   });
 
   let totalDone=gateDone,totalCount=gateEntries.filter(g=>g.item.status!=='na').length;
@@ -1471,13 +1505,17 @@ function renderLeanPlan(c){
   const paraleloTxt=carriles.length===0?'sin frentes activos todavía':(activos+' frente'+(activos===1?'':'s')+' avanzando en paralelo');
   const estado=gateDone<gateEntries.length?'Puerta inicial en curso':(overallPct===100?'Implementación completa':'Implementación en curso');
 
-  // ---- Cards de frentes (compactas, con todas las actividades visibles dentro) ----
+  // ---- Cards de frentes (compactas, subagrupadas por frente para diferenciar de dónde viene cada actividad) ----
   const cardsHtml=carriles.map(g=>{
     const locked=!plan.pitAprobado;
+    const scrollKey='lean-'+esc(g.car);
     const bodyHtml=locked?'<div class="lean-lock-msg">🔒 Se desbloquea cuando el PIT esté aprobado</div>':
-      '<div class="lean-card-list">'+g.sorted.map(r=>leanItemRow(c.id,r.ref,r.label,r.item,r.isCustom,true,r.cat)).join('')+'</div>';
+      '<div class="lean-card-list" data-scroll-key="'+scrollKey+'">'+g.frOrder.map(fr=>
+        '<div class="lean-card-sub-hdr">'+esc(fr)+'</div>'+
+        g.frGroups[fr].map(r=>leanItemRow(c.id,r.ref,r.label,r.item,r.isCustom,true,r.cat)).join('')
+      ).join('')+'</div>';
     return '<div class="lean-card'+(locked?' locked':'')+'">'+
-      '<div class="lean-card-hdr"><div class="lean-card-icon">'+leanCarrilIcon(g.car)+'</div><div class="txt"><div class="t">'+esc(leanCarrilLabel(g.car))+'</div>'+(g.subFrentes.length?'<div class="s">'+esc(g.subFrentes.join(', '))+'</div>':'')+'</div><div class="cnt">'+g.doneCount+'/'+g.applicable.length+'</div></div>'+
+      '<div class="lean-card-hdr"><div class="lean-card-icon">'+leanCarrilIcon(g.car)+'</div><div class="txt"><div class="t">'+esc(leanCarrilLabel(g.car))+'</div></div><div class="cnt">'+g.doneCount+'/'+g.applicable.length+'</div></div>'+
       bodyHtml+
     '</div>';
   }).join('');
@@ -1529,6 +1567,17 @@ function renderLeanCatalogo(c){
     '<button class="mini-btn primary" onclick="leanAddAllOrigen('+c.id+',\''+leanCatOrigen+'\')" title="Agrega las '+items.length+' actividades de esta biblioteca de una vez">+ Agregar TODO ('+items.length+')</button></div>'+
     '<div class="tips-box" style="max-height:65vh;overflow-y:auto">'+bodyHtml+'</div>';
 }
+function preserveScroll(renderFn){
+  const y=window.scrollY;
+  const subScrolls={};
+  document.querySelectorAll('[data-scroll-key]').forEach(el=>{subScrolls[el.getAttribute('data-scroll-key')]=el.scrollTop;});
+  renderFn();
+  window.scrollTo(0,y);
+  document.querySelectorAll('[data-scroll-key]').forEach(el=>{
+    const key=el.getAttribute('data-scroll-key');
+    if(subScrolls[key]!=null)el.scrollTop=subScrolls[key];
+  });
+}
 function renderLean(){
   const box=document.getElementById('lean-body');if(!box)return;
   const wrap=document.getElementById('lean-client-wrap');
@@ -1543,7 +1592,9 @@ function renderLean(){
   document.getElementById('lean-client-select').innerHTML=clients.map(c=>'<option value="'+c.id+'"'+(c.id===leanClient?' selected':'')+'>'+esc(c.emp)+'</option>').join('');
   const c=contacts.find(x=>x.id===leanClient);if(!c)return;
   leanSeedFaseInicial(c);
-  if(leanView==='catalogo')renderLeanCatalogo(c);else renderLeanPlan(c);
+  preserveScroll(()=>{
+    if(leanView==='catalogo')renderLeanCatalogo(c);else renderLeanPlan(c);
+  });
 }
 // ---- Plan por pilares: plan de trabajo libre por cliente (sin catálogo ni dependencias) ----
 let planMode='lean',pilarClient=null,pilarActivo=null;
@@ -1671,6 +1722,7 @@ function renderPilares(){
   if(!pilarClient||!clients.some(c=>c.id===pilarClient))pilarClient=clients[0].id;
   document.getElementById('pilar-client-select').innerHTML=clients.map(c=>'<option value="'+c.id+'"'+(c.id===pilarClient?' selected':'')+'>'+esc(c.emp)+'</option>').join('');
   const c=contacts.find(x=>x.id===pilarClient);if(!c)return;
+  preserveScroll(()=>{
   const pilares=pilarEnsure(c);
   const names=Object.keys(pilares).sort((a,b)=>a.localeCompare(b));
   if(!pilarActivo||!names.includes(pilarActivo))pilarActivo=names[0]||null;
@@ -1695,6 +1747,7 @@ function renderPilares(){
   box.innerHTML='<div class="tips-box"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong style="font-size:12px;color:#64748b">Pilares de '+esc(c.emp)+':</strong>'+chips+addForm+'</div>'+
     (names.length===0?'<div style="color:#94a3b8;font-size:13px;margin-top:8px">Este cliente todavía no tiene ningún pilar. Crea el primero arriba.</div>':'')+
     '</div>'+tableHtml;
+  });
 }
 function entryUf(e,contactUf){return parseFloat(e.ufHora)||contactUf||0;}
 function bitaClientList(){
