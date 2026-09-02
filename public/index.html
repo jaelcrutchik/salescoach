@@ -402,9 +402,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-gantt-segments{display:flex;height:16px}
 .lean-gantt-segment{position:absolute;top:0;height:16px;font-size:9px;font-weight:700;color:#7c3aed;background:#f5f3ff;border-bottom:1px solid #ddd6fe;text-align:center;overflow:hidden;white-space:nowrap;box-sizing:border-box;padding-top:1px}
 .lean-gantt-monthrow{display:flex;border-bottom:1px solid var(--border)}
-.lean-gantt-month{flex-shrink:0;font-size:10px;font-weight:700;color:#64748b;text-align:center;padding:3px 0;box-sizing:border-box;border-right:1px solid #f1f5f9}
+.lean-gantt-month{flex-shrink:0;font-size:10px;font-weight:700;color:#64748b;text-align:center;padding:3px 0;box-sizing:border-box;border-right:1px solid #cbd5e1}
 .lean-gantt-weekrow{display:flex}
-.lean-gantt-weekhdr{flex-shrink:0;font-size:9px;color:#94a3b8;text-align:center;padding:3px 0;box-sizing:border-box;border-right:1px solid #f8fafc}
+.lean-gantt-weekhdr{flex-shrink:0;font-size:9px;color:#94a3b8;text-align:center;padding:3px 0;box-sizing:border-box;border-right:1px solid #e2e8f0}
 .lean-gantt-weekhdr.today{color:#2563eb;font-weight:700}
 .lean-gantt-body{position:relative}
 .lean-gantt-frente-hdr{display:flex;cursor:pointer}
@@ -2553,7 +2553,7 @@ function renderLeanGantt(c){
         '<div class="lean-gantt-cell actividad" title="'+esc(r.label)+'">'+esc(r.label)+'</div>'+
         '<div class="lean-gantt-cell area" title="'+esc(r.area||'')+'">'+esc(r.area||'')+'</div>'+
       '</div>'+
-      '<div class="lean-gantt-timeline" data-weekwidth="'+weekWidth+'" style="width:'+timelineWidth+'px">'+
+      '<div class="lean-gantt-timeline" data-weekwidth="'+weekWidth+'" style="width:'+timelineWidth+'px;background-image:repeating-linear-gradient(to right,#e2e8f0,#e2e8f0 1px,transparent 1px,transparent '+weekWidth+'px)">'+
         (todayIdx>=0?'<div class="lean-gantt-todaycol" style="left:'+(todayIdx*weekWidth)+'px;width:'+weekWidth+'px"></div>':'')+
         ganttBarHtml(r)+
       '</div>'+
