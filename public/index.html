@@ -2320,7 +2320,12 @@ function renderLeanFlujo(c){
 }
 // ================= GANTT DE RUTA LEAN =================
 // No es un plan independiente: lee las mismas plan.items/plan.custom (y voc) que Seguimiento/Flujo.
-let leanGanttView='semana',leanGanttFiltroFrente='',leanGanttFiltroArea='',leanGanttFiltroEstado='',leanGanttOcultarHechas=false;
+let leanGanttView='semana',leanGanttFiltroFrente='',leanGanttFiltroArea='',leanGanttFiltroEstado='',leanGanttOcultarHechas=false,leanGanttSelected=null;
+function leanGanttSelect(cid,ref,isCustom,kind){
+  leanGanttSelected={cid,ref,isCustom:!!isCustom,kind};
+  renderLean();
+}
+function leanGanttCloseDetail(){leanGanttSelected=null;renderLean();}
 function setLeanGanttView(v){leanGanttView=v;renderLean();}
 function setLeanGanttFiltro(field,value){
   if(field==='frente')leanGanttFiltroFrente=value;
@@ -2425,10 +2430,7 @@ function ganttBarMouseUp(){
   const d=ganttDrag;ganttDrag=null;
   const dW=d.deltaWeeks;
   if(!dW){
-    if(d.mode==='move'){
-      if(d.kind==='voc'){if(d.isCustom)vocCycleCustom(d.cid,d.ref);else vocCycle(d.cid,d.ref);}
-      else{if(d.isCustom)leanCycleCustom(d.cid,d.ref);else leanCycle(d.cid,d.ref);}
-    }
+    if(d.mode==='move')leanGanttSelect(d.cid,d.ref,d.isCustom,d.kind);
     return;
   }
   const addW=(dateStr,n)=>dateStr?ganttFmtDate(ganttAddDays(new Date(dateStr+'T00:00:00'),n*7)):'';
@@ -2440,6 +2442,26 @@ function ganttBarMouseUp(){
   if(newInicio!==d.origFechaInicio)setFn(d.cid,d.ref,'fechaInicio',newInicio);
   if(newFin!==d.origFecha)setFn(d.cid,d.ref,'fecha',newFin);
   renderLean();
+}
+// ---- Panel de edición de la actividad seleccionada en el Gantt: fechas precisas además de arrastrar ----
+function leanGanttDetailHtml(c,allRows){
+  if(!leanGanttSelected||leanGanttSelected.cid!==c.id)return '';
+  const sel=leanGanttSelected;
+  const row=allRows.find(r=>!!r.isCustom===!!sel.isCustom&&r.kind===sel.kind&&String(r.ref)===String(sel.ref));
+  if(!row)return '';
+  const st=row.item.status||'pendiente';
+  const idArg=sel.isCustom?"'"+sel.ref+"'":sel.ref;
+  const cycleFn=sel.kind==='voc'?(sel.isCustom?'vocCycleCustom':'vocCycle'):(sel.isCustom?'leanCycleCustom':'leanCycle');
+  const metaPanel=sel.kind==='voc'?vocItemMetaPanel(c.id,idArg,row.item,sel.isCustom):leanItemMetaPanel(c.id,idArg,row.item,sel.isCustom,sel.ref);
+  return '<div class="lean-flow-detail" style="margin-top:12px">'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
+      '<strong style="font-size:13.5px">'+esc(row.label)+'</strong>'+
+      '<span class="ls-badge" style="font-size:11px;cursor:pointer" onclick="'+cycleFn+'('+c.id+','+idArg+')" title="Click para cambiar de estado">'+LEAN_STATUS_LABEL[st]+'</span>'+
+      '<span style="margin-left:auto;font-size:11px;color:#94a3b8;cursor:pointer" onclick="leanGanttCloseDetail()">✕ Cerrar</span>'+
+    '</div>'+
+    '<div style="font-size:11px;color:#94a3b8;margin-bottom:8px">'+esc(row.frente)+(row.area?' · '+esc(row.area):'')+'</div>'+
+    metaPanel.replace(' hidden','')+
+  '</div>';
 }
 function renderLeanGantt(c){
   const box=document.getElementById('lean-body');
@@ -2581,7 +2603,7 @@ function renderLeanGantt(c){
       '<select onchange="setLeanGanttFiltro(\'estado\',this.value)">'+estadoFilterOpts+'</select>'+
       '<label style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:#64748b;cursor:pointer"><input type="checkbox" '+(leanGanttOcultarHechas?'checked':'')+' onchange="toggleLeanGanttOcultarHechas()"> Ocultar terminadas</label>'+
     '</div>'+
-    '<div class="lean-gantt-legend">🟩 Hecho · 🟧 En curso · ⬜ Pendiente · <span style="opacity:.5">⬜</span> No aplica · <span style="color:#dc2626">borde rojo</span> = vencida · ◆ hito — arrastra una barra para mover, estira sus bordes para cambiar duración</div>'+
+    '<div class="lean-gantt-legend">🟩 Hecho · 🟧 En curso · ⬜ Pendiente · <span style="opacity:.5">⬜</span> No aplica · <span style="color:#dc2626">borde rojo</span> = vencida · ◆ hito — arrastra una barra para mover o estira sus bordes para cambiar duración; click sin arrastrar abre el detalle para editar fechas a mano</div>'+
     '<div class="lean-gantt-wrap">'+
       '<div class="lean-gantt-headerrow">'+
         '<div class="lean-gantt-left lean-gantt-left-hdr"><div class="lean-gantt-cell frente">Frente</div><div class="lean-gantt-cell actividad">Actividad</div><div class="lean-gantt-cell area">Área</div></div>'+
@@ -2589,6 +2611,7 @@ function renderLeanGantt(c){
       '</div>'+
       '<div class="lean-gantt-body">'+(bodyHtml||'<div class="tips-box" style="margin:10px">Ninguna actividad programada todavía. Asigna fechas desde "Sin programar" más abajo.</div>')+'</div>'+
     '</div>'+
+    leanGanttDetailHtml(c,allRows)+
     sinProgramarHtml;
 }
 function renderLeanCatalogo(c){
