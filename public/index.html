@@ -384,6 +384,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .pilar-avance-chip.ent{border-left:3px solid #16a34a}
 .pilar-avance-sub{font-weight:400;color:#94a3b8}
 /* ---- Gantt de Ruta Lean ---- */
+.lean-gantt-toolbar select,.lean-gantt-toolbar button,.lean-gantt-unsched-row input,.lean-gantt-unsched-row button{font-family:var(--sans)}
 .lean-gantt-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;padding:8px;background:#f8fafc;border:1px solid var(--border);border-radius:8px}
 .lean-gantt-toolbar-group{display:flex;gap:4px}
 .lean-gantt-toolbar select{font-size:11.5px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);background:white}
@@ -392,7 +393,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-gantt-headerrow{display:flex;position:sticky;top:0;z-index:3;background:white}
 .lean-gantt-left{display:flex;flex-shrink:0;width:420px;position:sticky;left:0;z-index:2;background:white;border-right:1px solid var(--border)}
 .lean-gantt-left-hdr{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--border)}
-.lean-gantt-cell{padding:6px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box}
+.lean-gantt-cell{padding:6px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;font-size:11.5px;font-family:var(--sans)}
 .lean-gantt-cell.frente{width:150px;flex-shrink:0}
 .lean-gantt-cell.actividad{width:200px;flex-shrink:0}
 .lean-gantt-cell.area{width:70px;flex-shrink:0;color:#94a3b8;font-size:10.5px}
@@ -2551,13 +2552,14 @@ function renderLeanGantt(c){
     '</div>';
   }).join('');
 
-  const sinProgramarHtml=sinProgramar.length?'<div class="lean-gantt-unsched"><div class="lean-gantt-unsched-hdr">📋 Sin programar ('+sinProgramar.length+') — asigna fechas para incorporarlas al Gantt</div>'+
+  const sinProgramarHtml=sinProgramar.length?'<div class="lean-gantt-unsched"><div class="lean-gantt-unsched-hdr">📋 Sin programar ('+sinProgramar.length+') — completa inicio y/o término y confirma con ✓ para incorporarlas al Gantt</div>'+
     sinProgramar.map(r=>{
       const idArg=r.isCustom?"'"+r.ref+"'":r.ref;
       const setFn=ganttSetFnOf(r);
       return '<div class="lean-gantt-unsched-row"><span class="lean-gantt-unsched-label">'+esc(r.frente)+(r.area?' · '+esc(r.area):'')+' — '+esc(r.label)+'</span>'+
-        '<input type="date" title="Inicio planificado" onchange="'+setFn+'('+c.id+','+idArg+',\'fechaInicio\',this.value);renderLean();">'+
-        '<input type="date" title="Término planificado" onchange="'+setFn+'('+c.id+','+idArg+',\'fecha\',this.value);renderLean();">'+
+        '<input type="date" value="'+esc(r.item.fechaInicio||'')+'" title="Inicio planificado" onchange="'+setFn+'('+c.id+','+idArg+',\'fechaInicio\',this.value)">'+
+        '<input type="date" value="'+esc(r.item.fecha||'')+'" title="Término planificado" onchange="'+setFn+'('+c.id+','+idArg+',\'fecha\',this.value)">'+
+        '<button type="button" class="mini-btn" onclick="renderLean()" title="Confirmar e incorporar al Gantt">✓</button>'+
       '</div>';
     }).join('')+
   '</div>':'';
