@@ -2452,11 +2452,15 @@ function leanGanttDetailHtml(c,allRows){
   const st=row.item.status||'pendiente';
   const idArg=sel.isCustom?"'"+sel.ref+"'":sel.ref;
   const cycleFn=sel.kind==='voc'?(sel.isCustom?'vocCycleCustom':'vocCycle'):(sel.isCustom?'leanCycleCustom':'leanCycle');
-  const metaPanel=sel.kind==='voc'?vocItemMetaPanel(c.id,idArg,row.item,sel.isCustom):leanItemMetaPanel(c.id,idArg,row.item,sel.isCustom,sel.ref);
+  const rawMetaPanel=sel.kind==='voc'?vocItemMetaPanel(c.id,idArg,row.item,sel.isCustom):leanItemMetaPanel(c.id,idArg,row.item,sel.isCustom,sel.ref);
+  // leanSetMeta/vocSetMeta guardan pero no re-renderizan (para no interrumpir mientras se escribe en otras vistas);
+  // acá sí hace falta, porque la barra del Gantt tiene que moverse apenas se confirma una fecha.
+  const metaPanel=rawMetaPanel.replace(/this\.value\)"/g,'this.value);renderLean()"').replace(/this\.checked\)"/g,'this.checked);renderLean()"');
+  const stColorBg={pendiente:'#e2e8f0',curso:'#fdba74',revision:'#fdba74',hecho:'#86efac',na:'#f1f5f9'}[st]||'#e2e8f0';
   return '<div class="lean-flow-detail" style="margin-top:12px">'+
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
       '<strong style="font-size:13.5px">'+esc(row.label)+'</strong>'+
-      '<span class="ls-badge" style="font-size:11px;cursor:pointer" onclick="'+cycleFn+'('+c.id+','+idArg+')" title="Click para cambiar de estado">'+LEAN_STATUS_LABEL[st]+'</span>'+
+      '<span class="mini-btn" style="font-size:11px;padding:3px 9px;background:'+stColorBg+';border-color:transparent" onclick="'+cycleFn+'('+c.id+','+idArg+')" title="Click para cambiar de estado (Pendiente → En curso → Hecho → No aplica)">Estado: '+LEAN_STATUS_LABEL[st]+' ✎</span>'+
       '<span style="margin-left:auto;font-size:11px;color:#94a3b8;cursor:pointer" onclick="leanGanttCloseDetail()">✕ Cerrar</span>'+
     '</div>'+
     '<div style="font-size:11px;color:#94a3b8;margin-bottom:8px">'+esc(row.frente)+(row.area?' · '+esc(row.area):'')+'</div>'+
