@@ -407,7 +407,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-gantt-weekhdr{flex-shrink:0;font-size:9px;color:#94a3b8;text-align:center;padding:3px 0;box-sizing:border-box;border-right:1px solid #f8fafc}
 .lean-gantt-weekhdr.today{color:#2563eb;font-weight:700}
 .lean-gantt-body{position:relative}
-.lean-gantt-frente-hdr{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:#1e293b;background:#f8fafc;padding:6px 10px;cursor:pointer;position:sticky;left:0;width:fit-content;min-width:100%;box-sizing:border-box;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.lean-gantt-frente-hdr{display:flex;cursor:pointer}
+.lean-gantt-frente-hdr-left{align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:#1e293b;background:#f8fafc!important;padding:6px 10px;box-sizing:border-box;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.lean-gantt-frente-hdr-fill{flex-shrink:0;background:#f8fafc;border-top:1px solid var(--border);border-bottom:1px solid var(--border);box-sizing:border-box}
 .lean-gantt-frente-hdr .chev{color:#94a3b8;font-size:10px}
 .lean-gantt-frente-hdr .cnt{margin-left:auto;color:#94a3b8;font-weight:600;font-size:10.5px}
 .lean-gantt-row{display:flex;border-bottom:1px solid #f8fafc}
@@ -2573,7 +2575,10 @@ function renderLeanGantt(c){
     const doneN=rows.filter(r=>r.item.status==='hecho').length;
     const fkJs=esc(fk).replace(/'/g,"\\'");
     return '<div class="lean-gantt-frente-group">'+
-      '<div class="lean-gantt-frente-hdr" onclick="toggleLeanFlowCarril(\''+fkJs+'\')"><span class="chev">'+(closed?'▸':'▾')+'</span>'+esc(leanCarrilLabel(fk))+'<span class="cnt">'+doneN+'/'+rows.length+'</span></div>'+
+      '<div class="lean-gantt-frente-hdr" onclick="toggleLeanFlowCarril(\''+fkJs+'\')">'+
+        '<div class="lean-gantt-left lean-gantt-frente-hdr-left"><span class="chev">'+(closed?'▸':'▾')+'</span>'+esc(leanCarrilLabel(fk))+'<span class="cnt">'+doneN+'/'+rows.length+'</span></div>'+
+        '<div class="lean-gantt-frente-hdr-fill" style="width:'+timelineWidth+'px"></div>'+
+      '</div>'+
       (closed?'':rows.map(ganttRowHtml).join(''))+
     '</div>';
   }).join('');
