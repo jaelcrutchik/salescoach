@@ -2430,7 +2430,7 @@ function ganttBarMouseUp(){
   const d=ganttDrag;ganttDrag=null;
   const dW=d.deltaWeeks;
   if(!dW){
-    if(d.mode==='move')leanGanttSelect(d.cid,d.ref,d.isCustom,d.kind);
+    leanGanttSelect(d.cid,d.ref,d.isCustom,d.kind);
     return;
   }
   const addW=(dateStr,n)=>dateStr?ganttFmtDate(ganttAddDays(new Date(dateStr+'T00:00:00'),n*7)):'';
