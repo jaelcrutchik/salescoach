@@ -760,9 +760,22 @@ function initMigRemovePresale(){
   migRemovePresale=true;
   return true;
 }
+// Migración única: renombrar id 31 ("Mapeo de flujo de valor por familia de producto o servicio" -> "Mapeo de flujos a armar")
+// en los planes de clientes que ya lo tenían agregado (snapshot de texto tomado antes del cambio de catálogo).
+let migRenameId31=false;
+function initMigRenameId31(){
+  if(migRenameId31)return false;
+  const textoAnterior='Mapeo de flujo de valor por familia de producto o servicio';
+  contacts.forEach(c=>{
+    const item=c.leanPlan&&c.leanPlan.items&&c.leanPlan.items[31];
+    if(item&&item.snapTexto===textoAnterior)item.snapTexto='Mapeo de flujos a armar';
+  });
+  migRenameId31=true;
+  return true;
+}
 const STORE_KEY='ryc_salescoach_v2';
 function persist(){
-  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,migStages2026,pilarSeedVictoria,migMetodologia,migRemovePresale,ufValorClp,ufPorMes,updatedAt:new Date().toISOString()});
+  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,migStages2026,pilarSeedVictoria,migMetodologia,migRemovePresale,migRenameId31,ufValorClp,ufPorMes,updatedAt:new Date().toISOString()});
   try{localStorage.setItem(STORE_KEY,payload);}
   catch(e){console.error('storage error',e);showToast('⚠️ No se pudo guardar — exporta un respaldo');}
 }
@@ -777,12 +790,12 @@ function loadData(){
   try{const p=localStorage.getItem(STORE_KEY);if(p)d=JSON.parse(p);}catch(e){console.error('load error',e);}
   if(d){
     contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;
-    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;migStages2026=!!d.migStages2026;pilarSeedVictoria=!!d.pilarSeedVictoria;migMetodologia=!!d.migMetodologia;migRemovePresale=!!d.migRemovePresale;ufValorClp=parseFloat(d.ufValorClp)||40820.31;ufPorMes=d.ufPorMes&&typeof d.ufPorMes==='object'?d.ufPorMes:{};
+    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;migStages2026=!!d.migStages2026;pilarSeedVictoria=!!d.pilarSeedVictoria;migMetodologia=!!d.migMetodologia;migRemovePresale=!!d.migRemovePresale;migRenameId31=!!d.migRenameId31;ufValorClp=parseFloat(d.ufValorClp)||40820.31;ufPorMes=d.ufPorMes&&typeof d.ufPorMes==='object'?d.ufPorMes:{};
   }else{
     contacts=SEED.map(normalize);nextId=60;
   }
   loaded=true;
-  const cambios=[initOwners(),initRafa(),initFix(),initBita(),initRestore0702(),initRestoreB(),initMigStages2026(),initPilarSeedVictoria(),initMigMetodologia(),initMigRemovePresale()].filter(Boolean).length;
+  const cambios=[initOwners(),initRafa(),initFix(),initBita(),initRestore0702(),initRestoreB(),initMigStages2026(),initPilarSeedVictoria(),initMigMetodologia(),initMigRemovePresale(),initMigRenameId31()].filter(Boolean).length;
   if(cambios||!d){persist();if(fixJustRan||cambios)showToast('✅ Pipeline actualizado');}
 }
 
@@ -1186,7 +1199,7 @@ const LEAN_CATALOG=[
 {id:28,o:'existente',fa:'Ruta existente',fr:'Cierre del proyecto',a:'Revisión de Quick Wins implementados',t:'Transversal',car:'Resultados y sostenibilidad',g:'P4 Implementación estabilizada',ch:'Condicional por diagnóstico',pr:[27],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.'},
 {id:29,o:'existente',fa:'Ruta existente',fr:'Roles y responsabilidades',a:'Revisión estructura organizacional',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[5],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.'},
 {id:30,o:'existente',fa:'Ruta existente',fr:'Roles y responsabilidades',a:'Definición de estructura organizacional',t:'Transversal',car:'Cultura, personas y liderazgo',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[29],c:'Definir con cliente completado, revisado y aceptado por la contraparte responsable.',e:'Definir con cliente + validación de la contraparte.',ap:1},
-{id:31,o:'existente',fa:'Ruta existente',fr:'VSM / Flujo actual',a:'Mapeo de flujo de valor por familia de producto o servicio',t:'Transversal',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[5],c:'Mapa o flujo validado por quienes ejecutan y por el dueño del proceso.',e:'Mapa/VSM/diagrama versionado + validación.'},
+{id:31,o:'existente',fa:'Ruta existente',fr:'VSM / Flujo actual',a:'Mapeo de flujos a armar',t:'Transversal',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[5],c:'Mapa o flujo validado por quienes ejecutan y por el dueño del proceso.',e:'Mapa/VSM/diagrama versionado + validación.'},
 {id:32,o:'existente',fa:'Ruta existente',fr:'VSM / Flujo actual',a:'Armado de flujos de trabajo',t:'Transversal',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[31],c:'Mapa o flujo validado por quienes ejecutan y por el dueño del proceso.',e:'Mapa/VSM/diagrama versionado + validación.'},
 {id:33,o:'existente',fa:'Ruta existente',fr:'VSM / Flujo actual',a:'Revisión de flujos de procesos',t:'Transversal',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[32],c:'Mapa o flujo validado por quienes ejecutan y por el dueño del proceso.',e:'Mapa/VSM/diagrama versionado + validación.'},
 {id:34,o:'existente',fa:'Ruta existente',fr:'VSM / Flujo futuro',a:'Definición de flujos de procesos eficiente',t:'Transversal',car:'Operación y procesos',g:'P2 PIT aprobado',ch:'Condicional por diagnóstico',pr:[33],c:'Mapa o flujo validado por quienes ejecutan y por el dueño del proceso.',e:'Mapa/VSM/diagrama versionado + validación.',ap:1},
