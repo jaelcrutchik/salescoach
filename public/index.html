@@ -295,6 +295,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-acciones-summary .ac-x{cursor:pointer;color:#cbd5e1}
 .lean-acciones-summary .ac-x:hover{color:#ef4444}
 .li-rec-badge,.li-accion-badge{font-size:10px}
+.lean-item.suggested .lean-step{box-shadow:inset 3px 0 0 #2563eb}
+.li-suggested-badge{font-size:9px;font-weight:700;color:#2563eb;background:#eff6ff;padding:1px 5px;border-radius:20px}
 .lean-flow-frente{margin-bottom:12px}
 .lean-flow-frente:last-child{margin-bottom:0}
 .lean-flow-frente-hdr{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.3px;padding:2px 0;margin-bottom:6px}
@@ -315,8 +317,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-flow-node.hecho .txt{color:#166534}
 .lean-flow-node .badge{font-size:9px;color:#94a3b8;margin-top:3px;text-transform:uppercase;letter-spacing:.3px}
 .lean-flow-node.recurrente{border-style:dashed;border-color:#94a3b8}
-.lean-flow-node.lean-flow-group{cursor:default}
-.lean-flow-node.lean-flow-group.open{width:320px}
+.lean-flow-node.lean-flow-group{cursor:pointer}
 .lf-grp-hdr{display:flex;align-items:flex-start;gap:4px;cursor:pointer}
 .lf-grp-hdr .chev{flex-shrink:0;color:#94a3b8;font-size:10px;margin-top:2px}
 .lean-flow-group-subs{margin-top:8px;padding-top:8px;border-top:1px dashed #e2e8f0}
@@ -325,6 +326,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .lean-group-subs .lean-step{font-size:11.5px}
 .lean-group-hdr{cursor:pointer}
 .lean-group-hdr .chev{color:#94a3b8;font-size:10px;margin-right:2px}
+.lean-group-hdr.sub{background:#fafaf9;border-radius:6px;padding-left:4px}
+.lean-subgrupo-item .lean-group-subs{border-left-color:#e5e7eb}
+.lean-group-hint{font-size:10px;color:#94a3b8;font-style:italic;margin:2px 0 6px 18px}
 .lean-vsm-hub{margin:8px 0 12px;padding:10px 12px;border:1px solid #ddd6fe;border-radius:10px;background:#f5f3ff}
 .lean-vsm-hub-hdr{font-size:12px;font-weight:700;color:#5b21b6;margin-bottom:4px}
 .lean-vsm-hub .lean-accion-form{border-top:none;margin-top:0;padding-top:0}
@@ -362,6 +366,71 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .pilar-task-add .pt-new{display:block;width:100%;box-sizing:border-box;border:1px dashed var(--border);border-radius:5px;padding:3px 6px;font-family:var(--sans);font-size:11.5px;min-height:22px}
 .pilar-task-add .pt-new:hover,.pilar-task-add .pt-new:focus{border-style:solid;background:white;outline:none}
 .pilar-task-add .pt-new:empty:before{content:attr(data-placeholder);color:#94a3b8}
+.pilar-task.na{opacity:.5}
+.pilar-task .pt-na{font-size:9px;font-weight:700;color:#cbd5e1;cursor:pointer;flex-shrink:0;margin-top:3px;padding:1px 4px;border-radius:4px}
+.pilar-task .pt-na:hover{color:#64748b;background:#f1f5f9}
+.pilar-entregable-task{flex-wrap:wrap}
+.pe-badge{flex-shrink:0;font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;cursor:pointer;text-transform:uppercase;letter-spacing:.2px;background:#f1f5f9;color:#64748b}
+.pilar-entregable-task.pendiente .pe-badge{background:#f1f5f9;color:#64748b}
+.pilar-entregable-task.curso .pe-badge{background:#fef3c7;color:#92400e}
+.pilar-entregable-task.entregado .pe-badge{background:#dbeafe;color:#1e40af}
+.pilar-entregable-task.validado .pe-badge{background:#dcfce7;color:#166534}
+.pilar-entregable-task.na .pe-badge{background:#f1f5f9;color:#cbd5e1}
+.pilar-entregable-task.na{opacity:.5}
+.pe-link{font-size:10px;color:#94a3b8;border:1px solid var(--border);border-radius:5px;padding:1px 4px;max-width:130px;font-family:var(--sans);flex-shrink:0}
+.pilar-avance-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.pilar-avance-chip{font-size:11.5px;font-weight:600;color:#1e293b;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:5px 10px}
+.pilar-avance-chip.act{border-left:3px solid #2563eb}
+.pilar-avance-chip.ent{border-left:3px solid #16a34a}
+.pilar-avance-sub{font-weight:400;color:#94a3b8}
+/* ---- Gantt de Ruta Lean ---- */
+.lean-gantt-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;padding:8px;background:#f8fafc;border:1px solid var(--border);border-radius:8px}
+.lean-gantt-toolbar-group{display:flex;gap:4px}
+.lean-gantt-toolbar select{font-size:11.5px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans);background:white}
+.lean-gantt-legend{font-size:10.5px;color:#94a3b8;margin-bottom:8px}
+.lean-gantt-wrap{border:1px solid var(--border);border-radius:10px;overflow:auto;max-height:70vh;position:relative;background:white}
+.lean-gantt-headerrow{display:flex;position:sticky;top:0;z-index:3;background:white}
+.lean-gantt-left{display:flex;flex-shrink:0;width:420px;position:sticky;left:0;z-index:2;background:white;border-right:1px solid var(--border)}
+.lean-gantt-left-hdr{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--border)}
+.lean-gantt-cell{padding:6px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box}
+.lean-gantt-cell.frente{width:150px;flex-shrink:0}
+.lean-gantt-cell.actividad{width:200px;flex-shrink:0}
+.lean-gantt-cell.area{width:70px;flex-shrink:0;color:#94a3b8;font-size:10.5px}
+.lean-gantt-timeline-hdr-wrap{overflow:hidden}
+.lean-gantt-timeline-hdr{position:relative}
+.lean-gantt-segments{display:flex;height:16px}
+.lean-gantt-segment{position:absolute;top:0;height:16px;font-size:9px;font-weight:700;color:#7c3aed;background:#f5f3ff;border-bottom:1px solid #ddd6fe;text-align:center;overflow:hidden;white-space:nowrap;box-sizing:border-box;padding-top:1px}
+.lean-gantt-monthrow{display:flex;border-bottom:1px solid var(--border)}
+.lean-gantt-month{flex-shrink:0;font-size:10px;font-weight:700;color:#64748b;text-align:center;padding:3px 0;box-sizing:border-box;border-right:1px solid #f1f5f9}
+.lean-gantt-weekrow{display:flex}
+.lean-gantt-weekhdr{flex-shrink:0;font-size:9px;color:#94a3b8;text-align:center;padding:3px 0;box-sizing:border-box;border-right:1px solid #f8fafc}
+.lean-gantt-weekhdr.today{color:#2563eb;font-weight:700}
+.lean-gantt-body{position:relative}
+.lean-gantt-frente-hdr{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:#1e293b;background:#f8fafc;padding:6px 10px;cursor:pointer;position:sticky;left:0;width:fit-content;min-width:100%;box-sizing:border-box;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.lean-gantt-frente-hdr .chev{color:#94a3b8;font-size:10px}
+.lean-gantt-frente-hdr .cnt{margin-left:auto;color:#94a3b8;font-weight:600;font-size:10.5px}
+.lean-gantt-row{display:flex;border-bottom:1px solid #f8fafc}
+.lean-gantt-row:hover{background:#fafaf9}
+.lean-gantt-timeline{position:relative;height:30px;flex-shrink:0}
+.lean-gantt-todaycol{position:absolute;top:0;bottom:0;background:#eff6ff;z-index:0}
+.lean-gantt-bar{position:absolute;top:5px;height:20px;border-radius:5px;background:#e2e8f0;display:flex;align-items:center;overflow:hidden;cursor:grab;z-index:1;border:1.5px solid transparent;box-sizing:border-box}
+.lean-gantt-bar:active{cursor:grabbing}
+.lean-gantt-bar.hecho{background:#86efac;border-color:#22c55e}
+.lean-gantt-bar.curso{background:#fdba74;border-color:#f59e0b}
+.lean-gantt-bar.pendiente{background:#e2e8f0;border-color:#cbd5e1}
+.lean-gantt-bar.na{background:#f1f5f9;border-color:#e2e8f0;opacity:.5}
+.lean-gantt-bar.overdue{border-color:#dc2626;border-width:2px}
+.lean-gantt-bar-label{font-size:9.5px;color:#1e293b;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 6px;pointer-events:none}
+.lean-gantt-bar-handle{width:6px;align-self:stretch;cursor:ew-resize;flex-shrink:0}
+.lean-gantt-bar-handle:hover{background:rgba(0,0,0,.15)}
+.lean-gantt-hito{position:absolute;top:8px;width:13px;height:13px;transform:rotate(45deg);background:#a78bfa;border:1.5px solid #7c3aed;cursor:grab;z-index:1}
+.lean-gantt-hito.hecho{background:#22c55e;border-color:#166534}
+.lean-gantt-hito.overdue{border-color:#dc2626;border-width:2px}
+.lean-gantt-unsched{margin-top:14px;padding:10px 12px;border:1px dashed var(--border);border-radius:10px;background:#fafaf9}
+.lean-gantt-unsched-hdr{font-size:11.5px;font-weight:700;color:#64748b;margin-bottom:6px}
+.lean-gantt-unsched-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11.5px;border-bottom:1px solid #f1f5f9}
+.lean-gantt-unsched-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lean-gantt-unsched-row input[type=date]{font-size:11px;padding:3px 5px;border:1px solid var(--border);border-radius:5px;font-family:var(--sans)}
 </style>
 </head>
 <body>
@@ -1401,7 +1470,9 @@ const LEAN_ACCION_PROCESOS=[...LEAN_CARRIL_ORDER,'Voz y experiencia del cliente'
 // ids nuevos (solo 3, sin cobertura existente, origen 'Metodología operativa propia'): 179,180,181.
 const LEAN_GRUPOS=[
   {id:'grp_vsm_actual',label:'Construir y validar VSM / flujo actual',car:'Operación y procesos',fr:'VSM / Flujo actual',
-    subIds:[31,179,32,83,33,84,85,87,88,89,90,91,92,93,94,95,96,97,148]},
+    flowHint:'Mapear → Revisar → Analizar → Identificar brechas → Diseñar futuro',
+    subIds:[31,179,32,83,33,84,85,87,88,89,90,91,92,93,94,95,96,97,148],
+    subgrupos:[{id:'sub_ocho_desperdicios',label:'Revisar los ocho desperdicios Lean',progresoTxt:'revisados',subIds:[90,91,92,93,94,95,96,97]}]},
   {id:'grp_vsm_futuro',label:'Diseñar y validar VSM / flujo futuro',car:'Operación y procesos',fr:'VSM / Flujo futuro',
     subIds:[99,98,34]},
   {id:'grp_smed',label:'Aplicar SMED para reducir tiempos de preparación',car:'Operación y procesos',fr:'SMED',condicional:true,
@@ -1409,6 +1480,27 @@ const LEAN_GRUPOS=[
 ];
 function leanGrupoOf(catId){return LEAN_GRUPOS.find(g=>g.subIds.includes(catId));}
 function leanGrupoById(grpId){return LEAN_GRUPOS.find(g=>g.id===grpId);}
+// ---- Reparte los subpasos de un grupo en unidades a renderizar: ítems sueltos o sub-grupos colapsables (ej. ocho desperdicios) ----
+function leanPartitionSubRows(grupo,subRows){
+  const subgrupos=grupo.subgrupos||[];
+  const byRef=new Map(subRows.map(r=>[r.ref,r]));
+  const consumed=new Set();
+  const units=[];
+  grupo.subIds.forEach(id=>{
+    if(consumed.has(id))return;
+    const sg=subgrupos.find(s=>s.subIds.includes(id));
+    if(sg){
+      const rows=sg.subIds.map(sid=>byRef.get(sid)).filter(Boolean);
+      if(!rows.length)return;
+      rows.forEach(r=>consumed.add(r.ref));
+      units.push({type:'subgrupo',def:sg,rows});
+      return;
+    }
+    const r=byRef.get(id);
+    if(r){consumed.add(id);units.push({type:'item',row:r});}
+  });
+  return units;
+}
 function leanGroupStatusItem(subRows){
   if(!subRows.length)return {status:'pendiente'};
   const applicable=subRows.filter(r=>(r.item.status||'pendiente')!=='na');
@@ -1476,6 +1568,42 @@ function leanVertebralHtml(c){
     return i<LEAN_VERTEBRAL.length-1?box+'<div class="lean-vert-arrow">→</div>':box;
   }).join('');
   return '<div class="lean-vertebral"><div class="lean-vertebral-lbl">Secuencia sugerida después del PIT · no bloquea el avance</div><div class="lean-vertebral-row">'+stagesHtml+'</div></div>';
+}
+// ---- Cadena visual local del VSM (dentro de Operación y procesos): solo informativa, no bloqueante ----
+const LEAN_VSM_CHAIN=[
+  {label:'VSM actual',grp:'grp_vsm_actual'},
+  {label:'VSM futuro',grp:'grp_vsm_futuro'},
+  {label:'Convertir brechas',accionHub:true},
+  {label:'Implementar mejoras',fr:'Mejoras implementadas'},
+  {label:'Estandarizar',fr:'Estandarización y calidad'},
+  {label:'Medir resultados',resultados:true}
+];
+function leanVsmChainStatus(c,stage){
+  const plan=leanEnsurePlan(c);
+  if(stage.grp){
+    const grp=leanGrupoById(stage.grp);
+    const rows=grp.subIds.map(id=>plan.items[id]).filter(Boolean);
+    if(!rows.length)return 'vacio';
+    const applicable=rows.filter(it=>(it.status||'pendiente')!=='na');
+    if(!applicable.length)return 'vacio';
+    if(applicable.every(it=>it.status==='hecho'))return 'hecho';
+    if(applicable.some(it=>it.status==='curso'||it.status==='revision'))return 'curso';
+    return 'pendiente';
+  }
+  if(stage.accionHub){
+    const acciones=(plan.acciones||[]).filter(a=>a.origenRef==='vsm_brechas');
+    if(!acciones.length)return 'vacio';
+    return acciones.every(a=>a.estado==='cerrada')?'hecho':'curso';
+  }
+  return leanVertebralStatus(c,{car:stage.resultados?LEAN_CARRIL_RESULTADOS:'Operación y procesos',fr:stage.resultados?null:stage.fr});
+}
+function leanVsmChainHtml(c){
+  const stagesHtml=LEAN_VSM_CHAIN.map((s,i)=>{
+    const st=leanVsmChainStatus(c,s);
+    const box='<div class="lean-vert-step '+st+'" title="Secuencia visual del VSM, no bloqueante">'+esc(s.label)+'</div>';
+    return i<LEAN_VSM_CHAIN.length-1?box+'<div class="lean-vert-arrow">→</div>':box;
+  }).join('');
+  return '<div class="lean-vertebral"><div class="lean-vertebral-lbl">Secuencia del VSM · visual, no bloqueante</div><div class="lean-vertebral-row">'+stagesHtml+'</div></div>';
 }
 function leanEnsurePlan(c){
   if(!c.leanPlan)c.leanPlan={pitAprobado:false,items:{},custom:[]};
@@ -1585,7 +1713,15 @@ function leanVsmAccionesHubHtml(c){
     leanAccionFormHtml(c.id,"'vsm_brechas'",'vsm_brechas',true)+
   '</div>';
 }
-function leanBlankItem(){return {status:'pendiente',responsable:'',fecha:'',entregable:'',evidencia:'',notas:''};}
+function leanBlankItem(){return {status:'pendiente',responsable:'',fecha:'',entregable:'',evidencia:'',notas:'',fechaInicio:'',fechaInicioReal:'',fechaReal:'',hito:false};}
+// ---- Fechas para Gantt: retrocompatibles, se agregan solas la primera vez que se leen ----
+function leanEnsureFechas(item){
+  if(item.fechaInicio==null)item.fechaInicio='';
+  if(item.fechaInicioReal==null)item.fechaInicioReal='';
+  if(item.fechaReal==null)item.fechaReal='';
+  if(item.hito==null)item.hito=false;
+  return item;
+}
 function leanSnapshotOf(cat){const item=leanBlankItem();item.snapTexto=cat.a;item.snapFrente=cat.fr;return item;}
 function leanSeedFaseInicial(c){
   const plan=leanEnsurePlan(c);
@@ -1598,6 +1734,28 @@ function leanBlockedReason(cid,cat){
   const open=cat.pr.filter(pid=>{const p=plan.items[pid];return p&&p.status!=='hecho'&&p.status!=='na';});
   if(!open.length)return null;
   return 'Falta: '+open.map(pid=>{const pc=leanCatalogById(pid);return pc?pc.a:('#'+pid);}).join('; ');
+}
+// ---- Clasificación visual de relaciones (independiente / convergencia / recurrente), compartida entre Seguimiento y Flujo ----
+function leanRelFlags(cat,plan){
+  if(!cat)return {independent:false,convergente:false,recurrente:false,predsCount:0};
+  const predsPresent=(cat.pr||[]).filter(pid=>plan.items[pid]);
+  const succCount=LEAN_CATALOG.filter(x=>x.pr&&x.pr.includes(cat.id)&&plan.items[x.id]).length;
+  return {
+    independent:predsPresent.length===0&&succCount===0,
+    convergente:predsPresent.length>1,
+    recurrente:!!cat.rec,
+    predsCount:predsPresent.length
+  };
+}
+function leanRelBadgesHtml(cat,plan){
+  if(!cat)return '';
+  const f=leanRelFlags(cat,plan);
+  if(!f.independent&&!f.convergente&&!f.recurrente)return '';
+  return '<div class="lf-tags">'+
+    (f.independent?'<span class="lf-tag indep" title="No depende de otra actividad ni es predecesora de otra — puede ejecutarse en paralelo, en cualquier momento">🔓 Independiente</span>':'')+
+    (f.convergente?'<span class="lf-tag conv" title="Convergen '+f.predsCount+' actividades antes de esta">🔀 Convergencia</span>':'')+
+    (f.recurrente?'<span class="lf-tag rec" title="Actividad recurrente, se repite en el ciclo de gestión">↻ Recurrente</span>':'')+
+  '</div>';
 }
 function toggleLeanPit(cid){
   const c=contacts.find(x=>x.id===cid);if(!c)return;
@@ -1728,21 +1886,33 @@ function leanFlowNodeClick(cid,ref,isCustom){
   vocFlowSelected=null;
   if(isCustom)leanCycleCustom(cid,ref);else leanCycle(cid,ref);
 }
+function leanFlowGroupSelect(cid,grpId){
+  leanFlowSelected={ref:grpId,isGroupSel:true};
+  vocFlowSelected=null;
+  renderLean();
+}
 function setLeanFlowClose(){leanFlowSelected=null;renderLean();}
 function leanItemMetaPanel(cid,idArg,item,isCustom,refId){
   const setFn=isCustom?'leanSetMetaCustom':'leanSetMeta';
+  leanEnsureFechas(item);
   return '<div class="lean-meta" hidden>'+
     '<div class="field-row3">'+
       '<div class="field"><label>Responsable</label><select onchange="'+setFn+'('+cid+','+idArg+',\'responsable\',this.value)"><option value="">—</option>'+['Jael','Rafa','Cliente','Ambos'].map(o=>'<option'+(item.responsable===o?' selected':'')+'>'+o+'</option>').join('')+'</select></div>'+
-      '<div class="field"><label>Fecha</label><input type="date" value="'+(item.fecha||'')+'" onchange="'+setFn+'('+cid+','+idArg+',\'fecha\',this.value)"></div>'+
       '<div class="field"><label>Entregable</label><input type="text" value="'+esc(item.entregable||'')+'" placeholder="ej: PPT, Excel, informe" onchange="'+setFn+'('+cid+','+idArg+',\'entregable\',this.value)"></div>'+
+      '<div class="field" style="align-self:end"><label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" '+(item.hito?'checked':'')+' onchange="'+setFn+'('+cid+','+idArg+',\'hito\',this.checked)"> Es un hito (Gantt)</label></div>'+
+    '</div>'+
+    '<div class="field-row4">'+
+      '<div class="field"><label>Inicio plan.</label><input type="date" value="'+(item.fechaInicio||'')+'" onchange="'+setFn+'('+cid+','+idArg+',\'fechaInicio\',this.value)"></div>'+
+      '<div class="field"><label>Término plan.</label><input type="date" value="'+(item.fecha||'')+'" onchange="'+setFn+'('+cid+','+idArg+',\'fecha\',this.value)"></div>'+
+      '<div class="field"><label>Inicio real</label><input type="date" value="'+(item.fechaInicioReal||'')+'" onchange="'+setFn+'('+cid+','+idArg+',\'fechaInicioReal\',this.value)"></div>'+
+      '<div class="field"><label>Término real</label><input type="date" value="'+(item.fechaReal||'')+'" onchange="'+setFn+'('+cid+','+idArg+',\'fechaReal\',this.value)"></div>'+
     '</div>'+
     '<div class="field"><label>Evidencia</label><input type="text" value="'+esc(item.evidencia||'')+'" placeholder="link o descripción de la evidencia" onchange="'+setFn+'('+cid+','+idArg+',\'evidencia\',this.value)"></div>'+
     '<div class="field"><label>Notas</label><textarea onchange="'+setFn+'('+cid+','+idArg+',\'notas\',this.value)" rows="2">'+esc(item.notas||'')+'</textarea></div>'+
     (refId!==undefined?'<div class="lean-track-hdr" style="margin-top:8px">🔧 Crear acción de mejora (A3 / PDCA / Kaizen / Quick Win)</div>'+leanAccionFormHtml(cid,idArg,refId,isCustom):'')+
   '</div>';
 }
-function leanItemRow(cid,refId,label,item,isCustom,removable,cat){
+function leanItemRow(cid,refId,label,item,isCustom,removable,cat,suggested){
   const st=item.status||'pendiente';
   const depReason=(!isCustom&&cat)?leanBlockedReason(cid,cat):null;
   const hasDep=!!depReason&&st!=='hecho'&&st!=='na';
@@ -1753,24 +1923,43 @@ function leanItemRow(cid,refId,label,item,isCustom,removable,cat){
   const clickHandler=cycleFn+'('+cid+','+idArg+')';
   const c0=contacts.find(x=>x.id===cid);
   const hasAccion=c0&&leanAccionesEnsure(c0).some(a=>!!a.origenIsCustom===!!isCustom&&a.origenRef===refId);
-  return '<div class="lean-item">'+
+  const relBadges=(!isCustom&&c0)?leanRelBadgesHtml(cat,leanEnsurePlan(c0)):'';
+  return '<div class="lean-item'+(suggested?' suggested':'')+'">'+
     '<div class="lean-step '+st+'" onclick="'+clickHandler+'">'+
-      '<span class="ls-dot"></span><span class="ls-txt">'+esc(label)+(cat&&cat.ap?' <span class="li-approval" title="Requiere aprobación formal">✓</span>':'')+(cat&&cat.rec?' <span class="li-rec-badge" title="Actividad recurrente">↻</span>':'')+(hasDep?' <span class="li-dep-badge" title="'+esc(depReason)+'">🔗</span>':'')+(hasAccion?' <span class="li-accion-badge" title="Tiene una acción de mejora vinculada">🔧</span>':'')+'</span>'+
+      '<span class="ls-dot"></span><span class="ls-txt">'+esc(label)+(cat&&cat.ap?' <span class="li-approval" title="Requiere aprobación formal">✓</span>':'')+(cat&&cat.rec?' <span class="li-rec-badge" title="Actividad recurrente">↻</span>':'')+(hasDep?' <span class="li-dep-badge" title="'+esc(depReason)+'">🔗</span>':'')+(hasAccion?' <span class="li-accion-badge" title="Tiene una acción de mejora vinculada">🔧</span>':'')+(suggested?' <span class="li-suggested-badge" title="Siguiente actividad sugerida en este frente — no bloquea el resto">➜ Sugerida</span>':'')+'</span>'+
       (hasMeta?'<span class="li-dot-meta" title="Tiene datos registrados">●</span>':'')+
       '<span class="ls-badge">'+LEAN_STATUS_LABEL[st]+'</span>'+
       '<span class="li-meta-toggle" onclick="event.stopPropagation();leanToggleMeta(this)" title="Responsable / fecha / entregable / evidencia / acción de mejora">⋯</span>'+
       (removable!==false?'<span class="li-x" onclick="event.stopPropagation();'+removeFn+'('+cid+','+idArg+')" title="Quitar del plan">✕</span>':'')+
     '</div>'+
+    relBadges+
     leanItemMetaPanel(cid,idArg,item,isCustom,refId)+
   '</div>';
 }
 // ---- Tarjeta de actividad principal con subpasos (checklist): estado siempre calculado, nunca guardado ----
+function leanSubgrupoRowHtml(cid,def,rows){
+  const open=leanOpenGroups.has(def.id);
+  const doneN=rows.filter(r=>r.item.status==='hecho').length;
+  const subsHtml=open?'<div class="lean-group-subs">'+rows.map(r=>leanItemRow(cid,r.ref,r.label,r.item,r.isCustom,false,r.cat)).join('')+'</div>':'';
+  return '<div class="lean-item lean-subgrupo-item">'+
+    '<div class="lean-step lean-group-hdr sub" onclick="toggleLeanGroup(\''+def.id+'\')">'+
+      '<span class="chev">'+(open?'▾':'▸')+'</span><span class="ls-txt">'+esc(def.label)+'</span>'+
+      '<span class="ls-badge">'+doneN+'/'+rows.length+' '+(def.progresoTxt||'hechos')+'</span>'+
+    '</div>'+
+    subsHtml+
+  '</div>';
+}
+function leanGroupSubUnitsHtml(cid,grupo,subRows,removable){
+  const units=leanPartitionSubRows(grupo,subRows);
+  return units.map(u=>u.type==='subgrupo'?leanSubgrupoRowHtml(cid,u.def,u.rows):leanItemRow(cid,u.row.ref,u.row.label,u.row.item,u.row.isCustom,!!removable,u.row.cat)).join('');
+}
 function leanGroupRowHtml(cid,row){
   const st=row.item.status||'pendiente';
   const open=leanOpenGroups.has(row.grupo.id);
   const doneSub=row.subRows.filter(r=>r.item.status==='hecho').length;
   const condTag=row.grupo.condicional?' <span class="li-dep-badge" title="Herramienta condicional: úsala solo si el VSM detecta que aplica">⚙️ condicional</span>':'';
-  const subsHtml=open?'<div class="lean-group-subs">'+row.subRows.map(r=>leanItemRow(cid,r.ref,r.label,r.item,r.isCustom,false,r.cat)).join('')+'</div>':'';
+  const hintHtml=(open&&row.grupo.flowHint)?'<div class="lean-group-hint">'+esc(row.grupo.flowHint)+'</div>':'';
+  const subsHtml=open?hintHtml+'<div class="lean-group-subs">'+leanGroupSubUnitsHtml(cid,row.grupo,row.subRows)+'</div>':'';
   return '<div class="lean-item lean-group-item">'+
     '<div class="lean-step lean-group-hdr '+st+'" onclick="toggleLeanGroup(\''+row.grupo.id+'\')">'+
       '<span class="chev">'+(open?'▾':'▸')+'</span><span class="ls-txt">'+esc(row.label)+condTag+'</span>'+
@@ -1779,8 +1968,8 @@ function leanGroupRowHtml(cid,row){
     subsHtml+
   '</div>';
 }
-function leanRowHtml(cid,r){
-  return r.isGroup?leanGroupRowHtml(cid,r):leanItemRow(cid,r.ref,r.label,r.item,r.isCustom,true,r.cat);
+function leanRowHtml(cid,r,suggested){
+  return r.isGroup?leanGroupRowHtml(cid,r):leanItemRow(cid,r.ref,r.label,r.item,r.isCustom,true,r.cat,suggested);
 }
 // ---- Agrupación por carril (frentes en paralelo), agrupando actividades principales con subpasos ----
 function leanBuildCarriles(c,plan,gateIds){
@@ -1883,14 +2072,25 @@ function renderLeanPlan(c){
   const estado=gateDone<gateEntries.length?'Puerta inicial en curso':(overallPct===100?'Implementación completa':'Implementación en curso');
 
   // ---- Cards de frentes (compactas, subagrupadas por frente para diferenciar de dónde viene cada actividad) ----
+  const leanSuggestedRefOf=rows=>{
+    const sorted=rows.slice().sort((a,b)=>(typeof a.ref==='number'?a.ref:1e9)-(typeof b.ref==='number'?b.ref:1e9));
+    const found=sorted.find(r=>{
+      const st=r.item.status||'pendiente';
+      if(st==='hecho'||st==='na')return false;
+      const reason=r.cat?leanBlockedReason(c.id,r.cat):null;
+      return !reason;
+    });
+    return found?found.ref:null;
+  };
   const leanCardHtml=g=>{
     const locked=!plan.pitAprobado;
     const scrollKey='lean-'+esc(g.car);
     const bodyHtml=locked?'<div class="lean-lock-msg">🔒 Se desbloquea cuando el PIT esté aprobado</div>':
-      '<div class="lean-card-list" data-scroll-key="'+scrollKey+'">'+g.frOrder.map(fr=>
-        '<div class="lean-card-sub-hdr">'+esc(fr)+'</div>'+
-        g.frGroups[fr].map(r=>leanRowHtml(c.id,r)).join('')
-      ).join('')+(g.car==='Operación y procesos'?leanVsmAccionesHubHtml(c):'')+'</div>';
+      '<div class="lean-card-list" data-scroll-key="'+scrollKey+'">'+g.frOrder.map(fr=>{
+        const suggestedRef=leanSuggestedRefOf(g.frGroups[fr]);
+        return '<div class="lean-card-sub-hdr">'+esc(fr)+'</div>'+
+        g.frGroups[fr].map(r=>leanRowHtml(c.id,r,r.ref===suggestedRef&&!r.isCustom)).join('');
+      }).join('')+(g.car==='Operación y procesos'?leanVsmChainHtml(c)+leanVsmAccionesHubHtml(c):'')+'</div>';
     return '<div class="lean-card'+(locked?' locked':'')+'">'+
       '<div class="lean-card-hdr"><div class="lean-card-icon">'+leanCarrilIcon(g.car)+'</div><div class="txt"><div class="t">'+esc(leanCarrilLabel(g.car))+'</div></div><div class="cnt">'+g.doneCount+'/'+g.applicable.length+'</div></div>'+
       bodyHtml+
@@ -1908,7 +2108,8 @@ function renderLeanPlan(c){
       '<div class="lean-gate2-hdr"><div class="t">Puerta inicial '+(gateDone>=gateEntries.length?'completada':'en curso')+'</div><button class="lean-gate2-badge '+(plan.pitAprobado?'on':'off')+'" onclick="toggleLeanPit('+c.id+')">'+(plan.pitAprobado?'PIT aprobado':'PIT pendiente')+'</button></div>'+
       '<div class="lean-gate2-steps">'+gateHtml+'</div>'+
     '</div>'+
-    '<div class="section-hdr" style="margin-bottom:2px"><div class="section-title" style="font-size:14px">Frentes en paralelo</div><div style="display:flex;gap:6px;margin-left:auto"><button class="fb on" onclick="setLeanFlowMode(\'seguimiento\')">Seguimiento</button><button class="fb" onclick="setLeanFlowMode(\'flujo\')">Flujo</button></div></div>'+
+    leanVertebralHtml(c)+
+    '<div class="section-hdr" style="margin-bottom:2px"><div class="section-title" style="font-size:14px">Frentes en paralelo</div><div style="display:flex;gap:6px;margin-left:auto"><button class="fb on" onclick="setLeanFlowMode(\'seguimiento\')">Seguimiento</button><button class="fb" onclick="setLeanFlowMode(\'flujo\')">Flujo</button><button class="fb" onclick="setLeanFlowMode(\'gantt\')">Gantt</button></div></div>'+
     '<div style="font-size:12px;color:#94a3b8;margin-bottom:8px">Click en una actividad para pasar de estado — 🔗 = depende de otra actividad sin terminar</div>'+
     ((paraleloCarriles.length||c.vocActive)?('<div class="lean-cards">'+cardsHtml+'</div>'):'<div class="tips-box" style="color:#94a3b8;font-size:13px;margin-bottom:14px">Aún no hay actividades en el plan de este cliente (fuera de la puerta inicial). Agrégalas desde el catálogo.</div>')+
     resultadosHtml+
@@ -1993,15 +2194,13 @@ function renderLeanFlujo(c){
   const predsPresentOf=cat=>(cat&&cat.pr?cat.pr.filter(pid=>plan.items[pid]):[]);
   const leanFlowGroupNode=r=>{
     const st=r.item.status||'pendiente';
-    const open=leanOpenGroups.has(r.grupo.id);
+    const sel=leanFlowSelected&&leanFlowSelected.isGroupSel&&leanFlowSelected.ref===r.grupo.id;
     const doneSub=r.subRows.filter(x=>x.item.status==='hecho').length;
     const condTag=r.grupo.condicional?'<span class="lf-tag rec" title="Herramienta condicional: úsala solo si el VSM detecta que aplica">⚙️ condicional</span>':'';
-    const subsHtml=open?'<div class="lean-flow-group-subs">'+r.subRows.map(sr=>leanItemRow(c.id,sr.ref,sr.label,sr.item,sr.isCustom,false,sr.cat)).join('')+'</div>':'';
-    return '<div class="lean-flow-node lean-flow-group '+st+(open?' open':'')+'" title="'+esc(r.label)+'">'+
-      '<div class="lf-grp-hdr" onclick="toggleLeanGroup(\''+r.grupo.id+'\')"><span class="chev">'+(open?'▾':'▸')+'</span><div class="txt">'+esc(r.label)+'</div></div>'+
+    return '<div class="lean-flow-node lean-flow-group '+st+(sel?' sel':'')+'" title="'+esc(r.label)+'" onclick="leanFlowGroupSelect('+c.id+',\''+r.grupo.id+'\')">'+
+      '<div class="txt">'+esc(r.label)+'</div>'+
       '<div class="lf-tags">'+condTag+'</div>'+
-      '<div class="badge">'+doneSub+'/'+r.subRows.length+' subpasos · '+LEAN_STATUS_LABEL[st]+'</div>'+
-      subsHtml+
+      '<div class="badge">'+doneSub+'/'+r.subRows.length+' subpasos · '+LEAN_STATUS_LABEL[st]+' · ver detalle ▸</div>'+
     '</div>';
   };
   const leanFlowNode=(r,suggestedRef)=>{
@@ -2053,7 +2252,7 @@ function renderLeanFlujo(c){
         '<div class="lean-flow-frente-hdr" onclick="toggleLeanFlowFrente(\''+frJs+'\')"><span class="chev">'+(frClosed?'▸':'▾')+'</span>'+esc(fr)+'</div>'+
         laneHtml+
       '</div>';
-    }).join('')+(g.car==='Operación y procesos'&&!closed?leanVsmAccionesHubHtml(c):'');
+    }).join('')+(g.car==='Operación y procesos'&&!closed?leanVsmChainHtml(c)+leanVsmAccionesHubHtml(c):'');
     const io=LEAN_CARRIL_IO[g.car];
     const ioHtml=(io&&!closed)?'<div class="lean-flow-io"><span class="lf-io-in">◀ '+esc(io.entrada)+'</span><span class="lf-io-arrow">→ '+esc(leanCarrilLabel(g.car))+' →</span><span class="lf-io-out">'+esc(io.salida)+' ▶</span></div>':'';
     const continuaHtml=(io&&!closed&&g.car!==LEAN_CARRIL_RESULTADOS)?'<div class="lean-flow-continua" onclick="leanVertebralClick('+c.id+',{car:LEAN_CARRIL_RESULTADOS,fr:null})">↳ El flujo continúa en <strong>'+esc(leanCarrilLabel(LEAN_CARRIL_RESULTADOS))+'</strong></div>':'';
@@ -2065,9 +2264,22 @@ function renderLeanFlujo(c){
   const carrilesHtml=paraleloCarriles.map(leanFlowCarrilHtml).join('')+(c.vocActive?vocFlowLaneHtml(c):'');
   const resultadosFlowHtml=resultadosGroup?('<div class="lean-terminal-lead">🏆 Destino común de las mejoras y resultados</div><div class="lean-terminal">'+leanFlowCarrilHtml(resultadosGroup)+'</div>'):'';
 
-  // ---- Panel de detalle de la actividad seleccionada ----
+  // ---- Panel de detalle de la actividad seleccionada (lateral, no deforma el diagrama) ----
   let detailHtml='';
-  if(leanFlowSelected){
+  if(leanFlowSelected&&leanFlowSelected.isGroupSel){
+    let groupRow=null;
+    for(const g of carriles){for(const r of g.rows){if(r.isGroup&&r.grupo.id===leanFlowSelected.ref){groupRow=r;break;}}if(groupRow)break;}
+    if(groupRow){
+      const st=groupRow.item.status||'pendiente';
+      const doneSub=groupRow.subRows.filter(x=>x.item.status==='hecho').length;
+      const hintHtml=groupRow.grupo.flowHint?'<div style="font-size:11px;color:#94a3b8;font-style:italic;margin-bottom:8px">'+esc(groupRow.grupo.flowHint)+'</div>':'';
+      detailHtml='<div class="lean-flow-detail">'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><strong style="font-size:13.5px">'+esc(groupRow.label)+'</strong><span class="ls-badge" style="font-size:11px">'+doneSub+'/'+groupRow.subRows.length+' subpasos · '+LEAN_STATUS_LABEL[st]+'</span><span style="margin-left:auto;font-size:11px;color:#94a3b8;cursor:pointer" onclick="setLeanFlowClose()">✕ Cerrar</span></div>'+
+        hintHtml+
+        '<div class="lean-group-subs" style="margin-left:0;padding-left:10px">'+leanGroupSubUnitsHtml(c.id,groupRow.grupo,groupRow.subRows,false)+'</div>'+
+      '</div>';
+    }
+  }else if(leanFlowSelected){
     const isCustom=leanFlowSelected.isCustom;
     const item=isCustom?(plan.custom||[]).find(x=>x.id===leanFlowSelected.ref):plan.items[leanFlowSelected.ref];
     const label=isCustom?(item&&item.texto):(selCat&&(item&&item.snapTexto||selCat.a));
@@ -2095,7 +2307,7 @@ function renderLeanFlujo(c){
       '<div class="lean-gate2-steps">'+gateHtml+'</div>'+
     '</div>'+
     leanVertebralHtml(c)+
-    '<div class="section-hdr" style="margin-bottom:2px"><div class="section-title" style="font-size:14px">Frentes en paralelo</div><div style="display:flex;gap:6px;margin-left:auto"><button class="fb" onclick="setLeanFlowMode(\'seguimiento\')">Seguimiento</button><button class="fb on" onclick="setLeanFlowMode(\'flujo\')">Flujo</button></div></div>'+
+    '<div class="section-hdr" style="margin-bottom:2px"><div class="section-title" style="font-size:14px">Frentes en paralelo</div><div style="display:flex;gap:6px;margin-left:auto"><button class="fb" onclick="setLeanFlowMode(\'seguimiento\')">Seguimiento</button><button class="fb on" onclick="setLeanFlowMode(\'flujo\')">Flujo</button><button class="fb" onclick="setLeanFlowMode(\'gantt\')">Gantt</button></div></div>'+
     '<div style="font-size:12px;color:#94a3b8;margin-bottom:8px">Click en una actividad para pasar de estado y ver de dónde viene / hacia dónde va — borde azul = siguiente sugerida (no bloquea el resto)</div>'+
     ((paraleloCarriles.length||c.vocActive)?carrilesHtml:'<div class="tips-box" style="color:#94a3b8;font-size:13px;margin-bottom:14px">Aún no hay actividades en el plan de este cliente (fuera de la puerta inicial). Agrégalas desde el catálogo.</div>')+
     resultadosFlowHtml+
@@ -2104,6 +2316,278 @@ function renderLeanFlujo(c){
     vocFlowDetailHtml(c)+
     '<div class="lean-addbar"><button class="mini-btn primary" onclick="setLeanView(\'catalogo\')">📚 Agregar actividades desde el catálogo</button></div>'+
     (c.vocActive?vocSectionsHtml(c):'');
+}
+// ================= GANTT DE RUTA LEAN =================
+// No es un plan independiente: lee las mismas plan.items/plan.custom (y voc) que Seguimiento/Flujo.
+let leanGanttView='semana',leanGanttFiltroFrente='',leanGanttFiltroArea='',leanGanttFiltroEstado='',leanGanttOcultarHechas=false;
+function setLeanGanttView(v){leanGanttView=v;renderLean();}
+function setLeanGanttFiltro(field,value){
+  if(field==='frente')leanGanttFiltroFrente=value;
+  else if(field==='area')leanGanttFiltroArea=value;
+  else if(field==='estado')leanGanttFiltroEstado=value;
+  renderLean();
+}
+function toggleLeanGanttOcultarHechas(){leanGanttOcultarHechas=!leanGanttOcultarHechas;renderLean();}
+function leanGanttGoToday(){
+  const el=document.querySelector('.lean-gantt-todaycol');
+  if(el)el.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+}
+function ganttMondayOf(dateStr){
+  const d=dateStr?new Date(dateStr+'T00:00:00'):new Date();
+  const day=(d.getDay()+6)%7;
+  d.setDate(d.getDate()-day);
+  d.setHours(0,0,0,0);
+  return d;
+}
+function ganttFmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function ganttAddDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function ganttWeekLabel(d){return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');}
+function ganttMonthLabel(d){
+  const meses=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return meses[d.getMonth()]+' '+String(d.getFullYear()).slice(2);
+}
+function ganttWeekIdx(weeks,dateStr){
+  const ms=ganttFmtDate(ganttMondayOf(dateStr));
+  return weeks.findIndex(w=>ganttFmtDate(w)===ms);
+}
+// ---- Aplana Seguimiento/Flujo (puerta, carriles con subpasos, VOC) a filas de una sola actividad = misma fuente de datos ----
+function leanGanttRows(c){
+  const plan=leanEnsurePlan(c);
+  const gateIds=leanGateIds();
+  const rows=[];
+  gateIds.forEach(id=>{
+    const cat=leanCatalogById(id);
+    if(!plan.items[id])return;
+    const item=leanEnsureFechas(plan.items[id]);
+    rows.push({kind:'lean',frenteKey:LEAN_GATE_CARRIL,frente:LEAN_GATE_CARRIL,area:'',label:item.snapTexto||cat.a,ref:id,isCustom:false,cat,item});
+  });
+  const carriles=leanBuildCarriles(c,plan,gateIds);
+  carriles.forEach(g=>{
+    const frenteLbl=leanCarrilLabel(g.car);
+    g.rows.forEach(r=>{
+      if(r.isGroup){
+        r.subRows.forEach(sr=>rows.push({kind:'lean',frenteKey:g.car,frente:frenteLbl,area:r.grupo.label,label:sr.label,ref:sr.ref,isCustom:sr.isCustom,cat:sr.cat,item:leanEnsureFechas(sr.item)}));
+      }else{
+        rows.push({kind:'lean',frenteKey:g.car,frente:frenteLbl,area:r.isCustom?'':(r.cat?r.cat.fr:''),label:r.label,ref:r.ref,isCustom:r.isCustom,cat:r.cat,item:leanEnsureFechas(r.item)});
+      }
+    });
+  });
+  if(c.vocActive){
+    vocRowsOf(c,true).forEach(r=>rows.push({kind:'voc',frenteKey:'Voz y experiencia del cliente',frente:'Voz y experiencia del cliente',area:'',label:r.label,ref:r.ref,isCustom:r.isCustom,cat:null,item:leanEnsureFechas(r.item)}));
+  }
+  return rows;
+}
+function ganttSetFnOf(r){return r.kind==='voc'?(r.isCustom?'vocSetMetaCustom':'vocSetMeta'):(r.isCustom?'leanSetMetaCustom':'leanSetMeta');}
+// ---- Arrastrar/estirar barras: desplaza en semanas completas los mismos campos fechaInicio/fecha, sin bloqueos ----
+let ganttDrag=null;
+function ganttBarMouseDown(ev,el){
+  ev.stopPropagation();ev.preventDefault();
+  const handle=ev.target.getAttribute('data-handle');
+  const timeline=el.closest('.lean-gantt-timeline');
+  const ww=parseFloat(timeline.dataset.weekwidth);
+  ganttDrag={
+    el,ww,mode:handle||'move',
+    startX:ev.clientX,
+    origLeft:parseFloat(el.style.left)||0,
+    origWidth:parseFloat(el.style.width)||ww,
+    cid:parseInt(el.dataset.cid,10),
+    ref:el.dataset.iscustom==='1'?el.dataset.ref:parseInt(el.dataset.ref,10),
+    isCustom:el.dataset.iscustom==='1',
+    kind:el.dataset.kind,
+    origFechaInicio:el.dataset.fechaInicio||'',
+    origFecha:el.dataset.fecha||'',
+    deltaWeeks:0
+  };
+  document.addEventListener('mousemove',ganttBarMouseMove);
+  document.addEventListener('mouseup',ganttBarMouseUp);
+}
+function ganttBarMouseMove(ev){
+  if(!ganttDrag)return;
+  const dx=ev.clientX-ganttDrag.startX;
+  const dW=Math.round(dx/ganttDrag.ww);
+  ganttDrag.deltaWeeks=dW;
+  if(ganttDrag.mode==='move'){
+    ganttDrag.el.style.left=(ganttDrag.origLeft+dW*ganttDrag.ww)+'px';
+  }else if(ganttDrag.mode==='end'){
+    const newW=Math.max(ganttDrag.ww,ganttDrag.origWidth+dW*ganttDrag.ww);
+    ganttDrag.el.style.width=newW+'px';
+  }else if(ganttDrag.mode==='start'){
+    const newLeft=ganttDrag.origLeft+dW*ganttDrag.ww;
+    const newW=ganttDrag.origWidth-dW*ganttDrag.ww;
+    if(newW>=ganttDrag.ww){ganttDrag.el.style.left=newLeft+'px';ganttDrag.el.style.width=newW+'px';}
+  }
+}
+function ganttBarMouseUp(){
+  document.removeEventListener('mousemove',ganttBarMouseMove);
+  document.removeEventListener('mouseup',ganttBarMouseUp);
+  if(!ganttDrag)return;
+  const d=ganttDrag;ganttDrag=null;
+  const dW=d.deltaWeeks;
+  if(!dW){
+    if(d.mode==='move'){
+      if(d.kind==='voc'){if(d.isCustom)vocCycleCustom(d.cid,d.ref);else vocCycle(d.cid,d.ref);}
+      else{if(d.isCustom)leanCycleCustom(d.cid,d.ref);else leanCycle(d.cid,d.ref);}
+    }
+    return;
+  }
+  const addW=(dateStr,n)=>dateStr?ganttFmtDate(ganttAddDays(new Date(dateStr+'T00:00:00'),n*7)):'';
+  let newInicio=d.origFechaInicio,newFin=d.origFecha;
+  if(d.mode==='move'){newInicio=addW(d.origFechaInicio,dW);newFin=addW(d.origFecha,dW);}
+  else if(d.mode==='start'){newInicio=addW(d.origFechaInicio,dW);}
+  else if(d.mode==='end'){newFin=addW(d.origFecha,dW);}
+  const setFn=d.kind==='voc'?(d.isCustom?vocSetMetaCustom:vocSetMeta):(d.isCustom?leanSetMetaCustom:leanSetMeta);
+  if(newInicio!==d.origFechaInicio)setFn(d.cid,d.ref,'fechaInicio',newInicio);
+  if(newFin!==d.origFecha)setFn(d.cid,d.ref,'fecha',newFin);
+  renderLean();
+}
+function renderLeanGantt(c){
+  const box=document.getElementById('lean-body');
+  const plan=leanEnsurePlan(c);
+  const allRows=leanGanttRows(c);
+
+  const frentesDisponibles=[...new Set(allRows.map(r=>r.frenteKey))];
+  const areasDisponibles=[...new Set(allRows.map(r=>r.area).filter(Boolean))];
+
+  let filtered=allRows;
+  if(leanGanttFiltroFrente)filtered=filtered.filter(r=>r.frenteKey===leanGanttFiltroFrente);
+  if(leanGanttFiltroArea)filtered=filtered.filter(r=>r.area===leanGanttFiltroArea);
+  if(leanGanttFiltroEstado)filtered=filtered.filter(r=>(r.item.status||'pendiente')===leanGanttFiltroEstado);
+  if(leanGanttOcultarHechas)filtered=filtered.filter(r=>r.item.status!=='hecho');
+
+  const sinProgramar=filtered.filter(r=>!r.item.fechaInicio&&!r.item.fecha);
+  const programadas=filtered.filter(r=>r.item.fechaInicio||r.item.fecha);
+
+  const todayMonday=ganttMondayOf(null);
+  let minD=ganttAddDays(todayMonday,-7*2),maxD=ganttAddDays(todayMonday,7*10);
+  programadas.forEach(r=>{
+    if(r.item.fechaInicio){const d=ganttMondayOf(r.item.fechaInicio);if(d<minD)minD=d;}
+    if(r.item.fecha){const d=ganttMondayOf(r.item.fecha);if(d>maxD)maxD=d;}
+  });
+  minD=ganttAddDays(minD,-7);maxD=ganttAddDays(maxD,7);
+  const weeks=[];
+  for(let d=new Date(minD);d<=maxD;d=ganttAddDays(d,7))weeks.push(new Date(d));
+  const weekWidth=leanGanttView==='mes'?14:36;
+  const todayIdx=ganttWeekIdx(weeks,ganttFmtDate(new Date()));
+  const timelineWidth=weeks.length*weekWidth;
+
+  const monthGroups=[];
+  weeks.forEach(w=>{
+    const lbl=ganttMonthLabel(w);
+    const last=monthGroups[monthGroups.length-1];
+    if(last&&last.label===lbl)last.count++;else monthGroups.push({label:lbl,count:1});
+  });
+  const monthHeaderHtml=monthGroups.map(m=>'<div class="lean-gantt-month" style="width:'+(m.count*weekWidth)+'px">'+esc(m.label)+'</div>').join('');
+  const weekHeaderHtml=weeks.map((w,i)=>'<div class="lean-gantt-weekhdr'+(i===todayIdx?' today':'')+'" style="width:'+weekWidth+'px">'+(leanGanttView==='mes'?'':ganttWeekLabel(w))+'</div>').join('');
+
+  const segments=[
+    {label:'Diagnóstico',keys:[LEAN_GATE_CARRIL]},
+    {label:'Implementación',keys:LEAN_CARRIL_ORDER.concat(['Voz y experiencia del cliente'])},
+    {label:'Mejora continua',keys:[LEAN_CARRIL_RESULTADOS]}
+  ];
+  const segmentSpans=segments.map(seg=>{
+    let lo=null,hi=null;
+    programadas.filter(r=>seg.keys.includes(r.frenteKey)).forEach(r=>{
+      if(r.item.fechaInicio){const i=ganttWeekIdx(weeks,r.item.fechaInicio);if(i>=0&&(lo==null||i<lo))lo=i;}
+      if(r.item.fecha){const i=ganttWeekIdx(weeks,r.item.fecha);if(i>=0&&(hi==null||i>hi))hi=i;}
+    });
+    return {label:seg.label,lo,hi};
+  });
+  const segmentHtml=segmentSpans.some(s=>s.lo!=null)?'<div class="lean-gantt-segments" style="width:'+timelineWidth+'px">'+segmentSpans.map(s=>s.lo!=null?'<div class="lean-gantt-segment" style="left:'+(s.lo*weekWidth)+'px;width:'+(((s.hi!=null?s.hi:s.lo)-s.lo+1)*weekWidth)+'px">'+esc(s.label)+'</div>':'').join('')+'</div>':'';
+
+  const ganttBarHtml=r=>{
+    const st=r.item.status||'pendiente';
+    const todayStr=ganttFmtDate(new Date());
+    const overdue=r.item.fecha&&r.item.fecha<todayStr&&st!=='hecho'&&st!=='na';
+    const dataAttrs='data-cid="'+c.id+'" data-ref="'+esc(String(r.ref))+'" data-iscustom="'+(r.isCustom?1:0)+'" data-kind="'+r.kind+'" data-fecha-inicio="'+esc(r.item.fechaInicio||'')+'" data-fecha="'+esc(r.item.fecha||'')+'"';
+    if(r.item.hito){
+      const anchor=r.item.fecha||r.item.fechaInicio;
+      const idx=ganttWeekIdx(weeks,anchor);
+      if(idx<0)return '';
+      const left=idx*weekWidth+weekWidth/2-6;
+      return '<div class="lean-gantt-hito '+st+(overdue?' overdue':'')+'" style="left:'+left+'px" title="'+esc(r.label)+' · hito" onmousedown="ganttBarMouseDown(event,this)" '+dataAttrs+'></div>';
+    }
+    const startStr=r.item.fechaInicio||r.item.fecha,endStr=r.item.fecha||r.item.fechaInicio;
+    let si=ganttWeekIdx(weeks,startStr),ei=ganttWeekIdx(weeks,endStr);
+    if(si<0)si=0;if(ei<0)ei=weeks.length-1;if(ei<si)ei=si;
+    const left=si*weekWidth,width=Math.max(weekWidth-4,(ei-si+1)*weekWidth-4);
+    return '<div class="lean-gantt-bar '+st+(overdue?' overdue':'')+'" style="left:'+left+'px;width:'+width+'px" title="'+esc(r.label)+' ('+LEAN_STATUS_LABEL[st]+')" onmousedown="ganttBarMouseDown(event,this)" '+dataAttrs+'>'+
+      '<span class="lean-gantt-bar-handle" data-handle="start"></span>'+
+      '<span class="lean-gantt-bar-label">'+esc(r.label)+'</span>'+
+      '<span class="lean-gantt-bar-handle" data-handle="end"></span>'+
+    '</div>';
+  };
+  const ganttRowHtml=r=>{
+    const st=r.item.status||'pendiente';
+    return '<div class="lean-gantt-row">'+
+      '<div class="lean-gantt-left">'+
+        '<div class="lean-gantt-cell frente" title="'+esc(r.frente)+'">'+esc(r.frente)+'</div>'+
+        '<div class="lean-gantt-cell actividad" title="'+esc(r.label)+'">'+esc(r.label)+'</div>'+
+        '<div class="lean-gantt-cell area" title="'+esc(r.area||'')+'">'+esc(r.area||'')+'</div>'+
+      '</div>'+
+      '<div class="lean-gantt-timeline" data-weekwidth="'+weekWidth+'" style="width:'+timelineWidth+'px">'+
+        (todayIdx>=0?'<div class="lean-gantt-todaycol" style="left:'+(todayIdx*weekWidth)+'px;width:'+weekWidth+'px"></div>':'')+
+        ganttBarHtml(r)+
+      '</div>'+
+    '</div>';
+  };
+
+  const byFrente={};const frenteOrder=[];
+  programadas.forEach(r=>{if(!byFrente[r.frenteKey]){byFrente[r.frenteKey]=[];frenteOrder.push(r.frenteKey);}byFrente[r.frenteKey].push(r);});
+  frenteOrder.sort((a,b)=>{
+    const ia=LEAN_CARRIL_ORDER.indexOf(a),ib=LEAN_CARRIL_ORDER.indexOf(b);
+    if(a===LEAN_GATE_CARRIL)return -1;if(b===LEAN_GATE_CARRIL)return 1;
+    if(ia!==-1&&ib!==-1)return ia-ib;if(ia!==-1)return -1;if(ib!==-1)return 1;
+    return leanCarrilLabel(a).localeCompare(leanCarrilLabel(b));
+  });
+
+  const bodyHtml=frenteOrder.map(fk=>{
+    const closed=leanFlowClosedCarriles.has(fk);
+    const rows=byFrente[fk];
+    const doneN=rows.filter(r=>r.item.status==='hecho').length;
+    const fkJs=esc(fk).replace(/'/g,"\\'");
+    return '<div class="lean-gantt-frente-group">'+
+      '<div class="lean-gantt-frente-hdr" onclick="toggleLeanFlowCarril(\''+fkJs+'\')"><span class="chev">'+(closed?'▸':'▾')+'</span>'+esc(leanCarrilLabel(fk))+'<span class="cnt">'+doneN+'/'+rows.length+'</span></div>'+
+      (closed?'':rows.map(ganttRowHtml).join(''))+
+    '</div>';
+  }).join('');
+
+  const sinProgramarHtml=sinProgramar.length?'<div class="lean-gantt-unsched"><div class="lean-gantt-unsched-hdr">📋 Sin programar ('+sinProgramar.length+') — asigna fechas para incorporarlas al Gantt</div>'+
+    sinProgramar.map(r=>{
+      const idArg=r.isCustom?"'"+r.ref+"'":r.ref;
+      const setFn=ganttSetFnOf(r);
+      return '<div class="lean-gantt-unsched-row"><span class="lean-gantt-unsched-label">'+esc(r.frente)+(r.area?' · '+esc(r.area):'')+' — '+esc(r.label)+'</span>'+
+        '<input type="date" title="Inicio planificado" onchange="'+setFn+'('+c.id+','+idArg+',\'fechaInicio\',this.value);renderLean();">'+
+        '<input type="date" title="Término planificado" onchange="'+setFn+'('+c.id+','+idArg+',\'fecha\',this.value);renderLean();">'+
+      '</div>';
+    }).join('')+
+  '</div>':'';
+
+  const frenteFilterOpts='<option value="">Todos los frentes</option>'+frentesDisponibles.map(fk=>'<option value="'+esc(fk)+'"'+(leanGanttFiltroFrente===fk?' selected':'')+'>'+esc(leanCarrilLabel(fk))+'</option>').join('');
+  const areaFilterOpts='<option value="">Todas las áreas</option>'+areasDisponibles.map(a=>'<option value="'+esc(a)+'"'+(leanGanttFiltroArea===a?' selected':'')+'>'+esc(a)+'</option>').join('');
+  const estadoFilterOpts='<option value="">Todos los estados</option>'+Object.keys(LEAN_STATUS_LABEL).filter(s=>s!=='revision').map(s=>'<option value="'+s+'"'+(leanGanttFiltroEstado===s?' selected':'')+'>'+LEAN_STATUS_LABEL[s]+'</option>').join('');
+
+  box.innerHTML=
+    '<div class="lean-summary">'+
+      '<div><div class="t">'+esc(c.emp)+' · Gantt</div><div class="s">'+programadas.length+' actividades programadas · '+sinProgramar.length+' sin programar</div></div>'+
+    '</div>'+
+    '<div class="section-hdr" style="margin-bottom:2px"><div class="section-title" style="font-size:14px">Gantt</div><div style="display:flex;gap:6px;margin-left:auto"><button class="fb" onclick="setLeanFlowMode(\'seguimiento\')">Seguimiento</button><button class="fb" onclick="setLeanFlowMode(\'flujo\')">Flujo</button><button class="fb on" onclick="setLeanFlowMode(\'gantt\')">Gantt</button></div></div>'+
+    '<div class="lean-gantt-toolbar">'+
+      '<div class="lean-gantt-toolbar-group"><button class="fb'+(leanGanttView==='semana'?' on':'')+'" onclick="setLeanGanttView(\'semana\')">Semanal</button><button class="fb'+(leanGanttView==='mes'?' on':'')+'" onclick="setLeanGanttView(\'mes\')">Mensual</button></div>'+
+      '<button class="mini-btn" onclick="leanGanttGoToday()">📍 Semana actual</button>'+
+      '<select onchange="setLeanGanttFiltro(\'frente\',this.value)">'+frenteFilterOpts+'</select>'+
+      '<select onchange="setLeanGanttFiltro(\'area\',this.value)">'+areaFilterOpts+'</select>'+
+      '<select onchange="setLeanGanttFiltro(\'estado\',this.value)">'+estadoFilterOpts+'</select>'+
+      '<label style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:#64748b;cursor:pointer"><input type="checkbox" '+(leanGanttOcultarHechas?'checked':'')+' onchange="toggleLeanGanttOcultarHechas()"> Ocultar terminadas</label>'+
+    '</div>'+
+    '<div class="lean-gantt-legend">🟩 Hecho · 🟧 En curso · ⬜ Pendiente · <span style="opacity:.5">⬜</span> No aplica · <span style="color:#dc2626">borde rojo</span> = vencida · ◆ hito — arrastra una barra para mover, estira sus bordes para cambiar duración</div>'+
+    '<div class="lean-gantt-wrap">'+
+      '<div class="lean-gantt-headerrow">'+
+        '<div class="lean-gantt-left lean-gantt-left-hdr"><div class="lean-gantt-cell frente">Frente</div><div class="lean-gantt-cell actividad">Actividad</div><div class="lean-gantt-cell area">Área</div></div>'+
+        '<div class="lean-gantt-timeline-hdr-wrap"><div class="lean-gantt-timeline-hdr" style="width:'+timelineWidth+'px">'+segmentHtml+'<div class="lean-gantt-monthrow">'+monthHeaderHtml+'</div><div class="lean-gantt-weekrow">'+weekHeaderHtml+'</div></div></div>'+
+      '</div>'+
+      '<div class="lean-gantt-body">'+(bodyHtml||'<div class="tips-box" style="margin:10px">Ninguna actividad programada todavía. Asigna fechas desde "Sin programar" más abajo.</div>')+'</div>'+
+    '</div>'+
+    sinProgramarHtml;
 }
 function renderLeanCatalogo(c){
   const box=document.getElementById('lean-body');
@@ -2164,6 +2648,7 @@ function renderLean(){
   preserveScroll(()=>{
     if(leanView==='catalogo')renderLeanCatalogo(c);
     else if(leanFlowMode==='flujo')renderLeanFlujo(c);
+    else if(leanFlowMode==='gantt')renderLeanGantt(c);
     else renderLeanPlan(c);
   });
 }
@@ -2264,13 +2749,109 @@ function pilarTaskDel(cid,pilar,idx,field,ti){
   pilarTaskList(row,field).splice(ti,1);
   persist();renderPilares();
 }
+// ---- Avance en Plan por Pilares: por actividades (checklist done/na) y por entregables (estado de 5 valores) ----
+const PILAR_ENTREGABLE_LABEL={pendiente:'Pendiente',curso:'En curso',entregado:'Entregado',validado:'Validado',na:'No aplica'};
+const PILAR_ENTREGABLE_SEQ=['pendiente','curso','entregado','validado','na'];
+function pilarEntregableEnsureStatus(list){
+  list.forEach(t=>{if(t.status==null)t.status=t.done?'entregado':'pendiente';});
+  return list;
+}
+function pilarEntregableCycle(cid,pilar,idx,ti){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const pilares=pilarEnsure(c);
+  const row=pilares[pilar]&&pilares[pilar][idx];if(!row)return;
+  const list=pilarEntregableEnsureStatus(pilarTaskList(row,'entregable'));
+  const t=list[ti];if(!t)return;
+  const i=PILAR_ENTREGABLE_SEQ.indexOf(t.status||'pendiente');
+  t.status=PILAR_ENTREGABLE_SEQ[(i+1)%PILAR_ENTREGABLE_SEQ.length];
+  t.done=(t.status==='validado');
+  persist();renderPilares();
+}
+function pilarTaskNaToggle(cid,pilar,idx,field,ti){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const pilares=pilarEnsure(c);
+  const row=pilares[pilar]&&pilares[pilar][idx];if(!row)return;
+  const list=pilarTaskList(row,field);
+  const t=list[ti];if(!t)return;
+  t.na=!t.na;
+  persist();renderPilares();
+}
+function pilarActividadVincular(cid,pilar,idx,ti,value){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const pilares=pilarEnsure(c);
+  const row=pilares[pilar]&&pilares[pilar][idx];if(!row)return;
+  const list=pilarTaskList(row,'entregable');
+  const t=list[ti];if(!t)return;
+  t.actividadVinculada=value;
+  persist();
+}
+function pilarAvanceActividadesDe(rows){
+  let total=0,done=0;
+  (rows||[]).forEach(row=>{
+    pilarTaskList(row,'actividades').forEach(t=>{
+      if(t.na)return;
+      total++;if(t.done)done++;
+    });
+  });
+  return {done,total,pct:total?Math.round(done/total*100):0};
+}
+function pilarAvanceEntregablesDe(rows){
+  let total=0,validado=0,curso=0,entregado=0;
+  (rows||[]).forEach(row=>{
+    const list=pilarEntregableEnsureStatus(pilarTaskList(row,'entregable'));
+    list.forEach(t=>{
+      if(t.status==='na')return;
+      total++;
+      if(t.status==='validado')validado++;
+      else if(t.status==='curso')curso++;
+      else if(t.status==='entregado')entregado++;
+    });
+  });
+  return {validado,total,curso,entregado,pct:total?Math.round(validado/total*100):0};
+}
+function pilarAvanceActividades(c){return pilarAvanceActividadesDe(Object.values(pilarEnsure(c)).flat());}
+function pilarAvanceEntregables(c){return pilarAvanceEntregablesDe(Object.values(pilarEnsure(c)).flat());}
+function pilarMedirPorEnsure(c){if(!c.pilarMedirPor)c.pilarMedirPor='actividades';return c.pilarMedirPor;}
+function setPilarMedirPor(cid,value){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  c.pilarMedirPor=value;
+  persist();renderPilares();
+}
+function pilarAvanceHtml(rows,medirPor){
+  const parts=[];
+  if(medirPor==='actividades'||medirPor==='ambos'){
+    const a=pilarAvanceActividadesDe(rows);
+    parts.push('<span class="pilar-avance-chip act">Actividades: '+a.done+'/'+a.total+' completadas · '+a.pct+'%</span>');
+  }
+  if(medirPor==='entregables'||medirPor==='ambos'){
+    const e=pilarAvanceEntregablesDe(rows);
+    parts.push('<span class="pilar-avance-chip ent">Entregables: '+e.validado+'/'+e.total+' validados · '+e.pct+'%'+((e.curso||e.entregado)?' <span class="pilar-avance-sub">('+e.curso+' en curso · '+e.entregado+' entregados sin validar)</span>':'')+'</span>');
+  }
+  return parts.length?'<div class="pilar-avance-row">'+parts.join('')+'</div>':'';
+}
 function pilarChecklistHtml(cid,pilar,idx,field,row){
   const pilarJs=esc(pilar).replace(/'/g,"\\'");
   const list=pilarTaskList(row,field);
+  if(field==='entregable'){
+    pilarEntregableEnsureStatus(list);
+    const actividades=pilarTaskList(row,'actividades');
+    const rows=list.map((t,ti)=>
+      '<div class="pilar-task pilar-entregable-task '+(t.status||'pendiente')+'">'+
+        '<span class="pe-badge" title="Click para cambiar estado" onclick="pilarEntregableCycle('+cid+',\''+pilarJs+'\','+idx+','+ti+')">'+PILAR_ENTREGABLE_LABEL[t.status||'pendiente']+'</span>'+
+        '<span class="pt-text" contenteditable="true" onblur="pilarTaskEditSave('+cid+',\''+pilarJs+'\','+idx+',\'entregable\','+ti+',this.textContent)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}">'+esc(t.texto)+'</span>'+
+        (actividades.length?'<select class="pe-link" onchange="pilarActividadVincular('+cid+',\''+pilarJs+'\','+idx+','+ti+',this.value)" title="Vincular con la actividad que produce este entregable (opcional, no bloquea)"><option value="">🔗 vincular…</option>'+actividades.map(a=>'<option'+(t.actividadVinculada===a.texto?' selected':'')+'>'+esc(a.texto)+'</option>').join('')+'</select>':'')+
+        '<span class="pt-del" title="Eliminar" onclick="event.stopPropagation();pilarTaskDel('+cid+',\''+pilarJs+'\','+idx+',\'entregable\','+ti+')">✕</span>'+
+      '</div>'
+    ).join('');
+    return '<div class="pilar-checklist">'+rows+
+      '<div class="pilar-task-add"><span class="pt-text pt-new" contenteditable="true" data-placeholder="+ agregar entregable" onblur="pilarTaskAdd('+cid+',\''+pilarJs+'\','+idx+',\'entregable\',this.textContent);this.textContent=\'\';" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}"></span></div>'+
+    '</div>';
+  }
   const rows=list.map((t,ti)=>
-    '<div class="pilar-task'+(t.done?' done':'')+'">'+
-      '<input type="checkbox" class="pt-chk"'+(t.done?' checked':'')+' onchange="pilarTaskToggle('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+')">'+
+    '<div class="pilar-task'+(t.done?' done':'')+(t.na?' na':'')+'">'+
+      '<input type="checkbox" class="pt-chk"'+(t.done?' checked':'')+(t.na?' disabled':'')+' onchange="pilarTaskToggle('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+')">'+
       '<span class="pt-text" contenteditable="true" onblur="pilarTaskEditSave('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+',this.textContent)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}">'+esc(t.texto)+'</span>'+
+      '<span class="pt-na" title="'+(t.na?'Marcar como aplicable':'Marcar como No aplica')+'" onclick="event.stopPropagation();pilarTaskNaToggle('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+')">'+(t.na?'N/A':'—')+'</span>'+
       '<span class="pt-del" title="Eliminar tarea" onclick="event.stopPropagation();pilarTaskDel('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+')">✕</span>'+
     '</div>'
   ).join('');
@@ -2297,10 +2878,17 @@ function renderPilares(){
   if(!pilarActivo||!names.includes(pilarActivo))pilarActivo=names[0]||null;
   const chips=names.map(n=>'<button class="fb'+(n===pilarActivo?' on':'')+'" onclick="setPilarActivo(\''+esc(n)+'\')">'+esc(n)+'</button>').join('');
   const addForm='<span style="display:inline-flex;gap:6px;align-items:center"><input id="pilar-new-name" placeholder="Nombre del pilar (ej: Control de Gestión)" style="font-size:12px;padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans)" onkeydown="if(event.key===\'Enter\')addPilar('+c.id+')"><button class="mini-btn" onclick="addPilar('+c.id+')">+ Nuevo pilar</button></span>';
+  const medirPor=pilarMedirPorEnsure(c);
+  const medirPorSelect='<span style="display:inline-flex;gap:5px;align-items:center;margin-left:auto"><label style="font-size:11px;color:#94a3b8">Medir avance por</label><select style="font-size:12px;padding:4px 7px;border:1px solid var(--border);border-radius:6px;font-family:var(--sans)" onchange="setPilarMedirPor('+c.id+',this.value)">'+
+    ['actividades','entregables','ambos'].map(o=>'<option value="'+o+'"'+(medirPor===o?' selected':'')+'>'+(o==='actividades'?'Actividades':o==='entregables'?'Entregables':'Ambos')+'</option>').join('')+
+  '</select></span>';
+  const resumenAvance=pilarAvanceHtml(Object.values(pilares).flat(),medirPor);
   let tableHtml='';
   if(pilarActivo){
     const rows=pilares[pilarActivo]||[];
-    tableHtml='<div class="table-wrap" style="padding:0.9rem;margin-top:12px"><table class="pilar-table"><thead><tr><th style="width:90px">Semana</th><th style="width:120px">Foco</th><th>Actividades</th><th>Entregable</th><th style="width:130px">Responsable</th><th style="width:24px"></th></tr></thead><tbody>'+
+    const pilarAvance=pilarAvanceHtml(rows,medirPor);
+    tableHtml=(pilarAvance?'<div style="margin-top:12px">'+pilarAvance+'</div>':'')+
+      '<div class="table-wrap" style="padding:0.9rem;margin-top:8px"><table class="pilar-table"><thead><tr><th style="width:90px">Semana</th><th style="width:120px">Foco</th><th>Actividades</th><th>Entregable</th><th style="width:130px">Responsable</th><th style="width:24px"></th></tr></thead><tbody>'+
       rows.map((r,idx)=>'<tr>'+
         '<td><textarea rows="2" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'semana\',this.value)">'+esc(r.semana||'')+'</textarea></td>'+
         '<td><textarea rows="3" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'foco\',this.value)">'+esc(r.foco||'')+'</textarea></td>'+
@@ -2312,8 +2900,8 @@ function renderPilares(){
       '</tbody></table></div>'+
       '<div style="margin-top:8px;display:flex;gap:8px"><button class="mini-btn" onclick="addPilarSemana('+c.id+',\''+esc(pilarActivo)+'\')">+ Agregar semana</button><button class="mini-btn" style="color:#dc2626" onclick="delPilar('+c.id+',\''+esc(pilarActivo)+'\')">🗑 Eliminar pilar completo</button></div>';
   }
-  box.innerHTML='<div class="tips-box"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong style="font-size:12px;color:#64748b">Pilares de '+esc(c.emp)+':</strong>'+chips+addForm+'</div>'+
-    (names.length===0?'<div style="color:#94a3b8;font-size:13px;margin-top:8px">Este cliente todavía no tiene ningún pilar. Crea el primero arriba.</div>':'')+
+  box.innerHTML='<div class="tips-box"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong style="font-size:12px;color:#64748b">Pilares de '+esc(c.emp)+':</strong>'+chips+addForm+medirPorSelect+'</div>'+
+    (names.length===0?'<div style="color:#94a3b8;font-size:13px;margin-top:8px">Este cliente todavía no tiene ningún pilar. Crea el primero arriba.</div>':resumenAvance)+
     '</div>'+tableHtml;
   });
 }
