@@ -377,7 +377,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .pilar-entregable-task.validado .pe-badge{background:#dcfce7;color:#166534}
 .pilar-entregable-task.na .pe-badge{background:#f1f5f9;color:#cbd5e1}
 .pilar-entregable-task.na{opacity:.5}
-.pe-link{font-size:10px;color:#94a3b8;border:1px solid var(--border);border-radius:5px;padding:1px 4px;max-width:130px;font-family:var(--sans);flex-shrink:0}
 .pilar-avance-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
 .pilar-avance-chip{font-size:11.5px;font-weight:600;color:#1e293b;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:5px 10px}
 .pilar-avance-chip.act{border-left:3px solid #2563eb}
@@ -2810,15 +2809,6 @@ function pilarTaskNaToggle(cid,pilar,idx,field,ti){
   t.na=!t.na;
   persist();renderPilares();
 }
-function pilarActividadVincular(cid,pilar,idx,ti,value){
-  const c=contacts.find(x=>x.id===cid);if(!c)return;
-  const pilares=pilarEnsure(c);
-  const row=pilares[pilar]&&pilares[pilar][idx];if(!row)return;
-  const list=pilarTaskList(row,'entregable');
-  const t=list[ti];if(!t)return;
-  t.actividadVinculada=value;
-  persist();
-}
 function pilarAvanceActividadesDe(rows){
   let total=0,done=0;
   (rows||[]).forEach(row=>{
@@ -2868,12 +2858,10 @@ function pilarChecklistHtml(cid,pilar,idx,field,row){
   const list=pilarTaskList(row,field);
   if(field==='entregable'){
     pilarEntregableEnsureStatus(list);
-    const actividades=pilarTaskList(row,'actividades');
     const rows=list.map((t,ti)=>
       '<div class="pilar-task pilar-entregable-task '+(t.status||'pendiente')+'">'+
         '<span class="pe-badge" title="Click para cambiar estado" onclick="pilarEntregableCycle('+cid+',\''+pilarJs+'\','+idx+','+ti+')">'+PILAR_ENTREGABLE_LABEL[t.status||'pendiente']+'</span>'+
         '<span class="pt-text" contenteditable="true" onblur="pilarTaskEditSave('+cid+',\''+pilarJs+'\','+idx+',\'entregable\','+ti+',this.textContent)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}">'+esc(t.texto)+'</span>'+
-        (actividades.length?'<select class="pe-link" onchange="pilarActividadVincular('+cid+',\''+pilarJs+'\','+idx+','+ti+',this.value)" title="Vincular con la actividad que produce este entregable (opcional, no bloquea)"><option value="">🔗 vincular…</option>'+actividades.map(a=>'<option'+(t.actividadVinculada===a.texto?' selected':'')+'>'+esc(a.texto)+'</option>').join('')+'</select>':'')+
         '<span class="pt-del" title="Eliminar" onclick="event.stopPropagation();pilarTaskDel('+cid+',\''+pilarJs+'\','+idx+',\'entregable\','+ti+')">✕</span>'+
       '</div>'
     ).join('');
