@@ -3451,7 +3451,7 @@ function renderBitacora(){
       '<td style="white-space:normal;vertical-align:top;font-size:11px;color:#64748b">'+esc(e.participantes||'—')+bitaSplitHtml(c,e)+'</td>'+
       '<td style="white-space:normal;vertical-align:top;font-size:11px;color:#64748b">'+esc(e.lugar||'—')+'</td>'+
       '<td style="text-align:center;vertical-align:top">'+(e.minutos?e.minutos+' min':'—')+(e.ufHora?'<div style="font-size:10px;color:#b45309;margin-top:2px" title="Esta sesi&#243;n se cobr&#243; a esta tarifa, distinta al UF/hora actual de la ficha">'+String(e.ufHora).replace('.',',')+' UF/h</div>':'')+'</td>'+
-      '<td style="text-align:center;vertical-align:top;white-space:nowrap"><button onclick="event.stopPropagation();editBita('+c.id+','+idx+')" style="border:none;background:none;cursor:pointer;font-size:12px" title="Editar">✏️</button><button onclick="event.stopPropagation();delBita('+c.id+','+idx+')" style="border:none;background:none;cursor:pointer;color:#cbd5e1" title="Eliminar">✕</button></td>'+
+      '<td style="text-align:center;vertical-align:top;white-space:nowrap"><button onclick="event.stopPropagation();editBita('+c.id+','+idx+')" style="border:none;background:none;cursor:pointer;font-size:12px" title="Editar">✏️</button><button onclick="event.stopPropagation();duplicateBita('+c.id+','+idx+')" style="border:none;background:none;cursor:pointer;font-size:12px" title="Duplicar (para la próxima semana, misma reunión)">📋</button><button onclick="event.stopPropagation();delBita('+c.id+','+idx+')" style="border:none;background:none;cursor:pointer;color:#cbd5e1" title="Eliminar">✕</button></td>'+
       '<td style="text-align:center;vertical-align:top"><button onclick="event.stopPropagation();toggleBitaRealizado('+c.id+','+idx+')" style="border:none;background:none;cursor:pointer;font-size:17px;line-height:1" title="'+(e.realizado?'Marcar como no realizada':'Marcar como realizada')+'">'+(e.realizado?'✅':'<span style="display:inline-block;width:17px;height:17px;border:2px solid #d1d5db;border-radius:50%;vertical-align:middle"></span>')+'</button></td></tr>';
   }).join('');
   document.getElementById('bita-table').innerHTML='<thead><tr><th>Fecha</th><th>Reunión / Comentarios</th><th>Participantes</th><th>Lugar</th><th style="text-align:center">Duración</th><th></th><th style="text-align:center">Realizada</th></tr></thead><tbody>'+(rows||'<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:1.2rem">Sin entradas en este periodo.</td></tr>')+'</tbody>';
@@ -3477,6 +3477,28 @@ function editBita(cid,idx){
   }
   renderBitacora();
   document.getElementById('b-tema').focus();
+}
+function duplicateBita(cid,idx){
+  const c=contacts.find(x=>x.id===cid);if(!c||!c.bitacora||!c.bitacora[idx])return;
+  const e=c.bitacora[idx];
+  bitaClient=cid;bitaEditIdx=null;
+  const sv=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+  let proxDate='';
+  if(e.fecha){
+    const d=new Date(e.fecha+'T00:00:00');
+    d.setDate(d.getDate()+7);
+    proxDate=d.toISOString().split('T')[0];
+  }
+  sv('b-fecha',proxDate);sv('b-hora',e.hora);sv('b-min',e.minutos||'');sv('b-lugar',e.lugar);sv('b-tema',e.tema);sv('b-com',e.comentarios);sv('b-part',e.participantes);sv('b-uf',e.ufHora||'');
+  resetBitaSplitForm();
+  if(e.splitEspecial&&e.splitEspecial.length){
+    document.getElementById('b-split-on').checked=true;
+    document.getElementById('b-split-rows').style.display='block';
+    e.splitEspecial.slice(0,3).forEach((s,i)=>{sv('b-split-n'+(i+1),s.nombre);sv('b-split-p'+(i+1),s.pct);});
+  }
+  renderBitacora();
+  document.getElementById('b-fecha').focus();
+  showToast('📋 Copiada a la semana siguiente — revisa la fecha y guarda');
 }
 function cancelBitaEdit(){
   bitaEditIdx=null;
