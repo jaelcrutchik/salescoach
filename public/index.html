@@ -3370,6 +3370,44 @@ function exportResumenHoras(onlyClient){
   window.print();
   setTimeout(()=>{document.title=prevTitle;},500);
 }
+function csvEscape(v){
+  const s=(v==null?'':String(v));
+  if(/["\n;]/.test(s))return '"'+s.replace(/"/g,'""')+'"';
+  return s;
+}
+function slugFile(s){return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-+|-+$/g,'');}
+function exportResumenHorasExcel(onlyClient){
+  const d=lastResumenHoras;if(!d){showToast('No hay datos para exportar en este periodo');return;}
+  let clientEmp=null;
+  if(onlyClient){
+    const cSel=contacts.find(x=>x.id===bitaClient);
+    if(!cSel){showToast('Selecciona un cliente primero');return;}
+    clientEmp=cSel.emp;
+  }
+  let sessions=contacts.map(c=>({c,ent:bitaFiltered((c.bitacora||[]).filter(e=>(parseFloat(e.minutos)||0)>0)).sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''))}))
+    .filter(r=>r.ent.length).sort((a,b)=>a.c.emp.localeCompare(b.c.emp));
+  if(clientEmp)sessions=sessions.filter(r=>r.c.emp===clientEmp);
+  if(!sessions.length){showToast(clientEmp?'Ese cliente no tiene horas en este periodo':'No hay datos para exportar en este periodo');return;}
+  const headers=(clientEmp?[]:['Cliente']).concat(['Fecha','Hora','Reunión','Comentarios','Participantes','Lugar','Horas','Realizada']);
+  const rows=[headers];
+  let totalHoras=0;
+  sessions.forEach(r=>r.ent.forEach(e=>{
+    const horas=e.minutos?+(e.minutos/60).toFixed(2):'';
+    if(horas)totalHoras+=horas;
+    const row=(clientEmp?[]:[r.c.emp]).concat([e.fecha||'',e.hora||'',e.tema||'',e.comentarios||'',e.participantes||'',e.lugar||'',horas,e.realizado?'Sí':'No']);
+    rows.push(row);
+  }));
+  rows.push((clientEmp?['Total']:['','Total']).concat(['','','','','',totalHoras.toFixed(2),'']));
+  const csv='﻿'+rows.map(r=>r.map(csvEscape).join(';')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='Rave-Crutchik-horas'+(clientEmp?'-'+slugFile(clientEmp):'')+'-'+slugFile(d.periodo)+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  showToast('✅ Excel descargado');
+}
 function renderResumenHoras(){
   const box=document.getElementById('bita-resumen-interno');if(!box)return;
   // Aplica los mismos filtros de mes/semana que la tabla de sesiones
@@ -3401,6 +3439,8 @@ function renderResumenHoras(){
   box.innerHTML='<div class="hrs-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap"><span>Horas por cliente · '+periodo+'</span><span style="display:flex;gap:6px;flex-wrap:wrap">'+
     '<button class="mini-btn" onclick="exportResumenHoras()" style="text-transform:none;letter-spacing:0;font-weight:600" title="PDF con las horas de todos los clientes y el detalle de reuniones del periodo (para enviar a facturar)">⬇ PDF completo</button>'+
     (bitaClientObj?'<button class="mini-btn" onclick="exportResumenHoras(true)" style="text-transform:none;letter-spacing:0;font-weight:600" title="PDF con solo los datos de '+esc(bitaClientObj.emp)+', para enviárselo directamente">⬇ PDF de '+esc(bitaClientObj.emp)+'</button>':'')+
+    '<button class="mini-btn" onclick="exportResumenHorasExcel()" style="text-transform:none;letter-spacing:0;font-weight:600" title="Excel (CSV) con el detalle de reuniones y horas de todos los clientes del periodo">⬇ Excel completo</button>'+
+    (bitaClientObj?'<button class="mini-btn" onclick="exportResumenHorasExcel(true)" style="text-transform:none;letter-spacing:0;font-weight:600" title="Excel (CSV) con solo los datos de '+esc(bitaClientObj.emp)+', para enviárselo directamente">⬇ Excel de '+esc(bitaClientObj.emp)+'</button>':'')+
     '</span></div><div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
     weeks.map(w=>'<th>'+w+'</th>').join('')+'<th class="hrs-tot">HH</th><th class="hrs-tot" title="Horas × tarifa UF/hora de la ficha del cliente">UF</th></tr></thead><tbody>'+
     rows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perW.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(r.tot)+'</td><td class="hrs-tot">'+(r.ufTot!=null?fuf(r.ufTot):'<span title="Define UF/hora en la ficha del cliente" style="color:#cbd5e1">—</span>')+'</td></tr>').join('')+
