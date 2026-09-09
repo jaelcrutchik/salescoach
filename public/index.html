@@ -378,10 +378,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .pilar-entregable-task.na .pe-badge{background:#f1f5f9;color:#cbd5e1}
 .pilar-entregable-task.na{opacity:.5}
 .pilar-actividad-task{flex-wrap:wrap}
-.pa-badge{flex-shrink:0;font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;cursor:pointer;text-transform:uppercase;letter-spacing:.2px;background:#f1f5f9;color:#64748b}
-.pilar-actividad-task.pendiente .pa-badge{background:#f1f5f9;color:#64748b}
-.pilar-actividad-task.curso .pa-badge{background:#fef3c7;color:#92400e}
-.pilar-actividad-task.hecho .pa-badge{background:#dcfce7;color:#166534}
+.pa-badge{flex-shrink:0;width:11px;height:11px;border-radius:50%;cursor:pointer;margin-top:3px;box-sizing:border-box;border:2px solid #cbd5e1;background:transparent}
+.pilar-actividad-task.pendiente .pa-badge{background:transparent;border-color:#cbd5e1}
+.pilar-actividad-task.curso .pa-badge{background:#f59e0b;border-color:#f59e0b}
+.pilar-actividad-task.hecho .pa-badge{background:#22c55e;border-color:#22c55e}
 .pilar-avance-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
 .pilar-avance-chip{font-size:11.5px;font-weight:600;color:#1e293b;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:5px 10px}
 .pilar-avance-chip.act{border-left:3px solid #2563eb}
@@ -2942,7 +2942,7 @@ function pilarChecklistHtml(cid,pilar,idx,field,row){
   pilarActividadEnsureStatus(list);
   const rows=list.map((t,ti)=>
     '<div class="pilar-task pilar-actividad-task '+(t.status||'pendiente')+(t.na?' na':'')+'">'+
-      '<span class="pa-badge" title="Click para cambiar estado" onclick="pilarActividadCycle('+cid+',\''+pilarJs+'\','+idx+','+ti+')">'+PILAR_ACTIVIDAD_LABEL[t.status||'pendiente']+'</span>'+
+      '<span class="pa-badge" title="'+PILAR_ACTIVIDAD_LABEL[t.status||'pendiente']+' — click para cambiar estado" onclick="pilarActividadCycle('+cid+',\''+pilarJs+'\','+idx+','+ti+')"></span>'+
       '<span class="pt-text" contenteditable="true" onblur="pilarTaskEditSave('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+',this.textContent)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}">'+esc(t.texto)+'</span>'+
       '<span class="pt-na" title="'+(t.na?'Marcar como aplicable':'Marcar como No aplica')+'" onclick="event.stopPropagation();pilarTaskNaToggle('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+')">'+(t.na?'N/A':'—')+'</span>'+
       '<span class="pt-del" title="Eliminar tarea" onclick="event.stopPropagation();pilarTaskDel('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+')">✕</span>'+
