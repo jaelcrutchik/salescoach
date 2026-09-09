@@ -353,7 +353,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .pilar-table{width:100%;border-collapse:collapse;font-size:12.5px}
 .pilar-table th{background:#f1f5f9;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;padding:6px 8px;text-align:left;border-bottom:1px solid var(--border)}
 .pilar-table td{padding:4px;vertical-align:top;border-bottom:1px solid #f1f5f9}
-.pilar-table textarea{width:100%;box-sizing:border-box;border:1px solid transparent;border-radius:6px;padding:5px 7px;font-family:var(--sans);font-size:12.5px;line-height:1.4;resize:vertical;background:transparent}
+.pilar-table textarea{width:100%;box-sizing:border-box;border:1px solid transparent;border-radius:6px;padding:5px 7px;font-family:var(--sans);font-size:12.5px;line-height:1.4;resize:vertical;background:transparent;overflow:hidden}
 .pilar-table textarea:hover,.pilar-table textarea:focus{border-color:var(--border);background:white}
 .pilar-checklist{display:flex;flex-direction:column;gap:2px}
 .pilar-task{display:flex;align-items:flex-start;gap:6px;border-radius:6px;padding:3px}
@@ -2983,11 +2983,11 @@ function renderPilares(){
     tableHtml=(pilarAvance?'<div style="margin-top:12px">'+pilarAvance+'</div>':'')+
       '<div class="table-wrap" style="padding:0.9rem;margin-top:8px"><table class="pilar-table"><thead><tr><th style="width:90px">Semana</th><th style="width:120px">Foco</th><th>Actividades</th><th>Entregable</th><th style="width:130px">Responsable</th><th style="width:24px"></th></tr></thead><tbody>'+
       rows.map((r,idx)=>'<tr>'+
-        '<td><textarea rows="2" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'semana\',this.value)">'+esc(r.semana||'')+'</textarea></td>'+
-        '<td><textarea rows="3" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'foco\',this.value)">'+esc(r.foco||'')+'</textarea></td>'+
+        '<td><textarea rows="2" oninput="pilarAutoGrow(this)" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'semana\',this.value)">'+esc(r.semana||'')+'</textarea></td>'+
+        '<td><textarea rows="3" oninput="pilarAutoGrow(this)" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'foco\',this.value)">'+esc(r.foco||'')+'</textarea></td>'+
         '<td>'+pilarChecklistHtml(c.id,pilarActivo,idx,'actividades',r)+'</td>'+
         '<td>'+pilarChecklistHtml(c.id,pilarActivo,idx,'entregable',r)+'</td>'+
-        '<td><textarea rows="3" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'responsable\',this.value)">'+esc(r.responsable||'')+'</textarea></td>'+
+        '<td><textarea rows="3" oninput="pilarAutoGrow(this)" onchange="setPilarCell('+c.id+',\''+esc(pilarActivo)+'\','+idx+',\'responsable\',this.value)">'+esc(r.responsable||'')+'</textarea></td>'+
         '<td style="text-align:center;vertical-align:top;padding-top:10px"><span style="cursor:pointer;color:#cbd5e1" onclick="delPilarSemana('+c.id+',\''+esc(pilarActivo)+'\','+idx+')" title="Eliminar fila">✕</span></td>'+
         '</tr>').join('')+
       '</tbody></table></div>'+
@@ -2996,8 +2996,10 @@ function renderPilares(){
   box.innerHTML='<div class="tips-box"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong style="font-size:12px;color:#64748b">Pilares de '+esc(c.emp)+':</strong>'+chips+addForm+medirPorSelect+'</div>'+
     (names.length===0?'<div style="color:#94a3b8;font-size:13px;margin-top:8px">Este cliente todavía no tiene ningún pilar. Crea el primero arriba.</div>':resumenAvance)+
     '</div>'+tableHtml;
+  box.querySelectorAll('.pilar-table textarea').forEach(pilarAutoGrow);
   });
 }
+function pilarAutoGrow(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}
 // ---- Voz y experiencia del cliente: frente independiente (no depende de metodología), instancia única por cliente ----
 const VOC_ACTIVITIES=[
   {id:1,a:'Definir objetivo y alcance',pr:[]},
