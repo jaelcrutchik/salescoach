@@ -377,6 +377,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .pilar-entregable-task.validado .pe-badge{background:#dcfce7;color:#166534}
 .pilar-entregable-task.na .pe-badge{background:#f1f5f9;color:#cbd5e1}
 .pilar-entregable-task.na{opacity:.5}
+.pilar-actividad-task{flex-wrap:wrap}
+.pa-badge{flex-shrink:0;font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;cursor:pointer;text-transform:uppercase;letter-spacing:.2px;background:#f1f5f9;color:#64748b}
+.pilar-actividad-task.pendiente .pa-badge{background:#f1f5f9;color:#64748b}
+.pilar-actividad-task.curso .pa-badge{background:#fef3c7;color:#92400e}
+.pilar-actividad-task.hecho .pa-badge{background:#dcfce7;color:#166534}
 .pilar-avance-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
 .pilar-avance-chip{font-size:11.5px;font-weight:600;color:#1e293b;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:5px 10px}
 .pilar-avance-chip.act{border-left:3px solid #2563eb}
@@ -2811,14 +2816,6 @@ function pilarTaskAdd(cid,pilar,idx,field,texto){
   pilarTaskList(row,field).push({texto,done:false});
   persist();renderPilares();
 }
-function pilarTaskToggle(cid,pilar,idx,field,ti){
-  const c=contacts.find(x=>x.id===cid);if(!c)return;
-  const pilares=pilarEnsure(c);
-  const row=pilares[pilar]&&pilares[pilar][idx];if(!row)return;
-  const list=pilarTaskList(row,field);if(!list[ti])return;
-  list[ti].done=!list[ti].done;
-  persist();renderPilares();
-}
 function pilarTaskEditSave(cid,pilar,idx,field,ti,value){
   const c=contacts.find(x=>x.id===cid);if(!c)return;
   const pilares=pilarEnsure(c);
@@ -2836,7 +2833,24 @@ function pilarTaskDel(cid,pilar,idx,field,ti){
   pilarTaskList(row,field).splice(ti,1);
   persist();renderPilares();
 }
-// ---- Avance en Plan por Pilares: por actividades (checklist done/na) y por entregables (estado de 5 valores) ----
+// ---- Avance en Plan por Pilares: por actividades (estado de 3 valores) y por entregables (estado de 5 valores) ----
+const PILAR_ACTIVIDAD_LABEL={pendiente:'Pendiente',curso:'En curso',hecho:'Hecho'};
+const PILAR_ACTIVIDAD_SEQ=['pendiente','curso','hecho'];
+function pilarActividadEnsureStatus(list){
+  list.forEach(t=>{if(t.status==null)t.status=t.done?'hecho':'pendiente';});
+  return list;
+}
+function pilarActividadCycle(cid,pilar,idx,ti){
+  const c=contacts.find(x=>x.id===cid);if(!c)return;
+  const pilares=pilarEnsure(c);
+  const row=pilares[pilar]&&pilares[pilar][idx];if(!row)return;
+  const list=pilarActividadEnsureStatus(pilarTaskList(row,'actividades'));
+  const t=list[ti];if(!t)return;
+  const i=PILAR_ACTIVIDAD_SEQ.indexOf(t.status||'pendiente');
+  t.status=PILAR_ACTIVIDAD_SEQ[(i+1)%PILAR_ACTIVIDAD_SEQ.length];
+  t.done=(t.status==='hecho');
+  persist();renderPilares();
+}
 const PILAR_ENTREGABLE_LABEL={pendiente:'Pendiente',curso:'En curso',entregado:'Entregado',validado:'Validado',na:'No aplica'};
 const PILAR_ENTREGABLE_SEQ=['pendiente','curso','entregado','validado','na'];
 function pilarEntregableEnsureStatus(list){
@@ -2864,14 +2878,16 @@ function pilarTaskNaToggle(cid,pilar,idx,field,ti){
   persist();renderPilares();
 }
 function pilarAvanceActividadesDe(rows){
-  let total=0,done=0;
+  let total=0,done=0,curso=0;
   (rows||[]).forEach(row=>{
-    pilarTaskList(row,'actividades').forEach(t=>{
+    pilarActividadEnsureStatus(pilarTaskList(row,'actividades')).forEach(t=>{
       if(t.na)return;
-      total++;if(t.done)done++;
+      total++;
+      if(t.status==='hecho')done++;
+      else if(t.status==='curso')curso++;
     });
   });
-  return {done,total,pct:total?Math.round(done/total*100):0};
+  return {done,total,curso,pct:total?Math.round(done/total*100):0};
 }
 function pilarAvanceEntregablesDe(rows){
   let total=0,validado=0,curso=0,entregado=0;
@@ -2899,7 +2915,7 @@ function pilarAvanceHtml(rows,medirPor){
   const parts=[];
   if(medirPor==='actividades'||medirPor==='ambos'){
     const a=pilarAvanceActividadesDe(rows);
-    parts.push('<span class="pilar-avance-chip act">Actividades: '+a.done+'/'+a.total+' completadas · '+a.pct+'%</span>');
+    parts.push('<span class="pilar-avance-chip act">Actividades: '+a.done+'/'+a.total+' completadas · '+a.pct+'%'+(a.curso?' <span class="pilar-avance-sub">('+a.curso+' en curso)</span>':'')+'</span>');
   }
   if(medirPor==='entregables'||medirPor==='ambos'){
     const e=pilarAvanceEntregablesDe(rows);
@@ -2923,9 +2939,10 @@ function pilarChecklistHtml(cid,pilar,idx,field,row){
       '<div class="pilar-task-add"><span class="pt-text pt-new" contenteditable="true" data-placeholder="+ agregar entregable" onblur="pilarTaskAdd('+cid+',\''+pilarJs+'\','+idx+',\'entregable\',this.textContent);this.textContent=\'\';" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}"></span></div>'+
     '</div>';
   }
+  pilarActividadEnsureStatus(list);
   const rows=list.map((t,ti)=>
-    '<div class="pilar-task'+(t.done?' done':'')+(t.na?' na':'')+'">'+
-      '<input type="checkbox" class="pt-chk"'+(t.done?' checked':'')+(t.na?' disabled':'')+' onchange="pilarTaskToggle('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+')">'+
+    '<div class="pilar-task pilar-actividad-task '+(t.status||'pendiente')+(t.na?' na':'')+'">'+
+      '<span class="pa-badge" title="Click para cambiar estado" onclick="pilarActividadCycle('+cid+',\''+pilarJs+'\','+idx+','+ti+')">'+PILAR_ACTIVIDAD_LABEL[t.status||'pendiente']+'</span>'+
       '<span class="pt-text" contenteditable="true" onblur="pilarTaskEditSave('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+',this.textContent)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}">'+esc(t.texto)+'</span>'+
       '<span class="pt-na" title="'+(t.na?'Marcar como aplicable':'Marcar como No aplica')+'" onclick="event.stopPropagation();pilarTaskNaToggle('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+')">'+(t.na?'N/A':'—')+'</span>'+
       '<span class="pt-del" title="Eliminar tarea" onclick="event.stopPropagation();pilarTaskDel('+cid+',\''+pilarJs+'\','+idx+',\''+field+'\','+ti+')">✕</span>'+
