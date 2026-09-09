@@ -370,12 +370,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .pilar-task .pt-na{font-size:9px;font-weight:700;color:#cbd5e1;cursor:pointer;flex-shrink:0;margin-top:3px;padding:1px 4px;border-radius:4px}
 .pilar-task .pt-na:hover{color:#64748b;background:#f1f5f9}
 .pilar-entregable-task{flex-wrap:wrap}
-.pe-badge{flex-shrink:0;font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;cursor:pointer;text-transform:uppercase;letter-spacing:.2px;background:#f1f5f9;color:#64748b}
-.pilar-entregable-task.pendiente .pe-badge{background:#f1f5f9;color:#64748b}
-.pilar-entregable-task.curso .pe-badge{background:#fef3c7;color:#92400e}
-.pilar-entregable-task.entregado .pe-badge{background:#dbeafe;color:#1e40af}
-.pilar-entregable-task.validado .pe-badge{background:#dcfce7;color:#166534}
-.pilar-entregable-task.na .pe-badge{background:#f1f5f9;color:#cbd5e1}
+.pe-badge{flex-shrink:0;width:11px;height:11px;border-radius:50%;cursor:pointer;margin-top:3px;box-sizing:border-box;border:2px solid #cbd5e1;background:transparent}
+.pilar-entregable-task.pendiente .pe-badge{background:transparent;border-color:#cbd5e1}
+.pilar-entregable-task.curso .pe-badge{background:#f59e0b;border-color:#f59e0b}
+.pilar-entregable-task.entregado .pe-badge{background:#3b82f6;border-color:#3b82f6}
+.pilar-entregable-task.validado .pe-badge{background:#22c55e;border-color:#22c55e}
+.pilar-entregable-task.na .pe-badge{background:transparent;border-color:#e2e8f0}
 .pilar-entregable-task.na{opacity:.5}
 .pilar-actividad-task{flex-wrap:wrap}
 .pa-badge{flex-shrink:0;width:11px;height:11px;border-radius:50%;cursor:pointer;margin-top:3px;box-sizing:border-box;border:2px solid #cbd5e1;background:transparent}
@@ -2930,7 +2930,7 @@ function pilarChecklistHtml(cid,pilar,idx,field,row){
     pilarEntregableEnsureStatus(list);
     const rows=list.map((t,ti)=>
       '<div class="pilar-task pilar-entregable-task '+(t.status||'pendiente')+'">'+
-        '<span class="pe-badge" title="Click para cambiar estado" onclick="pilarEntregableCycle('+cid+',\''+pilarJs+'\','+idx+','+ti+')">'+PILAR_ENTREGABLE_LABEL[t.status||'pendiente']+'</span>'+
+        '<span class="pe-badge" title="'+PILAR_ENTREGABLE_LABEL[t.status||'pendiente']+' — click para cambiar estado" onclick="pilarEntregableCycle('+cid+',\''+pilarJs+'\','+idx+','+ti+')"></span>'+
         '<span class="pt-text" contenteditable="true" onblur="pilarTaskEditSave('+cid+',\''+pilarJs+'\','+idx+',\'entregable\','+ti+',this.textContent)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}">'+esc(t.texto)+'</span>'+
         '<span class="pt-del" title="Eliminar" onclick="event.stopPropagation();pilarTaskDel('+cid+',\''+pilarJs+'\','+idx+',\'entregable\','+ti+')">✕</span>'+
       '</div>'
