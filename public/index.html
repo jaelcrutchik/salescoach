@@ -807,6 +807,60 @@ function initPilarSeedVictoria(){
   ];
   return true;
 }
+let pilarSeedMyScrubs=false;
+function initPilarSeedMyScrubs(){
+  if(pilarSeedMyScrubs)return false;
+  const c=contacts.find(x=>/my scrubs/i.test(x.emp||''));
+  if(!c)return false;
+  pilarSeedMyScrubs=true;
+  c.metodologia='pilares';
+  c.leanActive=false;
+  if(!c.pilares)c.pilares={};
+  if(c.pilares['BODEGA']||c.pilares['TIENDAS']||c.pilares['S&OP'])return true;
+  const fila=(actividadesList)=>({semana:'Alcance',foco:'',responsable:'',entregable:'',actividades:actividadesList.map(texto=>({texto,done:false}))});
+  c.pilares['BODEGA']=[fila([
+    'Definición de KPIs operacionales',
+    'KPIs de seguridad; charla 5 min diaria',
+    'Revisión de layout de bodega',
+    'Estandarización proceso preparación de pedidos',
+    'Planilla seguimiento pedido end to end',
+    'Implementación EPP + Seguridad',
+    'ABC de almacenamiento de stock',
+    'Separar racks y apernar al suelo',
+    'Revisar stock sin rotación en casilleros',
+    'Calcular capacidad de almacenaje',
+    'Sistema de picking más eficiente',
+    'Correo exclusivo para pedidos',
+    'Definición de responsabilidades',
+    'Procedimiento revisión stock importado'
+  ])];
+  c.pilares['TIENDAS']=[fila([
+    'Dashboard de gestión de tienda',
+    'Botón "ver stock en tienda" en la web',
+    'Separar sistema bodega y tiendas',
+    'Revisar flujo abastecimiento Flapp',
+    'Estandarización de tiendas (luces, olor, etiquetas)',
+    'Checklist apertura y cierre de tienda',
+    'KPI condición de tienda: probadores, estantes, ventas, entre otros',
+    'Checklist orden y limpieza: limpieza/baño, apertura sistema, letrero, luces, reposición stock, música, uniforme, presentación personal (pelo, piercing, tatuajes), extintores',
+    'Capacitación 360°; presentación empresa; vendedoras que ingresen vengan a la oficina, bodega, aprendan del resto de las áreas y que hacen – los primeros 5 días al ingresar + capacitación de producto, estrategias de venta, de mercado; definir champion'
+  ])];
+  c.pilares['S&OP']=[fila([
+    'Definición de proceso S&OP: continuar con análisis venta → para llegar a forecast mensual por sku → pasar a la forma de comprar',
+    'Forecast por canal (tienda, ecommerce) y categoría',
+    'Análisis DOH por SKU y proveedor',
+    'Lead times y variabilidad de proveedores',
+    'Confiabilidad de proveedor',
+    'MOQ y estructura de costos',
+    'Planificación Black Sales / temporadas',
+    'KPIs: inbound/outbound, % merma, % dif. inventario',
+    'Reposición SKU top por tienda / rotación / tasa utilización',
+    'Planificación despachos CD ecommerce',
+    'Reflejar estrategia de crecimiento en fcst – promociones, aumento de share, empujes, descuentos',
+    'HC (headcount) y capacidad CD'
+  ])];
+  return true;
+}
 let migMetodologia=false;
 function initMigMetodologia(){
   if(migMetodologia)return false;
@@ -846,7 +900,7 @@ function initMigRenameId31(){
 }
 const STORE_KEY='ryc_salescoach_v2';
 function persist(){
-  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,migStages2026,pilarSeedVictoria,migMetodologia,migRemovePresale,migRenameId31,ufValorClp,ufPorMes,updatedAt:new Date().toISOString()});
+  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,migStages2026,pilarSeedVictoria,pilarSeedMyScrubs,migMetodologia,migRemovePresale,migRenameId31,ufValorClp,ufPorMes,updatedAt:new Date().toISOString()});
   try{localStorage.setItem(STORE_KEY,payload);}
   catch(e){console.error('storage error',e);showToast('⚠️ No se pudo guardar — exporta un respaldo');}
 }
@@ -861,12 +915,12 @@ function loadData(){
   try{const p=localStorage.getItem(STORE_KEY);if(p)d=JSON.parse(p);}catch(e){console.error('load error',e);}
   if(d){
     contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;
-    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;migStages2026=!!d.migStages2026;pilarSeedVictoria=!!d.pilarSeedVictoria;migMetodologia=!!d.migMetodologia;migRemovePresale=!!d.migRemovePresale;migRenameId31=!!d.migRenameId31;ufValorClp=parseFloat(d.ufValorClp)||40820.31;ufPorMes=d.ufPorMes&&typeof d.ufPorMes==='object'?d.ufPorMes:{};
+    ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;migStages2026=!!d.migStages2026;pilarSeedVictoria=!!d.pilarSeedVictoria;pilarSeedMyScrubs=!!d.pilarSeedMyScrubs;migMetodologia=!!d.migMetodologia;migRemovePresale=!!d.migRemovePresale;migRenameId31=!!d.migRenameId31;ufValorClp=parseFloat(d.ufValorClp)||40820.31;ufPorMes=d.ufPorMes&&typeof d.ufPorMes==='object'?d.ufPorMes:{};
   }else{
     contacts=SEED.map(normalize);nextId=60;
   }
   loaded=true;
-  const cambios=[initOwners(),initRafa(),initFix(),initBita(),initRestore0702(),initRestoreB(),initMigStages2026(),initPilarSeedVictoria(),initMigMetodologia(),initMigRemovePresale(),initMigRenameId31()].filter(Boolean).length;
+  const cambios=[initOwners(),initRafa(),initFix(),initBita(),initRestore0702(),initRestoreB(),initMigStages2026(),initPilarSeedVictoria(),initPilarSeedMyScrubs(),initMigMetodologia(),initMigRemovePresale(),initMigRenameId31()].filter(Boolean).length;
   if(cambios||!d){persist();if(fixJustRan||cambios)showToast('✅ Pipeline actualizado');}
 }
 
