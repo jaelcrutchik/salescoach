@@ -3527,6 +3527,8 @@ function renderResumenHoras(){
   const rcGrand=rows.reduce((s,r)=>s+r.rc,0);
   const jaelGrand=rows.reduce((s,r)=>s+r.jael,0);
   const rafaGrand=rows.reduce((s,r)=>s+r.rafa,0);
+  let sinEspecMin=0;
+  conBita.forEach(r=>r.ent.forEach(e=>{if(!bitaPersonaCategoria(e.participantes))sinEspecMin+=parseFloat(e.minutos)||0;}));
   lastResumenHoras={periodo,weeks,rows,totW,grand,ufGrand};
   const bitaClientObj=contacts.find(x=>x.id===bitaClient);
   box.innerHTML='<div class="hrs-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap"><span>Horas por cliente · '+periodo+'</span><span style="display:flex;gap:6px;flex-wrap:wrap">'+
@@ -3539,11 +3541,19 @@ function renderResumenHoras(){
     '<th class="hrs-gap"></th><th class="hrs-tot" title="Horas en reuniones marcadas R&C (Participantes) en este periodo">R&C</th><th class="hrs-tot" title="Horas en reuniones marcadas Jael (Participantes) en este periodo">Jael</th><th class="hrs-tot" title="Horas en reuniones marcadas Rafa (Participantes) en este periodo">Rafa</th>'+
     '</tr></thead><tbody>'+
     rows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perW.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(r.tot)+'</td><td class="hrs-tot">'+(r.ufTot!=null?fuf(r.ufTot):'<span title="Define UF/hora en la ficha del cliente" style="color:#cbd5e1">—</span>')+'</td>'+
-      '<td class="hrs-gap"></td><td class="hrs-tot">'+fh(r.rc)+'</td><td class="hrs-tot">'+fh(r.jael)+'</td><td class="hrs-tot">'+fh(r.rafa)+'</td></tr>').join('')+
+      '<td class="hrs-gap"></td><td class="hrs-tot'+(r.rc?'':' hrs-zero')+'">'+fh(r.rc)+'</td><td class="hrs-tot'+(r.jael?'':' hrs-zero')+'">'+fh(r.jael)+'</td><td class="hrs-tot'+(r.rafa?'':' hrs-zero')+'">'+fh(r.rafa)+'</td></tr>').join('')+
     '<tr class="hrs-total-row"><td class="hl">Total</td>'+totW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(grand)+'</td><td class="hrs-tot">'+fuf(ufGrand)+'</td>'+
     '<td class="hrs-gap"></td><td class="hrs-tot">'+fh(rcGrand)+'</td><td class="hrs-tot">'+fh(jaelGrand)+'</td><td class="hrs-tot">'+fh(rafaGrand)+'</td></tr>'+
     '</tbody></table></div>'+
-    '<div style="margin-top:6px;font-size:12px;color:#475569">Facturación estimada del periodo: <strong>'+fuf(ufGrand)+' UF</strong> <span style="color:#94a3b8;font-size:11px">(horas × UF/hora de cada ficha; clientes sin tarifa definida no suman)</span></div>';
+    '<div style="margin-top:6px;font-size:12px;color:#475569">Facturación estimada del periodo: <strong>'+fuf(ufGrand)+' UF</strong> <span style="color:#94a3b8;font-size:11px">(horas × UF/hora de cada ficha; clientes sin tarifa definida no suman)</span></div>'+
+    '<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">'+
+    '<div class="hrs-title" style="margin-bottom:6px" title="Se detecta según el campo Participantes de cada reunión: \'R&C\' = ambos, \'Jael\' = ella sola, \'Rafa\' = él solo">Horas por persona · '+periodo+'</div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<span class="pilar-avance-chip" style="border-left:3px solid #7c3aed">R&C: <strong>'+fh(rcGrand)+' h</strong></span>'+
+    '<span class="pilar-avance-chip" style="border-left:3px solid #2563eb">Jael: <strong>'+fh(jaelGrand)+' h</strong></span>'+
+    '<span class="pilar-avance-chip" style="border-left:3px solid #16a34a">Rafa: <strong>'+fh(rafaGrand)+' h</strong></span>'+
+    (sinEspecMin?'<span class="pilar-avance-chip" style="border-left:3px solid #cbd5e1;color:#94a3b8" title="Reuniones cuyo campo Participantes no menciona a Jael, Rafa ni R&C">Sin especificar: <strong>'+fh(sinEspecMin)+' h</strong></span>':'')+
+    '</div></div>';
 }
 function renderBitacora(){
   const chipsEl=document.getElementById('bita-clients');if(!chipsEl)return;
