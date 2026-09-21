@@ -3319,12 +3319,13 @@ function bitaFiltered(list){
   if(bitaSem!=='todos')e=e.filter(x=>isoWeek(x.fecha)===bitaSem);
   return e;
 }
-function bitaPersonas(participantes){
+function bitaPersonaCategoria(participantes){
   const s=(participantes||'').toLowerCase();
   const esRC=/r\s*&\s*c/.test(s)||/\br\s*y\s*c\b/.test(s);
-  const jael=esRC||/\bjael\b/.test(s);
-  const rafa=esRC||/\brafa\b/.test(s);
-  return {jael,rafa};
+  if(esRC)return 'rc';
+  if(/\bjael\b/.test(s))return 'jael';
+  if(/\brafa\b/.test(s))return 'rafa';
+  return null;
 }
 function partnerSplit(c,clp){
   const com=parseFloat(c.com)||0;
@@ -3516,17 +3517,19 @@ function renderResumenHoras(){
   const ufGrand=rows.reduce((s,r)=>s+(r.ufTot||0),0);
   lastResumenHoras={periodo,weeks,rows,totW,grand,ufGrand};
   const bitaClientObj=contacts.find(x=>x.id===bitaClient);
-  let jaelMin=0,rafaMin=0,sinEspecMin=0;
+  let rcMin=0,jaelMin=0,rafaMin=0,sinEspecMin=0;
   conBita.forEach(r=>r.ent.forEach(e=>{
     const mins=parseFloat(e.minutos)||0;
-    const p=bitaPersonas(e.participantes);
-    if(p.jael)jaelMin+=mins;
-    if(p.rafa)rafaMin+=mins;
-    if(!p.jael&&!p.rafa)sinEspecMin+=mins;
+    const cat=bitaPersonaCategoria(e.participantes);
+    if(cat==='rc')rcMin+=mins;
+    else if(cat==='jael')jaelMin+=mins;
+    else if(cat==='rafa')rafaMin+=mins;
+    else sinEspecMin+=mins;
   }));
   const personaHtml='<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">'+
-    '<div class="hrs-title" style="margin-bottom:6px" title="Se detecta según el campo Participantes de cada reunión: \'Jael\' = ella, \'Rafa\' = él, \'R&C\' = ambos">Horas por persona · '+periodo+'</div>'+
+    '<div class="hrs-title" style="margin-bottom:6px" title="Se detecta según el campo Participantes de cada reunión: \'R&C\' = ambos, \'Jael\' = ella sola, \'Rafa\' = él solo">Horas por persona · '+periodo+'</div>'+
     '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<span class="pilar-avance-chip" style="border-left:3px solid #7c3aed">R&C: <strong>'+fh(rcMin)+' h</strong></span>'+
     '<span class="pilar-avance-chip" style="border-left:3px solid #2563eb">Jael: <strong>'+fh(jaelMin)+' h</strong></span>'+
     '<span class="pilar-avance-chip" style="border-left:3px solid #16a34a">Rafa: <strong>'+fh(rafaMin)+' h</strong></span>'+
     (sinEspecMin?'<span class="pilar-avance-chip" style="border-left:3px solid #cbd5e1;color:#94a3b8" title="Reuniones cuyo campo Participantes no menciona a Jael, Rafa ni R&C">Sin especificar: <strong>'+fh(sinEspecMin)+' h</strong></span>':'')+
