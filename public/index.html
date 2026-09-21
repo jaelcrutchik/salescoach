@@ -906,7 +906,7 @@ function initMigRenameId31(){
 }
 const STORE_KEY='ryc_salescoach_v2';
 function persist(){
-  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,migStages2026,pilarSeedVictoria,pilarSeedMyScrubs,migMetodologia,migRemovePresale,migRenameId31,ufValorClp,ufPorMes,updatedAt:new Date().toISOString()});
+  const payload=JSON.stringify({contacts,nextId,ownersInit,rafaInit,fixInit,bitaInit,restore0702,restoreB,migStages2026,pilarSeedVictoria,pilarSeedMyScrubs,migMetodologia,migRemovePresale,migRenameId31,ufValorClp,ufPorMes,bitaClient,bitaMes,bitaSem,updatedAt:new Date().toISOString()});
   try{localStorage.setItem(STORE_KEY,payload);}
   catch(e){console.error('storage error',e);showToast('⚠️ No se pudo guardar — exporta un respaldo');}
 }
@@ -922,6 +922,9 @@ function loadData(){
   if(d){
     contacts=(d.contacts||[]).map(normalize);nextId=d.nextId||60;
     ownersInit=!!d.ownersInit;rafaInit=!!d.rafaInit;fixInit=!!d.fixInit;bitaInit=!!d.bitaInit;restore0702=!!d.restore0702;restoreB=!!d.restoreB;migStages2026=!!d.migStages2026;pilarSeedVictoria=!!d.pilarSeedVictoria;pilarSeedMyScrubs=!!d.pilarSeedMyScrubs;migMetodologia=!!d.migMetodologia;migRemovePresale=!!d.migRemovePresale;migRenameId31=!!d.migRenameId31;ufValorClp=parseFloat(d.ufValorClp)||40820.31;ufPorMes=d.ufPorMes&&typeof d.ufPorMes==='object'?d.ufPorMes:{};
+    if(d.bitaClient!=null)bitaClient=d.bitaClient;
+    if(d.bitaMes)bitaMes=d.bitaMes;
+    if(d.bitaSem)bitaSem=d.bitaSem;
   }else{
     contacts=SEED.map(normalize);nextId=60;
   }
@@ -3310,9 +3313,9 @@ function bitaClientList(){
     return true;
   }).sort((a,b)=>a.emp.localeCompare(b.emp));
 }
-function setBitaClient(id){bitaClient=id;bitaMes='todos';bitaSem='todos';bitaEditIdx=null;renderBitacora();}
-function setBitaMes(v){bitaMes=v;bitaSem='todos';renderBitacora();}
-function setBitaSem(v){bitaSem=v;renderBitacora();}
+function setBitaClient(id){bitaClient=id;bitaEditIdx=null;persist();renderBitacora();}
+function setBitaMes(v){bitaMes=v;bitaSem='todos';persist();renderBitacora();}
+function setBitaSem(v){bitaSem=v;persist();renderBitacora();}
 function toggleBitaTerm(){bitaShowTerm=!bitaShowTerm;renderBitacora();}
 function bitaFiltered(list){
   let e=list;
