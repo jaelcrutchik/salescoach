@@ -35,6 +35,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:10
 .hrs-zero{color:#cbd5e1}
 .hrs-tot{font-weight:700;border-left:1px solid var(--border)}
 .hrs-total-row td{font-weight:700;border-top:2px solid var(--border);border-bottom:none}
+.hrs-gap{border:none!important;padding:0 14px!important}
 .soc-fixed{table-layout:fixed}
 .soc-fixed .hl{width:130px}
 .soc-mcol{width:100px}
@@ -3509,43 +3510,40 @@ function renderResumenHoras(){
     const uf=parseFloat(r.c.uf)||0;
     const anyRate=uf>0||r.ent.some(e=>(parseFloat(e.ufHora)||0)>0);
     const ufTot=anyRate?r.ent.reduce((s,e)=>s+(parseFloat(e.minutos)||0)/60*entryUf(e,uf),0):null;
-    return {emp:r.c.emp,perW,tot,ufTot};
+    let rc=0,jael=0,rafa=0;
+    r.ent.forEach(e=>{
+      const mins=parseFloat(e.minutos)||0;
+      const cat=bitaPersonaCategoria(e.participantes);
+      if(cat==='rc')rc+=mins;
+      else if(cat==='jael')jael+=mins;
+      else if(cat==='rafa')rafa+=mins;
+    });
+    return {emp:r.c.emp,perW,tot,ufTot,rc,jael,rafa};
   }).sort((a,b)=>a.emp.localeCompare(b.emp));
   box.style.display='block';
   const totW=weeks.map((w,i)=>rows.reduce((s,r)=>s+r.perW[i],0));
   const grand=totW.reduce((s,v)=>s+v,0);
   const ufGrand=rows.reduce((s,r)=>s+(r.ufTot||0),0);
+  const rcGrand=rows.reduce((s,r)=>s+r.rc,0);
+  const jaelGrand=rows.reduce((s,r)=>s+r.jael,0);
+  const rafaGrand=rows.reduce((s,r)=>s+r.rafa,0);
   lastResumenHoras={periodo,weeks,rows,totW,grand,ufGrand};
   const bitaClientObj=contacts.find(x=>x.id===bitaClient);
-  let rcMin=0,jaelMin=0,rafaMin=0,sinEspecMin=0;
-  conBita.forEach(r=>r.ent.forEach(e=>{
-    const mins=parseFloat(e.minutos)||0;
-    const cat=bitaPersonaCategoria(e.participantes);
-    if(cat==='rc')rcMin+=mins;
-    else if(cat==='jael')jaelMin+=mins;
-    else if(cat==='rafa')rafaMin+=mins;
-    else sinEspecMin+=mins;
-  }));
-  const personaHtml='<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">'+
-    '<div class="hrs-title" style="margin-bottom:6px" title="Se detecta según el campo Participantes de cada reunión: \'R&C\' = ambos, \'Jael\' = ella sola, \'Rafa\' = él solo">Horas por persona · '+periodo+'</div>'+
-    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
-    '<span class="pilar-avance-chip" style="border-left:3px solid #7c3aed">R&C: <strong>'+fh(rcMin)+' h</strong></span>'+
-    '<span class="pilar-avance-chip" style="border-left:3px solid #2563eb">Jael: <strong>'+fh(jaelMin)+' h</strong></span>'+
-    '<span class="pilar-avance-chip" style="border-left:3px solid #16a34a">Rafa: <strong>'+fh(rafaMin)+' h</strong></span>'+
-    (sinEspecMin?'<span class="pilar-avance-chip" style="border-left:3px solid #cbd5e1;color:#94a3b8" title="Reuniones cuyo campo Participantes no menciona a Jael, Rafa ni R&C">Sin especificar: <strong>'+fh(sinEspecMin)+' h</strong></span>':'')+
-    '</div></div>';
   box.innerHTML='<div class="hrs-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap"><span>Horas por cliente · '+periodo+'</span><span style="display:flex;gap:6px;flex-wrap:wrap">'+
     '<button class="mini-btn" onclick="exportResumenHoras()" style="text-transform:none;letter-spacing:0;font-weight:600" title="PDF con las horas de todos los clientes y el detalle de reuniones del periodo (para enviar a facturar)">⬇ PDF completo</button>'+
     (bitaClientObj?'<button class="mini-btn" onclick="exportResumenHoras(true)" style="text-transform:none;letter-spacing:0;font-weight:600" title="PDF con solo los datos de '+esc(bitaClientObj.emp)+', para enviárselo directamente">⬇ PDF de '+esc(bitaClientObj.emp)+'</button>':'')+
     '<button class="mini-btn" onclick="exportResumenHorasExcel()" style="text-transform:none;letter-spacing:0;font-weight:600" title="Excel (CSV) con el detalle de reuniones y horas de todos los clientes del periodo">⬇ Excel completo</button>'+
     (bitaClientObj?'<button class="mini-btn" onclick="exportResumenHorasExcel(true)" style="text-transform:none;letter-spacing:0;font-weight:600" title="Excel (CSV) con solo los datos de '+esc(bitaClientObj.emp)+', para enviárselo directamente">⬇ Excel de '+esc(bitaClientObj.emp)+'</button>':'')+
     '</span></div><div style="overflow-x:auto"><table class="hrs-table"><thead><tr><th class="hl">Cliente</th>'+
-    weeks.map(w=>'<th>'+w+'</th>').join('')+'<th class="hrs-tot">HH</th><th class="hrs-tot" title="Horas × tarifa UF/hora de la ficha del cliente">UF</th></tr></thead><tbody>'+
-    rows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perW.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(r.tot)+'</td><td class="hrs-tot">'+(r.ufTot!=null?fuf(r.ufTot):'<span title="Define UF/hora en la ficha del cliente" style="color:#cbd5e1">—</span>')+'</td></tr>').join('')+
-    '<tr class="hrs-total-row"><td class="hl">Total</td>'+totW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(grand)+'</td><td class="hrs-tot">'+fuf(ufGrand)+'</td></tr>'+
+    weeks.map(w=>'<th>'+w+'</th>').join('')+'<th class="hrs-tot">HH</th><th class="hrs-tot" title="Horas × tarifa UF/hora de la ficha del cliente">UF</th>'+
+    '<th class="hrs-gap"></th><th class="hrs-tot" title="Horas en reuniones marcadas R&C (Participantes) en este periodo">R&C</th><th class="hrs-tot" title="Horas en reuniones marcadas Jael (Participantes) en este periodo">Jael</th><th class="hrs-tot" title="Horas en reuniones marcadas Rafa (Participantes) en este periodo">Rafa</th>'+
+    '</tr></thead><tbody>'+
+    rows.map(r=>'<tr><td class="hl" style="font-weight:600">'+esc(r.emp)+'</td>'+r.perW.map(v=>'<td'+(v?'':' class="hrs-zero"')+'>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(r.tot)+'</td><td class="hrs-tot">'+(r.ufTot!=null?fuf(r.ufTot):'<span title="Define UF/hora en la ficha del cliente" style="color:#cbd5e1">—</span>')+'</td>'+
+      '<td class="hrs-gap"></td><td class="hrs-tot">'+fh(r.rc)+'</td><td class="hrs-tot">'+fh(r.jael)+'</td><td class="hrs-tot">'+fh(r.rafa)+'</td></tr>').join('')+
+    '<tr class="hrs-total-row"><td class="hl">Total</td>'+totW.map(v=>'<td>'+fh(v)+'</td>').join('')+'<td class="hrs-tot">'+fh(grand)+'</td><td class="hrs-tot">'+fuf(ufGrand)+'</td>'+
+    '<td class="hrs-gap"></td><td class="hrs-tot">'+fh(rcGrand)+'</td><td class="hrs-tot">'+fh(jaelGrand)+'</td><td class="hrs-tot">'+fh(rafaGrand)+'</td></tr>'+
     '</tbody></table></div>'+
-    '<div style="margin-top:6px;font-size:12px;color:#475569">Facturación estimada del periodo: <strong>'+fuf(ufGrand)+' UF</strong> <span style="color:#94a3b8;font-size:11px">(horas × UF/hora de cada ficha; clientes sin tarifa definida no suman)</span></div>'+
-    personaHtml;
+    '<div style="margin-top:6px;font-size:12px;color:#475569">Facturación estimada del periodo: <strong>'+fuf(ufGrand)+' UF</strong> <span style="color:#94a3b8;font-size:11px">(horas × UF/hora de cada ficha; clientes sin tarifa definida no suman)</span></div>';
 }
 function renderBitacora(){
   const chipsEl=document.getElementById('bita-clients');if(!chipsEl)return;
